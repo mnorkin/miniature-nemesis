@@ -14,6 +14,10 @@ Documentation and implementation of target price project
 
   > Documentation in pdf format
 
+* Django/prototype/database
+
+  > Graphical representation of database in pdf format
+
 ### Implementation
 
 * Django/prototype/prototype
