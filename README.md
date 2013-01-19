@@ -1,4 +1,4 @@
-miniature-nemesis
+Target price project
 =================
 
-Target Price Project
+Documentation and implementation of target price project
