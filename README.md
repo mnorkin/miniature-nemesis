@@ -1,20 +1,21 @@
-Target price project
-=================
+# Target price project
 
 Documentation and implementation of target price project
 
-* Django
+## Front-end
 
-> The implementation and documentation for the front-end of the project
+### Documentation
 
 * Django/prototype/html
 
-> Documentation in html format
+  > Documentation in html format
 
 * Django/prototype/pdf
 
-> Documentation in pdf format
+  > Documentation in pdf format
+
+### Implementation
 
 * Django/prototype/prototype
 
-> Implementation of front end
+  > Implementation of front end
