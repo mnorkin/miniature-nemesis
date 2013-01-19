@@ -1,0 +1,24 @@
+<h1><a href="/prototype/">Index page</a></h1>
+
+<div class="latest_target_prices">
+
+	{% if latest_target_prices %}
+		<ul>
+			{% for target in latest_target_prices  %}
+				<li><a href="/prototype/analytic/{{ target.analytic.slug }}">{{ target.analytic }}</a> - {{ target.price }} - <a href="/prototype/ticket/{{ target.ticket.slug }}">{{ target.ticket }}</a></li>
+
+				{% if target.fap %}
+					<ul>
+						{% for feature in target.fap %}
+							<li>{{ feature.feature.name }} -- {{ feature.value }} {{ feature.feature.unit.name}}</li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+
+			{% endfor %}
+		</ul>
+	{% else %}
+		<p>Error</p>
+	{% endif %}
+
+</div>

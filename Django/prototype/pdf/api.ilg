@@ -1,0 +1,28 @@
+This is makeindex, version 2.15 [TeX Live 2012] (kpathsea + Thai support).
+Scanning input file api.idx....
+!! Input index error (file = api.idx, line = 15):
+   -- Extra `!' at position 94 of first argument.
+
+!! Input index error (file = api.idx, line = 18):
+   -- Extra `!' at position 97 of first argument.
+
+!! Input index error (file = api.idx, line = 21):
+   -- Extra `!' at position 98 of first argument.
+!! Input index error (file = api.idx, line = 22):
+   -- Extra `!' at position 98 of first argument.
+
+!! Input index error (file = api.idx, line = 25):
+   -- Extra `!' at position 96 of first argument.
+!! Input index error (file = api.idx, line = 26):
+   -- Extra `!' at position 96 of first argument.
+
+!! Input index error (file = api.idx, line = 29):
+   -- Extra `!' at position 111 of first argument.
+
+!! Input index error (file = api.idx, line = 36):
+   -- Extra `!' at position 98 of first argument.
+done (40 entries accepted, 8 rejected).
+Sorting entries....done (211 comparisons).
+Generating output file api.ind....done (43 lines written, 0 warnings).
+Output written in api.ind.
+Transcript written in api.ilg.

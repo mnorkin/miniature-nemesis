@@ -1,0 +1,57 @@
+<h1><a href="/prototype/">Analytic page</a></h1>
+
+{% if analytic %}
+
+<h2>General information</h2>
+<ul>
+	<li>{{ analytic.name }}</li>
+	<li>Analyzing {{ analytic.number_of_companies }} companies</li>
+	<li>{{ analytic.number_of_tp }} valid target prices</li>
+</ul>
+
+<ul>
+	<li>Valid target prices</li>
+	{# List of all valid target prices #}
+	{% if target_prices %}
+		<ul>
+			{% for target in target_prices %}
+				<li>{{ target.ticket }} on {{ target.date }} {{ target.price }}$</li>
+				{% if target.fap %}
+					<ul>
+						{% for feature in target.fap %}
+							<li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			{% endfor %}
+		</ul>
+	{% endif %}
+	<li>Analysis</li>
+	{# Graph by features #}
+
+	{# List of features #}
+	<ul>
+		<li>List of features</li>
+			{% if features %}
+				<ul>
+					{% for feature in features %}
+						<li><a href="/prototype/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a></li>
+						<li>{{ feature.description|truncatewords_html:10 }}</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+	</ul>
+
+	<li>Tickets / Companies</li>
+	{# List of tickets, which analytic works on #}
+	{% if target_prices %}
+		<ul>
+			{% for target in target_prices %}
+				<li>{{ target.ticket.long_name }}</li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+
+</ul>
+
+{% endif %}

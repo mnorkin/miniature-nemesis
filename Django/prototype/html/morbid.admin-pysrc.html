@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="ascii"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>morbid.admin</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css" />
+  <script type="text/javascript" src="epydoc.js"></script>
+</head>
+
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="morbid-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <span class="breadcrumbs">
+        <a href="morbid-module.html">Package&nbsp;morbid</a> ::
+        Module&nbsp;admin
+      </span>
+    </td>
+    <td>
+      <table cellpadding="0" cellspacing="0">
+        <!-- hide/show private -->
+        <tr><td align="right"><span class="options">[<a href="javascript:void(0);" class="privatelink"
+    onclick="toggle_private();">hide&nbsp;private</a>]</span></td></tr>
+        <tr><td align="right"><span class="options"
+            >[<a href="frames.html" target="_top">frames</a
+            >]&nbsp;|&nbsp;<a href="morbid.admin-pysrc.html"
+            target="_top">no&nbsp;frames</a>]</span></td></tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<h1 class="epydoc">Source Code for <a href="morbid.admin-module.html">Module morbid.admin</a></h1>
+<pre class="py-src">
+<a name="L1"></a><tt class="py-lineno"> 1</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt id="link-0" class="py-name" targets="Package morbid=morbid-module.html"><a title="morbid" class="py-name" href="#" onclick="return doclink('link-0', 'morbid', 'link-0');">morbid</a></tt><tt class="py-op">.</tt><tt id="link-1" class="py-name" targets="Module morbid.models=morbid.models-module.html"><a title="morbid.models" class="py-name" href="#" onclick="return doclink('link-1', 'models', 'link-1');">models</a></tt> <tt class="py-keyword">import</tt> <tt id="link-2" class="py-name" targets="Class morbid.models.Feature=morbid.models.Feature-class.html"><a title="morbid.models.Feature" class="py-name" href="#" onclick="return doclink('link-2', 'Feature', 'link-2');">Feature</a></tt><tt class="py-op">,</tt> <tt id="link-3" class="py-name" targets="Class morbid.models.Unit=morbid.models.Unit-class.html"><a title="morbid.models.Unit" class="py-name" href="#" onclick="return doclink('link-3', 'Unit', 'link-3');">Unit</a></tt><tt class="py-op">,</tt> <tt id="link-4" class="py-name" targets="Class morbid.models.Analytic=morbid.models.Analytic-class.html"><a title="morbid.models.Analytic" class="py-name" href="#" onclick="return doclink('link-4', 'Analytic', 'link-4');">Analytic</a></tt><tt class="py-op">,</tt> <tt id="link-5" class="py-name" targets="Class morbid.models.Ticket=morbid.models.Ticket-class.html"><a title="morbid.models.Ticket" class="py-name" href="#" onclick="return doclink('link-5', 'Ticket', 'link-5');">Ticket</a></tt><tt class="py-op">,</tt> <tt id="link-6" class="py-name" targets="Class morbid.models.TargetPrice=morbid.models.TargetPrice-class.html"><a title="morbid.models.TargetPrice" class="py-name" href="#" onclick="return doclink('link-6', 'TargetPrice', 'link-6');">TargetPrice</a></tt><tt class="py-op">,</tt> <tt id="link-7" class="py-name" targets="Class morbid.models.FeatureAnalyticTicket=morbid.models.FeatureAnalyticTicket-class.html"><a title="morbid.models.FeatureAnalyticTicket" class="py-name" href="#" onclick="return doclink('link-7', 'FeatureAnalyticTicket', 'link-7');">FeatureAnalyticTicket</a></tt> </tt>
+<a name="L2"></a><tt class="py-lineno"> 2</tt>  <tt class="py-line"><tt class="py-keyword">from</tt> <tt class="py-name">django</tt><tt class="py-op">.</tt><tt class="py-name">contrib</tt> <tt class="py-keyword">import</tt> <tt id="link-8" class="py-name" targets="Module morbid.admin=morbid.admin-module.html"><a title="morbid.admin" class="py-name" href="#" onclick="return doclink('link-8', 'admin', 'link-8');">admin</a></tt> </tt>
+<a name="L3"></a><tt class="py-lineno"> 3</tt>  <tt class="py-line"> </tt>
+<a name="FeatureAnalyticTicketAdmin"></a><div id="FeatureAnalyticTicketAdmin-def"><a name="L4"></a><tt class="py-lineno"> 4</tt> <a class="py-toggle" href="#" id="FeatureAnalyticTicketAdmin-toggle" onclick="return toggle('FeatureAnalyticTicketAdmin');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="morbid.admin.FeatureAnalyticTicketAdmin-class.html">FeatureAnalyticTicketAdmin</a><tt class="py-op">(</tt><tt class="py-base-class">admin</tt><tt class="py-op">.</tt><tt class="py-base-class">ModelAdmin</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FeatureAnalyticTicketAdmin-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="FeatureAnalyticTicketAdmin-expanded"><a name="L5"></a><tt class="py-lineno"> 5</tt>  <tt class="py-line">        <tt id="link-9" class="py-name" targets="Variable morbid.admin.FeatureAdmin.list_display=morbid.admin.FeatureAdmin-class.html#list_display,Variable morbid.admin.FeatureAnalyticTicketAdmin.list_display=morbid.admin.FeatureAnalyticTicketAdmin-class.html#list_display,Variable morbid.admin.TargetPriceAdmin.list_display=morbid.admin.TargetPriceAdmin-class.html#list_display,Variable morbid.admin.TicketAdmin.list_display=morbid.admin.TicketAdmin-class.html#list_display"><a title="morbid.admin.FeatureAdmin.list_display
+morbid.admin.FeatureAnalyticTicketAdmin.list_display
+morbid.admin.TargetPriceAdmin.list_display
+morbid.admin.TicketAdmin.list_display" class="py-name" href="#" onclick="return doclink('link-9', 'list_display', 'link-9');">list_display</a></tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">'analytic'</tt><tt class="py-op">,</tt> <tt class="py-string">'ticket'</tt><tt class="py-op">,</tt> <tt class="py-string">'feature'</tt><tt class="py-op">,</tt> <tt class="py-string">'value'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L6"></a><tt class="py-lineno"> 6</tt>  <tt class="py-line"> </tt>
+<a name="TargetPriceAdmin"></a><div id="TargetPriceAdmin-def"><a name="L7"></a><tt class="py-lineno"> 7</tt> <a class="py-toggle" href="#" id="TargetPriceAdmin-toggle" onclick="return toggle('TargetPriceAdmin');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="morbid.admin.TargetPriceAdmin-class.html">TargetPriceAdmin</a><tt class="py-op">(</tt><tt class="py-base-class">admin</tt><tt class="py-op">.</tt><tt class="py-base-class">ModelAdmin</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TargetPriceAdmin-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="TargetPriceAdmin-expanded"><a name="L8"></a><tt class="py-lineno"> 8</tt>  <tt class="py-line">        <tt id="link-10" class="py-name"><a title="morbid.admin.FeatureAdmin.list_display
+morbid.admin.FeatureAnalyticTicketAdmin.list_display
+morbid.admin.TargetPriceAdmin.list_display
+morbid.admin.TicketAdmin.list_display" class="py-name" href="#" onclick="return doclink('link-10', 'list_display', 'link-9');">list_display</a></tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">'analytic'</tt><tt class="py-op">,</tt> <tt class="py-string">'date'</tt><tt class="py-op">,</tt> <tt class="py-string">'price'</tt><tt class="py-op">,</tt> <tt class="py-string">'ticket'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L9"></a><tt class="py-lineno"> 9</tt>  <tt class="py-line"> </tt>
+<a name="TicketAdmin"></a><div id="TicketAdmin-def"><a name="L10"></a><tt class="py-lineno">10</tt> <a class="py-toggle" href="#" id="TicketAdmin-toggle" onclick="return toggle('TicketAdmin');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="morbid.admin.TicketAdmin-class.html">TicketAdmin</a><tt class="py-op">(</tt><tt class="py-base-class">admin</tt><tt class="py-op">.</tt><tt class="py-base-class">ModelAdmin</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="TicketAdmin-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="TicketAdmin-expanded"><a name="L11"></a><tt class="py-lineno">11</tt>  <tt class="py-line">        <tt id="link-11" class="py-name"><a title="morbid.admin.FeatureAdmin.list_display
+morbid.admin.FeatureAnalyticTicketAdmin.list_display
+morbid.admin.TargetPriceAdmin.list_display
+morbid.admin.TicketAdmin.list_display" class="py-name" href="#" onclick="return doclink('link-11', 'list_display', 'link-9');">list_display</a></tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">'name'</tt><tt class="py-op">,</tt> <tt class="py-string">'long_name'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L12"></a><tt class="py-lineno">12</tt>  <tt class="py-line"> </tt>
+<a name="FeatureAdmin"></a><div id="FeatureAdmin-def"><a name="L13"></a><tt class="py-lineno">13</tt> <a class="py-toggle" href="#" id="FeatureAdmin-toggle" onclick="return toggle('FeatureAdmin');">-</a><tt class="py-line"><tt class="py-keyword">class</tt> <a class="py-def-name" href="morbid.admin.FeatureAdmin-class.html">FeatureAdmin</a><tt class="py-op">(</tt><tt class="py-base-class">admin</tt><tt class="py-op">.</tt><tt class="py-base-class">ModelAdmin</tt><tt class="py-op">)</tt><tt class="py-op">:</tt> </tt>
+</div><div id="FeatureAdmin-collapsed" style="display:none;" pad="++" indent="++++"></div><div id="FeatureAdmin-expanded"><a name="L14"></a><tt class="py-lineno">14</tt>  <tt class="py-line">        <tt id="link-12" class="py-name"><a title="morbid.admin.FeatureAdmin.list_display
+morbid.admin.FeatureAnalyticTicketAdmin.list_display
+morbid.admin.TargetPriceAdmin.list_display
+morbid.admin.TicketAdmin.list_display" class="py-name" href="#" onclick="return doclink('link-12', 'list_display', 'link-9');">list_display</a></tt> <tt class="py-op">=</tt> <tt class="py-op">(</tt><tt class="py-string">'name'</tt><tt class="py-op">,</tt> <tt class="py-string">'unit'</tt><tt class="py-op">,</tt> <tt class="py-string">'display_in_frontpage'</tt><tt class="py-op">)</tt> </tt>
+</div><a name="L15"></a><tt class="py-lineno">15</tt>  <tt class="py-line"> </tt>
+<a name="L16"></a><tt class="py-lineno">16</tt>  <tt class="py-line"><tt id="link-13" class="py-name"><a title="morbid.admin" class="py-name" href="#" onclick="return doclink('link-13', 'admin', 'link-8');">admin</a></tt><tt class="py-op">.</tt><tt class="py-name">site</tt><tt class="py-op">.</tt><tt class="py-name">register</tt><tt class="py-op">(</tt><tt id="link-14" class="py-name"><a title="morbid.models.Unit" class="py-name" href="#" onclick="return doclink('link-14', 'Unit', 'link-3');">Unit</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L17"></a><tt class="py-lineno">17</tt>  <tt class="py-line"><tt id="link-15" class="py-name"><a title="morbid.admin" class="py-name" href="#" onclick="return doclink('link-15', 'admin', 'link-8');">admin</a></tt><tt class="py-op">.</tt><tt class="py-name">site</tt><tt class="py-op">.</tt><tt class="py-name">register</tt><tt class="py-op">(</tt><tt id="link-16" class="py-name"><a title="morbid.models.Feature" class="py-name" href="#" onclick="return doclink('link-16', 'Feature', 'link-2');">Feature</a></tt><tt class="py-op">,</tt> <tt id="link-17" class="py-name" targets="Class morbid.admin.FeatureAdmin=morbid.admin.FeatureAdmin-class.html"><a title="morbid.admin.FeatureAdmin" class="py-name" href="#" onclick="return doclink('link-17', 'FeatureAdmin', 'link-17');">FeatureAdmin</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L18"></a><tt class="py-lineno">18</tt>  <tt class="py-line"><tt id="link-18" class="py-name"><a title="morbid.admin" class="py-name" href="#" onclick="return doclink('link-18', 'admin', 'link-8');">admin</a></tt><tt class="py-op">.</tt><tt class="py-name">site</tt><tt class="py-op">.</tt><tt class="py-name">register</tt><tt class="py-op">(</tt><tt id="link-19" class="py-name"><a title="morbid.models.Analytic" class="py-name" href="#" onclick="return doclink('link-19', 'Analytic', 'link-4');">Analytic</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L19"></a><tt class="py-lineno">19</tt>  <tt class="py-line"><tt id="link-20" class="py-name"><a title="morbid.admin" class="py-name" href="#" onclick="return doclink('link-20', 'admin', 'link-8');">admin</a></tt><tt class="py-op">.</tt><tt class="py-name">site</tt><tt class="py-op">.</tt><tt class="py-name">register</tt><tt class="py-op">(</tt><tt id="link-21" class="py-name"><a title="morbid.models.Ticket" class="py-name" href="#" onclick="return doclink('link-21', 'Ticket', 'link-5');">Ticket</a></tt><tt class="py-op">,</tt> <tt id="link-22" class="py-name" targets="Class morbid.admin.TicketAdmin=morbid.admin.TicketAdmin-class.html"><a title="morbid.admin.TicketAdmin" class="py-name" href="#" onclick="return doclink('link-22', 'TicketAdmin', 'link-22');">TicketAdmin</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L20"></a><tt class="py-lineno">20</tt>  <tt class="py-line"><tt id="link-23" class="py-name"><a title="morbid.admin" class="py-name" href="#" onclick="return doclink('link-23', 'admin', 'link-8');">admin</a></tt><tt class="py-op">.</tt><tt class="py-name">site</tt><tt class="py-op">.</tt><tt class="py-name">register</tt><tt class="py-op">(</tt><tt id="link-24" class="py-name"><a title="morbid.models.TargetPrice" class="py-name" href="#" onclick="return doclink('link-24', 'TargetPrice', 'link-6');">TargetPrice</a></tt><tt class="py-op">,</tt> <tt id="link-25" class="py-name" targets="Class morbid.admin.TargetPriceAdmin=morbid.admin.TargetPriceAdmin-class.html"><a title="morbid.admin.TargetPriceAdmin" class="py-name" href="#" onclick="return doclink('link-25', 'TargetPriceAdmin', 'link-25');">TargetPriceAdmin</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L21"></a><tt class="py-lineno">21</tt>  <tt class="py-line"><tt id="link-26" class="py-name"><a title="morbid.admin" class="py-name" href="#" onclick="return doclink('link-26', 'admin', 'link-8');">admin</a></tt><tt class="py-op">.</tt><tt class="py-name">site</tt><tt class="py-op">.</tt><tt class="py-name">register</tt><tt class="py-op">(</tt><tt id="link-27" class="py-name"><a title="morbid.models.FeatureAnalyticTicket" class="py-name" href="#" onclick="return doclink('link-27', 'FeatureAnalyticTicket', 'link-7');">FeatureAnalyticTicket</a></tt><tt class="py-op">,</tt> <tt id="link-28" class="py-name" targets="Class morbid.admin.FeatureAnalyticTicketAdmin=morbid.admin.FeatureAnalyticTicketAdmin-class.html"><a title="morbid.admin.FeatureAnalyticTicketAdmin" class="py-name" href="#" onclick="return doclink('link-28', 'FeatureAnalyticTicketAdmin', 'link-28');">FeatureAnalyticTicketAdmin</a></tt><tt class="py-op">)</tt> </tt>
+<a name="L22"></a><tt class="py-lineno">22</tt>  <tt class="py-line"> </tt><script type="text/javascript">
+<!--
+expandto(location.href);
+// -->
+</script>
+</pre>
+<br />
+<!-- ==================== NAVIGATION BAR ==================== -->
+<table class="navbar" border="0" width="100%" cellpadding="0"
+       bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="middle">
+  <!-- Home link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="morbid-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Tree link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="module-tree.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Index link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="identifier-index.html">Indices</a>&nbsp;&nbsp;&nbsp;</th>
+
+  <!-- Help link -->
+      <th>&nbsp;&nbsp;&nbsp;<a
+        href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+
+      <th class="navbar" width="100%"></th>
+  </tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%%">
+  <tr>
+    <td align="left" class="footer">
+    Generated by Epydoc 3.0.1 on Sat Jan 19 19:55:57 2013
+    </td>
+    <td align="right" class="footer">
+      <a target="mainFrame" href="http://epydoc.sourceforge.net"
+        >http://epydoc.sourceforge.net</a>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+  <!--
+  // Private objects are initially displayed (because if
+  // javascript is turned off then we want them to be
+  // visible); but by default, we want to hide them.  So hide
+  // them unless we have a cookie that says to show them.
+  checkCookie();
+  // -->
+</script>
+</body>
+</html>

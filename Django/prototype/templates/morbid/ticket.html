@@ -1,0 +1,50 @@
+<h1><a href="/prototype/">Ticket page</a></h1>
+
+{% if ticket %}
+	
+<h2>General information</h2>
+<ul>
+	<li>{{ ticket.long_name }} ({{ ticket.name }})</li>
+	<li>Last stock price: {{ ticket.last_stock_price }} $</li>
+	<li>Number of banks {{ ticket.number_of_analytics }}</li>
+	<li>Number of target prices {{ ticket.number_of_tp }}</li>
+	<li>Consensus</li>
+	<ul>
+		<li>Min: {{ ticket.consensus_min }}</li>
+		<li>Avg: {{ ticket.consensus_avg }}</li>
+		<li>Max: {{ ticket.consensus_max }}</li>
+	</ul>
+</ul>
+
+<ul>
+	<li>Valid target prices</li>
+	{# List of all the target prices for this ticket #}
+		{% if target_prices %}
+		<ul>
+			{% for target in target_prices %}
+				<li>{{ target.analytic }} on {{ target.date }} -- {{ target.price }} $</li>
+				{% if target.fap %}
+					<ul>
+						{% for feature in target.fap %}
+							<li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			{% endfor %}
+		</ul>
+		{% endif %}
+	<li>Analysis</li>
+	{# Analysis of the data #}
+		<ul>
+			{% if features %}
+			<li>Features</li>
+				<ul>
+					{% for feature in features %}
+						<li><a href="/prototype/feature_by_ticket/{{ ticket.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a></li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+		</ul>
+</ul>
+
+{% endif %}

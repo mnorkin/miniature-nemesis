@@ -1,0 +1,38 @@
+\contentsline {section}{Contents}{1}{section*.1}
+\contentsline {section}{\numberline {1}Package morbid}{3}{section.1}
+\contentsline {subsection}{\numberline {1.1}Modules}{3}{subsection.1.1}
+\contentsline {section}{\numberline {2}Module morbid.admin}{4}{section.2}
+\contentsline {subsection}{\numberline {2.1}Class FeatureAnalyticTicketAdmin}{4}{subsection.2.1}
+\contentsline {subsubsection}{\numberline {2.1.1}Class Variables}{4}{subsubsection.2.1.1}
+\contentsline {subsection}{\numberline {2.2}Class TargetPriceAdmin}{4}{subsection.2.2}
+\contentsline {subsubsection}{\numberline {2.2.1}Class Variables}{4}{subsubsection.2.2.1}
+\contentsline {subsection}{\numberline {2.3}Class TicketAdmin}{4}{subsection.2.3}
+\contentsline {subsubsection}{\numberline {2.3.1}Class Variables}{4}{subsubsection.2.3.1}
+\contentsline {subsection}{\numberline {2.4}Class FeatureAdmin}{4}{subsection.2.4}
+\contentsline {subsubsection}{\numberline {2.4.1}Class Variables}{4}{subsubsection.2.4.1}
+\contentsline {section}{\numberline {3}Module morbid.models}{6}{section.3}
+\contentsline {subsection}{\numberline {3.1}Class Unit}{6}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}Methods}{6}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}Class Variables}{6}{subsubsection.3.1.2}
+\contentsline {subsection}{\numberline {3.2}Class Feature}{6}{subsection.3.2}
+\contentsline {subsubsection}{\numberline {3.2.1}Methods}{6}{subsubsection.3.2.1}
+\contentsline {subsubsection}{\numberline {3.2.2}Class Variables}{6}{subsubsection.3.2.2}
+\contentsline {subsection}{\numberline {3.3}Class Analytic}{7}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Methods}{7}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}Class Variables}{7}{subsubsection.3.3.2}
+\contentsline {subsection}{\numberline {3.4}Class Ticket}{8}{subsection.3.4}
+\contentsline {subsubsection}{\numberline {3.4.1}Methods}{8}{subsubsection.3.4.1}
+\contentsline {subsubsection}{\numberline {3.4.2}Class Variables}{8}{subsubsection.3.4.2}
+\contentsline {subsection}{\numberline {3.5}Class FeatureAnalyticTicket}{9}{subsection.3.5}
+\contentsline {subsubsection}{\numberline {3.5.1}Methods}{9}{subsubsection.3.5.1}
+\contentsline {subsubsection}{\numberline {3.5.2}Class Variables}{9}{subsubsection.3.5.2}
+\contentsline {subsection}{\numberline {3.6}Class TargetPrice}{9}{subsection.3.6}
+\contentsline {subsubsection}{\numberline {3.6.1}Class Variables}{9}{subsubsection.3.6.1}
+\contentsline {section}{\numberline {4}Module morbid.tests}{11}{section.4}
+\contentsline {subsection}{\numberline {4.1}Class SimpleTest}{11}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}Methods}{11}{subsubsection.4.1.1}
+\contentsline {section}{\numberline {5}Module morbid.urls}{12}{section.5}
+\contentsline {subsection}{\numberline {5.1}Variables}{12}{subsection.5.1}
+\contentsline {section}{\numberline {6}Module morbid.views}{13}{section.6}
+\contentsline {subsection}{\numberline {6.1}Functions}{13}{subsection.6.1}
+\contentsline {section}{Index}{15}{section*.2}
