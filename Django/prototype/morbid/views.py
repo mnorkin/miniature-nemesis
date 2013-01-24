@@ -156,7 +156,10 @@ def feature_by_ticket(self, slug, feature_id):
 		ticket_id = ticket.id
 		)
 
-	return HttpResponse(serializers.serialize('json', feature_analytic_tickets, fields=('analytic', 'value')))
+	return HttpResponse(serializers.serialize('json', 
+		feature_analytic_tickets, 
+		fields=('analytic', 'value'),
+		relations={'analytic':{'fields':('name',)}}))
 
 def feature_by_analytic(self, slug, feature_id):
 	"""
@@ -179,7 +182,10 @@ def feature_by_analytic(self, slug, feature_id):
 		analytic_id = analytic.id
 		)
 
-	return HttpResponse(serializers.serialize('json', feature_analytic_tickets, fields=('ticket', 'value')))
+	return HttpResponse(serializers.serialize('json', 
+		feature_analytic_tickets, 
+		fields=('ticket', 'value'),
+		relations={'ticket':{'fields':('name','long_name')}}))
 
 def search(self, search_me):
 	"""

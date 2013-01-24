@@ -70,6 +70,9 @@ class Analytic(models.Model):
 	"""Slug to reach the page of analytic
 	  @type: C{str}"""
 
+	def get_absolute_url(self):
+		return "/prototype/analytic/%s/" % self.slug;
+
 	def natural_key(self):
 		"""
 		Required for serialization
@@ -116,6 +119,9 @@ class Ticket(models.Model):
 	slug = models.SlugField()
 	"""The slug to reach the page
 	  @type: C{str}"""
+
+	def get_absolute_url(self):
+		return "/prototype/ticket/%s/" % self.slug;
 
 	def natural_key(self):
 		"""

@@ -5,7 +5,8 @@
 	{% if latest_target_prices %}
 		<ul>
 			{% for target in latest_target_prices  %}
-				<li><a href="/prototype/analytic/{{ target.analytic.slug }}">{{ target.analytic }}</a> - {{ target.price }} - <a href="/prototype/ticket/{{ target.ticket.slug }}">{{ target.ticket }}</a></li>
+				<li><a href="{{ target.analytic.get_absolute_url }}">{{ target.analytic }}</a> - {{ target.price }} - 
+					<a href="{{ target.ticket.get_absolute_url }}">{{ target.ticket }}</a></li>
 
 				{% if target.fap %}
 					<ul>
