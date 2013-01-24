@@ -23,3 +23,7 @@ Documentation and implementation of target price project
 * Django/prototype/prototype
 
   > Implementation of front end
+
+# Dependencies
+
+* [DjangoFullSerializers](http://code.google.com/p/wadofstuff/wiki/DjangoFullSerializers)
