@@ -24,6 +24,6 @@ Documentation and implementation of target price project
 
   > Implementation of front end
 
-# Dependencies
+### Dependencies
 
 * [DjangoFullSerializers](http://code.google.com/p/wadofstuff/wiki/DjangoFullSerializers)
