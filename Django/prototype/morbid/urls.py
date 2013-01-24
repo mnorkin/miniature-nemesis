@@ -7,4 +7,5 @@ urlpatterns = patterns('morbid.views',
 
 	url(r'^feature_by_ticket/(?P<slug>\w+)/(?P<feature_id>\d+)/$', 'feature_by_ticket'), # JSON only
 	url(r'^feature_by_analytic/(?P<slug>\w+)/(?P<feature_id>\d+)/$', 'feature_by_analytic'), # JSON only
+	url(r'^search/(?P<search_me>\w+)/$', 'search'), # JSON only
 )

@@ -3,6 +3,8 @@ from django.http import HttpResponse, Http404
 from django.template import Context, loader
 from django.core import serializers
 from morbid.models import TargetPrice, Analytic, FeatureAnalyticTicket, Feature, Ticket
+from django.db.models import Q
+from itertools import chain
 # from django.utils import simplejson
 
 def index(request):
@@ -13,7 +15,7 @@ def index(request):
 
 	@return: Http Response
 	"""
-	# @TODO: make a join query to database, not separate queries
+
 	# @TODO: filter by date
 	latest_target_prices = TargetPrice.objects.all()
 
@@ -195,4 +197,16 @@ def search(self, search_me):
 
 	@return: Http Response in JSON.
 	"""
-	pass
+	
+	analytics = Analytic.objects.filter(
+		name__icontains=search_me);
+
+	tickets = Ticket.objects.filter(
+		Q(name__icontains=search_me) | 
+		Q(long_name__icontains=search_me)
+		);
+
+	results = list(chain(analytics, tickets))
+
+	return HttpResponse(serializers.serialize('json',
+		results))
