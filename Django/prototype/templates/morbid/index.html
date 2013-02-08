@@ -1,11 +1,11 @@
-<h1><a href="/prototype/">Index page</a></h1>
+<h1><a href="/">Index page</a></h1>
 
 <div class="latest_target_prices">
 
 	{% if latest_target_prices %}
 		<ul>
 			{% for target in latest_target_prices  %}
-				<li><a href="{{ target.analytic.get_absolute_url }}">{{ target.analytic }}</a> - {{ target.price }} - 
+				<li><a href="{{ target.analytic.get_absolute_url }}">{{ target.analytic }}</a> - {{ target.price }} - {{ target.date|date }}
 					<a href="{{ target.ticket.get_absolute_url }}">{{ target.ticket }}</a></li>
 
 				{% if target.fap %}

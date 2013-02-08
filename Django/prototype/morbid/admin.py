@@ -1,13 +1,13 @@
-from morbid.models import Feature, Unit, Analytic, Ticket, TargetPrice, FeatureAnalyticTicket
+from morbid.models import Feature, Unit, Analytic, Ticker, TargetPrice, FeatureAnalyticTicker
 from django.contrib import admin
 
-class FeatureAnalyticTicketAdmin(admin.ModelAdmin):
-	list_display = ('analytic', 'ticket', 'feature', 'value')
+class FeatureAnalyticTickerAdmin(admin.ModelAdmin):
+	list_display = ('analytic', 'ticker', 'feature', 'value')
 
 class TargetPriceAdmin(admin.ModelAdmin):
-	list_display = ('analytic', 'date', 'price', 'ticket')
+	list_display = ('analytic', 'date', 'price', 'ticker')
 
-class TicketAdmin(admin.ModelAdmin):
+class TickerAdmin(admin.ModelAdmin):
 	list_display = ('name', 'long_name')
 
 class FeatureAdmin(admin.ModelAdmin):
@@ -16,7 +16,6 @@ class FeatureAdmin(admin.ModelAdmin):
 admin.site.register(Unit)
 admin.site.register(Feature, FeatureAdmin)
 admin.site.register(Analytic)
-admin.site.register(Ticket, TicketAdmin)
+admin.site.register(Ticker, TickerAdmin)
 admin.site.register(TargetPrice, TargetPriceAdmin)
-admin.site.register(FeatureAnalyticTicket, FeatureAnalyticTicketAdmin)
-
+admin.site.register(FeatureAnalyticTicker, FeatureAnalyticTickerAdmin)

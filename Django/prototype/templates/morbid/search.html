@@ -1,0 +1,9 @@
+{% if results %}
+
+  {% for analytic in results.analytics %}
+    {{ analytic.name }}
+  {% endfor %}
+
+{% else %}
+[]
+{% endif %}

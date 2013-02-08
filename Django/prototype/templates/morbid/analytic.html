@@ -1,8 +1,8 @@
-<h1><a href="/prototype/">Analytic page</a></h1>
+<h1><a href="/">Analytic page</a></h1>
 
 {% if analytic %}
 
-<h2>General information</h2>
+<h2>General information 2</h2>
 <ul>
 	<li>{{ analytic.name }}</li>
 	<li>Analyzing {{ analytic.number_of_companies }} companies</li>
@@ -15,7 +15,7 @@
 	{% if target_prices %}
 		<ul>
 			{% for target in target_prices %}
-				<li>{{ target.ticket }} on {{ target.date }} {{ target.price }}$</li>
+				<li>{{ target.ticker }} on {{ target.date }} {{ target.price }}$</li>
 				{% if target.fap %}
 					<ul>
 						{% for feature in target.fap %}
@@ -35,7 +35,7 @@
 			{% if features %}
 				<ul>
 					{% for feature in features %}
-						<li><a href="/prototype/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a></li>
+						<li><a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a></li>
 						<li>{{ feature.description|truncatewords_html:10 }}</li>
 					{% endfor %}
 				</ul>
@@ -47,7 +47,7 @@
 	{% if target_prices %}
 		<ul>
 			{% for target in target_prices %}
-				<li>{{ target.ticket.long_name }}</li>
+				<li><a href="{{ target.ticker.get_absolute_url }}" name="{{target.ticker.long_name}}">{{ target.ticker.long_name }}</a></li>
 			{% endfor %}
 		</ul>
 	{% endif %}

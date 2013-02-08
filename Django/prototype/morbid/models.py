@@ -1,5 +1,15 @@
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.conf import settings
+from django.contrib.auth import models as auth_models
+from django.contrib.auth.management import create_superuser
+from django.db.models import signals
+
+
+signals.post_syncdb.disconnect(
+	create_superuser,
+	sender=auth_models,
+	dispatch_uid='django.contrib.auth.management.create_superuser')
 
 
 class Unit(models.Model):
@@ -71,7 +81,7 @@ class Analytic(models.Model):
 	  @type: C{str}"""
 
 	def get_absolute_url(self):
-		return "/prototype/analytic/%s/" % self.slug;
+		return "/analytic/%s/" % self.slug;
 
 	def natural_key(self):
 		"""
@@ -86,25 +96,25 @@ class Analytic(models.Model):
 		"""
 		return self.name
 
-class Ticket(models.Model):
+class Ticker(models.Model):
 	"""
-	The ticket (or more precise to call it a company) name
+	The Ticker (or more precise to call it a company) name
 	"""
 
 	name = models.CharField(max_length=200)
-	"""Name of the ticket (AAPL, GOOG)
+	"""Name of the Ticker (AAPL, GOOG)
 	   @type: C{str}"""
 	long_name = models.CharField(max_length=200)
-	"""Full name of the ticket (Apple Inc, Google Inc)
+	"""Full name of the Ticker (Apple Inc, Google Inc)
 	   @type: C{str}"""
 	last_stock_price = models.FloatField()
-	"""Last stock price of the ticket (live update maybe)
+	"""Last stock price of the Ticker (live update maybe)
 	   @type: C{float}"""
 	number_of_analytics = models.IntegerField()
-	"""Number of analytics analyzing the ticket
+	"""Number of analytics analyzing the Ticker
 	   @type: C{integer}"""
 	number_of_tp = models.IntegerField()
-	"""How many target prices does the ticket have
+	"""How many target prices does the Ticker have
 	   @type: C{integer}"""
 	consensus_min = models.FloatField()
 	"""Minimum value for the consensus measure
@@ -121,12 +131,12 @@ class Ticket(models.Model):
 	  @type: C{str}"""
 
 	def get_absolute_url(self):
-		return "/prototype/ticket/%s/" % self.slug;
+		return "/ticker/%s/" % self.slug
 
 	def natural_key(self):
 		"""
 		The natural return key -- not index (pk), but the name (short name) 
-		of the ticket
+		of the Ticker
 
 		@return: string
 		"""
@@ -138,9 +148,9 @@ class Ticket(models.Model):
 		"""
 		return self.long_name + " (" + self.name + ")"
 
-class FeatureAnalyticTicket(models.Model):
+class FeatureAnalyticTicker(models.Model):
 	"""
-	The place where analytic, ticket and feature meets
+	The place where analytic, Ticker and feature meets
 	"""
 
 	value = models.FloatField()
@@ -152,9 +162,9 @@ class FeatureAnalyticTicket(models.Model):
 	analytic = models.ForeignKey(Analytic)
 	"""The analytic for which the feature was calculated
 	   @type: L{Analytic}"""
-	ticket = models.ForeignKey(Ticket)
-	"""The ticket on which the feature was calculated
-	   @type: L{Ticket}"""
+	ticker = models.ForeignKey(Ticker)
+	"""The Ticker on which the feature was calculated
+	   @type: L{Ticker}"""
 
 	def __unicode__(self):
 		"""
@@ -175,12 +185,36 @@ class TargetPrice(models.Model):
 	price = models.FloatField()
 	"""The price of the target price
 	   @type: C{Float}"""
-	ticket = models.ForeignKey(Ticket)
-	"""The ticket on which target price was released
-	   @type: L{Ticket}"""
+	ticker = models.ForeignKey(Ticker)
+	"""The Ticker on which target price was released
+	   @type: L{Ticker}"""
 	analytic = models.ForeignKey(Analytic)
 	"""The analytic, which published the target price
 	   @type: L{Analytic}"""
 
-	# def __unicode__(self):
-		# return str(self.price) + " " + str(self.ticket)
+	def __unicode__(self):
+		"""
+		Returns unicode object name
+		"""
+		return str(self.price) + " " + str(self.ticker)
+
+
+# Custom functions
+
+# Create fast user automatically
+def create_testuser(app, created_models, verbosity, **kwargs):
+	if not settings.DEBUG:
+		return
+	try:
+		auth_models.User.objects.get(username='test')
+	except auth_models.User.DoesNotExist:
+		print '*' * 80
+		print 'Creating test user -- login: test, password: test'
+		print '*' * 80
+		assert auth_models.User.objects.create_superuser('test', 'x@x.com', 'test')
+	else:
+		print 'Test user already exists'
+
+signals.post_syncdb.connect(create_testuser,
+	sender=auth_models, dispatch_uid='common.models.create_testuser')
+

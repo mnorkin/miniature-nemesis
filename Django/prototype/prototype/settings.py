@@ -4,7 +4,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('Maksim Norkin', 'maksim.norkin@ieee.org'),
 )
 
 MANAGERS = ADMINS
@@ -103,7 +103,7 @@ ROOT_URLCONF = 'prototype.urls'
 WSGI_APPLICATION = 'prototype.wsgi.application'
 
 TEMPLATE_DIRS = (
-    '/home/maksim/Work/Morbid/Django/prototype/templates/'
+    '/home/maksim/Work/Morbid/miniature-nemesis/Django/prototype/templates/'
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
