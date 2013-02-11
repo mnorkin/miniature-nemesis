@@ -11,7 +11,6 @@ signals.post_syncdb.disconnect(
 	sender=auth_models,
 	dispatch_uid='django.contrib.auth.management.create_superuser')
 
-
 class Unit(models.Model):
 	"""
 	The units of the feature
@@ -199,6 +198,21 @@ class TargetPrice(models.Model):
 		return str(self.price) + " " + str(self.ticker)
 
 
+class ApiKey(models.Model):
+	user = models.ForeignKey(User, related_name='keys', unique=True)
+	key = models.CharField(max_length=KEY_SIZE, null=True, blank=True)
+
+	def save(self, *args, **kwargs):
+		self.key = User.objects.make_random_password(length=KEY_SIZE)
+
+		while ApiKey.objects.filter(key__exact=self.key).count():
+			self.key = User.objects.make_random_password(length=KEY_SIZE)
+
+		super(ApiKey, self).save(*args, **kwargs)
+
+	def __unicode__(self):
+		return self.key
+		
 # Custom functions
 
 # Create fast user automatically
