@@ -91,7 +91,7 @@ def get_targetprices(analytic, ticker):
   """
   cur = connect_to_mysql()
   results = []
-  query = "SELECT `date`, `price0`, `price1` FROM `entries` WHERE `analytic`='%s' AND `ticket`='%s'" % (re.escape(analytic), re.escape(ticker))
+  query = "SELECT `date`, `price0`, `price1` FROM `entries` WHERE `analytic`='%s' AND `ticket`='%s' ORDER BY `date`" % (re.escape(analytic), re.escape(ticker))
 
   cur.execute(query)
 
@@ -102,7 +102,7 @@ def get_targetprices(analytic, ticker):
         price = row[1]
       else:
         price = row[2]
-      item = { 'date': time.mktime(row[0].timetuple()), 'price': price }
+      item = {'date': time.mktime(row[0].timetuple()), 'price': price}
       """Forming the dict"""
       if item not in results:
         """Escaping possible duplicates"""
@@ -126,7 +126,7 @@ def main():
       stock_data = stock_quote.get_data(ticker)
       if target_data.__len__() > 1:
         feature = Feature(target_data, stock_data)
-        print feature.accuracy()
+        print feature.profitability()
       else:
         if DEBUG:
           print 'Not enough target price data for %s ticker' % ticker
