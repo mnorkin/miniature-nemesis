@@ -69,6 +69,7 @@ def setup():
   # sudo('apt-get install -y nginx') # Web server
   # sudo('apt-get install -y postgresql') # Database
   # sudo('apt-get install -y git-core')
+  # sudo('apt-get install -y libpq-dev python-dev')
 
   # Additional future configurations
   sudo('mkdir -p %s; cd %s; virtualenv .;source ./bin/activate' %(env.code_root, env.code_root))
