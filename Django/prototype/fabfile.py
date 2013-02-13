@@ -11,7 +11,7 @@ def environment():
   env.user = 'root'
   env.hosts = ['185.5.55.178']
   env.deploy_user = 'root'
-  env.version = 1
+  env.version = 2
   env.release = env.version
   # Virtualenv path root
   env.code_root = '/var/www/targetprice'
@@ -60,15 +60,15 @@ def setup():
   """
   require('hosts', provided_by=[environment])
   require('code_root')
-  sudo('apt-get upgrade')
-  sudo('apt-get -y update')
+  # sudo('apt-get upgrade')
+  # sudo('apt-get -y update')
 
-  sudo('apt-get install -y python-setuptools')
-  sudo('easy_install pip')
-  sudo('pip install virtualenv')
-  sudo('apt-get install -y nginx') # Web server
-  sudo('apt-get install -y postgresql') # Database
-  sudo('apt-get install -y git-core')
+  # sudo('apt-get install -y python-setuptools')
+  # sudo('easy_install pip')
+  # sudo('pip install virtualenv')
+  # sudo('apt-get install -y nginx') # Web server
+  # sudo('apt-get install -y postgresql') # Database
+  # sudo('apt-get install -y git-core')
 
   # Additional future configurations
   sudo('mkdir -p %s; cd %s; virtualenv .;source ./bin/activate' %(env.code_root, env.code_root))
@@ -103,7 +103,7 @@ def upload_tar_from_git(path):
   sudo('mv /tmp/%s.tar.gz %s/packages/' %(env.release, env.code_root))
 
   sudo('cd %s && tar zxf ../../../packages/%s.tar.gz' %(env.whole_path, env.release))
-  sudo('cp %s/nginx.conf /etc/nginx/sites-enabled/default' $(env.whole_path))
+  sudo('cp %s/nginx.conf /etc/nginx/sites-enabled/default' %(env.whole_path))
   sudo('chown %s -R %s'% (env.user,env.whole_path))
   sudo('chgrp %s -R %s'% (env.user,env.whole_path))
   local('rm %s.tar.gz'% (env.release))
@@ -112,7 +112,7 @@ def install_requirements():
   "Install requirements of the app"
   require('release', provided_by=[environment])
   require('whole_path', provided_by=[environment])
-  sudo('cp %s; pip install -r %s/requirements.txt' %(env.code_root, env.whole_path))
+  sudo('cd %s; virtualenv .;source ./bin/activate; pip install -r %s/requirements.txt' %(env.code_root, env.whole_path))
   reset_permissions()
 
 def symlink_current_release():
@@ -139,7 +139,7 @@ def prepare_deploy():
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
-  run('%s/releases/current/%s/manage.py run_gunicorn' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/manage.py run_gunicorn' %(env.code_root, env.project_name))
 
 def restart_webserver():
   "Restart web server"
