@@ -141,7 +141,7 @@ def prepare_deploy():
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
-  virtualenv('%s/releases/current/%s/manage.py run_gunicorn' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/manage.py run_gunicorn' %(env.code_root, env.project_name), pty=False)
 
 def restart_webserver():
   "Restart web server"
