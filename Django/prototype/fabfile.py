@@ -11,7 +11,7 @@ def environment():
   env.user = 'root'
   env.hosts = ['185.5.55.178']
   env.deploy_user = 'root'
-  env.version = 2
+  env.version = 1
   env.release = env.version
   # Virtualenv path root
   env.code_root = '/var/www/targetprice'
@@ -141,7 +141,7 @@ def prepare_deploy():
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
-  virtualenv('%s/releases/current/%s/manage.py run_gunicorn' %(env.code_root, env.project_name), pty=False)
+  virtualenv('%s/releases/current/%s/manage.py run_gunicorn >> /dev/null &' %(env.code_root, env.project_name))
 
 def restart_webserver():
   "Restart web server"

@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication
-from morbid.handlers import FeatureAnalyticTickerHandler
+from api.handlers import FeatureAnalyticTickerHandler
 
 auth = HttpBasicAuthentication(realm='morbid_realm')
 ad = { 'authentication' : auth }
