@@ -60,6 +60,7 @@ def setup():
   # Additional future configurations
   sudo('mkdir -p %s; cd %s; virtualenv .;source ./bin/activate' %(env.code_root, env.code_root))
   sudo('cd %s; mkdir releases; mkdir shared; mkdir packages;' %(env.code_root))
+
   reset_permissions()
   deploy()
 
@@ -73,8 +74,8 @@ def deploy():
   require('hosts', provided_by=[environment])
   require('whole_path', provided_by=[environment])
   require('code_root')
-  install_requirements()
   upload_tar_from_git(env.whole_path)
+  install_requirements()
   symlink_current_release()
 
   restart_webserver()
@@ -102,8 +103,9 @@ def install_requirements():
 
 def symlink_current_release():
   "Symlink current release"
-  require('relase', provided_by=[environment])
+  require('release', provided_by=[environment])
   sudo('cd %s; ln -s %s releases/current; chown %s -R releases/current; chgrp %s -R releases/current' %(env.code_root, env.release, env.user, env.user))
+  put('nginx.conf', '/etc/nginx/sites-enabled/default')
 
 def install_site():
   # TODO
@@ -122,7 +124,8 @@ def prepare_deploy():
 
 def start_webserver():
   "Start webserver server"
-  sudo("nginx -s start")
+  sudo("nginx -s reload")
+  run('%s/releases/current/%s/manage.py run_gunicorn' %(env.code_root, env.project_name))
 
 def restart_webserver():
   "Restart web server"
