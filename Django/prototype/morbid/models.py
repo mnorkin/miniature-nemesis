@@ -2,9 +2,9 @@ from django.db import models
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth import models as auth_models
+from django.contrib.auth.models import User
 from django.contrib.auth.management import create_superuser
 from django.db.models import signals
-
 
 signals.post_syncdb.disconnect(
 	create_superuser,
@@ -200,13 +200,13 @@ class TargetPrice(models.Model):
 
 class ApiKey(models.Model):
 	user = models.ForeignKey(User, related_name='keys', unique=True)
-	key = models.CharField(max_length=KEY_SIZE, null=True, blank=True)
+	key = models.CharField(max_length=255, null=True, blank=True)
 
 	def save(self, *args, **kwargs):
-		self.key = User.objects.make_random_password(length=KEY_SIZE)
+		self.key = User.objects.make_random_password(length=255)
 
 		while ApiKey.objects.filter(key__exact=self.key).count():
-			self.key = User.objects.make_random_password(length=KEY_SIZE)
+			self.key = User.objects.make_random_password(length=255)
 
 		super(ApiKey, self).save(*args, **kwargs)
 
