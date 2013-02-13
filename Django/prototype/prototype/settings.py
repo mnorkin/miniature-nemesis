@@ -1,4 +1,6 @@
 # Django settings for prototype project.
+import os
+import django
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -44,7 +46,7 @@ USE_L10N = True
 USE_TZ = True
 
 # Root path to the web app
-ROOT_PATH = '/home/maksim/Work/Morbid/miniature-nemesis/Django/prototype/';
+ROOT_PATH = os.path.dirname(os.path.realpath(__file__));
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"

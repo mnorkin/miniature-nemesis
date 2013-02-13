@@ -1,4 +1,5 @@
 django==1.4.3
+django-piston
 django-apikey
 gunicorn
 psycopg2

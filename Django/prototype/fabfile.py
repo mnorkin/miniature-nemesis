@@ -70,6 +70,8 @@ def setup():
   # sudo('apt-get install -y postgresql') # Database
   # sudo('apt-get install -y git-core')
   # sudo('apt-get install -y libpq-dev python-dev')
+  # sudo('apt-get install -y python2.7-dev')
+  sudo('apt-get install -y libpq-dev')
 
   # Additional future configurations
   sudo('mkdir -p %s; cd %s; virtualenv .;source ./bin/activate' %(env.code_root, env.code_root))
@@ -91,8 +93,7 @@ def deploy():
   upload_tar_from_git(env.whole_path)
   install_requirements()
   symlink_current_release()
-
-  restart_webserver()
+  start_webserver()
 
 def upload_tar_from_git(path):
   require('release', provided_by=[environment])
@@ -113,7 +114,7 @@ def install_requirements():
   "Install requirements of the app"
   require('release', provided_by=[environment])
   require('whole_path', provided_by=[environment])
-  sudo('cd %s; virtualenv .;source ./bin/activate; pip install -r %s/requirements.txt' %(env.code_root, env.whole_path))
+  sudo('cd %s; virtualenv .;source ./bin/activate; export PATH=/usr/bin:"$PATH"; pip install -r %s/requirements.txt' %(env.code_root, env.whole_path))
   reset_permissions()
 
 def symlink_current_release():
