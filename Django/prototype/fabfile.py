@@ -28,18 +28,31 @@ def virtualenv(command):
 # Tasks
 def test():
   # "Run tests"
-  local('python2 manage.py test morbid')
+  local('./manage.py test morbid')
 
 def reset_permissions():
   sudo('chown %s -R %s' %(env.deploy_user, env.code_root_parent))
   sudo('chgrp %s -R %s' %(env.deploy_user, env.code_root_parent))
 
-def create_user():
-  require('deploy_user', provided_by=[environment])
+def create_group():
+  env.user = 'root'
 
-  admin_group = 'wheel'
-  sudo('addgroup %s' %(admin_group))
-  sudo('')
+  # Create a new group
+  wheel_group = 'wheel'
+  runcmd('addgroup {group}'.format(group=wheel_group))
+  runcmd('echo "%{group} ALL=(ALL) ALL" >> /etc/sudoers'.format(group=wheel_group))
+
+def create_user(wheel_username, wheel_password):
+  env.user = 'root'
+
+  wheel_group = 'wheel'
+
+  # Create a new user
+  runcmd('adduser {username} --disabled-password --gecos ""'.format(username=wheel_username))
+  runcmd('adduser {username} {group}'.format(username=wheel_username,group=wheel_group))
+
+  # Set the password
+  runcmd('echo "{username}:{password}" | chpasswd'.format(username=wheel_username, password=wheel_password))
 
 def setup():
   """
@@ -90,6 +103,7 @@ def upload_tar_from_git(path):
   sudo('mv /tmp/%s.tar.gz %s/packages/' %(env.release, env.code_root))
 
   sudo('cd %s && tar zxf ../../../packages/%s.tar.gz' %(env.whole_path, env.release))
+  sudo('cp %s/nginx.conf /etc/nginx/sites-enabled/default' $(env.whole_path))
   sudo('chown %s -R %s'% (env.user,env.whole_path))
   sudo('chgrp %s -R %s'% (env.user,env.whole_path))
   local('rm %s.tar.gz'% (env.release))
