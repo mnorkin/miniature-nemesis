@@ -4,13 +4,13 @@ Documentation and implementation of target price project
 
 ### Documentation
 
-* [Documentation in pdf format](blob/master/Django/prototype/pdf/api.pdf)
-* [Graphical representation of database in pdf format](blob/master/Django/prototype/database/beta_database_model.pdf)
+* [Documentation in pdf format](Django/prototype/pdf/api.pdf)
+* [Graphical representation of database in pdf format](Django/prototype/database/beta_database_model.pdf)
 
 ### Implementation
 
-* [Front-end](blob/master/Django/prototype/prototype)
-* [Back-end](blob/master/model)
+* [Front-end](Django/prototype/prototype)
+* [Back-end](model)
 
 ### Deployment
 
