@@ -15,9 +15,9 @@ INSERT INTO morbid_ticker (name, long_name, last_stock_price, number_of_analytic
   -- FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger(long_name_tsv, 'pg_catalog.english', long_name); -- Trigger for `long_name`
 
 -- CREATE INDEX morbid_ticker_name_tsv ON morbid_ticker USING gin(name_tsv); -- GIN entry for `name`
-CREATE INDEX morbid_ticker_name_idx ON morbid_ticker USING gin(lower(name) wildcard_ops);
+-- CREATE INDEX morbid_ticker_name_idx ON morbid_ticker USING gin(lower(name) wildcard_ops); -- TODO !
 -- CREATE INDEX morbid_ticker_long_name_tsv ON morbid_ticker USING gin(long_name_tsv); -- GIN entry for `long_name`
-CREATE INDEX morbid_ticker_long_name_idx ON morbid_ticker USING gin(lower(long_name) wildcard_ops);
+-- CREATE INDEX morbid_ticker_long_name_idx ON morbid_ticker USING gin(lower(long_name) wildcard_ops); -- TODO !
 
 -- UPDATE morbid_ticker SET name_tsv=to_tsvector(name); -- update the database data
 -- UPDATE morbid_ticker SET long_name_tsv=to_tsvector(long_name); --- update database data

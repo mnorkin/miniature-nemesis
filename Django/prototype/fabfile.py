@@ -68,6 +68,8 @@ def setup():
   # sudo('pip install virtualenv')
   # sudo('apt-get install -y nginx') # Web server
   # sudo('apt-get install -y postgresql') # Database
+  # sudo('apt-get install -y postgresql-contrib') # Database
+  # sudo('apt-get install -y postgresql-client') # Database
   # sudo('apt-get install -y git-core')
   # sudo('apt-get install -y libpq-dev python-dev')
   # sudo('apt-get install -y python2.7-dev')
@@ -141,7 +143,7 @@ def prepare_deploy():
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
-  virtualenv('%s/releases/current/%s/manage.py run_gunicorn >> /dev/null &' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/manage.py run_gunicorn >> /tmp/gunicorn.log &' %(env.code_root, env.project_name))
 
 def restart_webserver():
   "Restart web server"
