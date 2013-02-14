@@ -18,7 +18,8 @@ import unidecode
 import datetime, time
 import stock_quote
 from feature import *
-import httplib
+import httplib, urllib
+import json
 
 # CONFIG
 DEBUG = True
@@ -27,7 +28,7 @@ def slugify(str):
   """
   Slugify the string
   """
-  str = unidecode.unidecode(str).lower()
+  str = unidecode.unidecode(str.encode('utf-8')).lower()
   str = re.sub(r'\W+', '-', str)
 
   # Just to be on the safe side
@@ -57,7 +58,7 @@ def get_all_analytics():
   if not DEBUG:
     cur.execute("SELECT DISTINCT(`analytic`) FROM `entries`")
   else:
-    cur.execute("SELECT DISTINCT(`analytic`) FROM `entries` LIMIT 1")
+    cur.execute("SELECT DISTINCT(`analytic`) FROM `entries` LIMIT 5,1")
 
   results = []
 
@@ -110,26 +111,125 @@ def get_targetprices(analytic, ticker):
 
   return results
 
-def form_request():
-  conn = httplib.HTTPConnection("127.0.0.1:8000")
-  conn.request("GET", "/feature_write")
+def send_read(url, data):
+  params = json.dumps(data)
+  headers = {"Content-type": "application/json"}
+  conn = httplib.HTTPConnection("localhost:8000")
+  if DEBUG:
+    print params
+    print headers
+  conn.request("GET", url, params, headers)
+  response = conn.getresponse()
+  if DEBUG:
+    print response.read()
+    print response.status, response.reason
+  conn.close()
+  if response.status == 200: # READ
+    return True
+  else:
+    return False
+
+def send_post(url, data):
+  params = json.dumps(data)
+  headers = {"Content-type": "application/json"}
+  conn = httplib.HTTPConnection("localhost:8000")
+  if DEBUG:
+    print params
+    print headers
+  conn.request("POST", url, params, headers)
+  response = conn.getresponse()
+  if DEBUG:
+    print response.read()
+    print response.status, response.reason
+  conn.close()
+  if response.status == 201: # CREATED
+    return True
+  else:
+    return False
+
+def send_put(url, data):
+  params = json.dumps(data)
+  headers = {"Content-type": "application/json"}
+  conn = httplib.HTTPConnection("localhost:8000")
+  if DEBUG:
+    print params
+    print headers
+  conn.request("PUT", url, params, headers)
+  response = conn.getresponse()
+  if DEBUG:
+    print response.read()
+    print response.status, response.reason
+  conn.close()
+  if response.status == 201: # CREATED
+    return True
+  else:
+    return False
+
+def send_delete(url, data):
+  params = json.dumps(data)
+  headers = {"Content-type": "application/json"}
+  conn = httplib.HTTPConnection("localhost:8000")
+  if DEBUG:
+    print params
+    print headers
+  conn.request("DELETE", url, params, headers)
+  response = conn.getresponse()
+  if DEBUG:
+    print response.read()
+    print response.status, response.reason
+  conn.close()
+  if response.status == 204: # DELETED
+    return True
+  else:
+    return False
+
+def fetch_all_analytics():
+  for analytic in get_all_analytics():
+    number_of_companies = 0
+    number_of_tp = 0
+    last_target_price = 0
+    volatility = 0 # TODO
+    slug = slugify(str(analytic))
+    for ticker in get_tickers(analytic):
+      # Get all the tickers
+      number_of_companies = number_of_companies + 1
+      for targetprice in get_targetprices(analytic, ticker):
+        number_of_tp = number_of_tp + 1
+
+        if last_target_price == 0:
+          last_target_price = targetprice['price']
+
+    data = {'name': analytic, 
+      'number_of_companies': number_of_companies, 
+      'number_of_tp': number_of_tp,
+      'last_target_price': last_target_price,
+      'volatility': volatility,
+      'slug': slug}
+
+    if send_post("/api/analytics/", data):
+      print "Analytic data sent"
+    else:
+      # Send PUT maybe ?
+      print "Analytic data sent fail"
+
 
 def main():
   """
   Main thread
   """
-  cur = connect_to_mysql()
+
+  fetch_all_analytics()
   
-  for analytic in get_all_analytics():
-    for ticker in get_tickers(analytic):
-      target_data = get_targetprices(analytic, ticker)
-      stock_data = stock_quote.get_data(ticker)
-      if target_data.__len__() > 1:
-        feature = Feature(target_data, stock_data)
-        print feature.profitability()
-      else:
-        if DEBUG:
-          print 'Not enough target price data for %s ticker' % ticker
+  # for analytic in get_all_analytics():
+  #   for ticker in get_tickers(analytic):
+  #     target_data = get_targetprices(analytic, ticker)
+  #     stock_data = stock_quote.get_data(ticker)
+  #     if target_data.__len__() > 1:
+  #       feature = Feature(target_data, stock_data)
+  #       print feature.profitability()
+  #     else:
+  #       if DEBUG:
+  #         print 'Not enough target price data for %s ticker' % ticker
 
 if __name__ == '__main__':
   main()

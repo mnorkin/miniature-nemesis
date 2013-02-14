@@ -3,3 +3,4 @@ django-piston
 django-apikey
 gunicorn
 psycopg2
+pyyaml

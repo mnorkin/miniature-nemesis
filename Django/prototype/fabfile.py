@@ -97,6 +97,14 @@ def deploy():
   symlink_current_release()
   start_webserver()
 
+def small_deploy():
+  require('hosts', provided_by=[environment])
+  require('whole_path', provided_by=[environment])
+  require('code_root')
+  upload_tar_from_git(env.whole_path)
+  symlink_current_release()
+  start_webserver()
+
 def upload_tar_from_git(path):
   require('release', provided_by=[environment])
   require('whole_path', provided_by=[environment])
@@ -108,6 +116,8 @@ def upload_tar_from_git(path):
 
   sudo('cd %s && tar zxf ../../../packages/%s.tar.gz' %(env.whole_path, env.release))
   sudo('cp %s/nginx.conf /etc/nginx/sites-enabled/default' %(env.whole_path))
+  virtualenv('%s/releases/current/%s/manage.py syncdb' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/manage.py collectstatic' %(env.code_root, env.project_name))
   sudo('chown %s -R %s'% (env.user,env.whole_path))
   sudo('chgrp %s -R %s'% (env.user,env.whole_path))
   local('rm %s.tar.gz'% (env.release))

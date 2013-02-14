@@ -1,6 +1,7 @@
 from morbid.models import ApiKey, FeatureAnalyticTicker, Feature, TargetPrice, Ticker, Analytic
 from piston.handler import BaseHandler
 from piston.utils import rc, validate
+from django.http import HttpResponse, Http404
 
 class ApiKeyHandler(BaseHandler):
   model = ApiKey
@@ -14,52 +15,90 @@ class ApiKeyHandler(BaseHandler):
     return HttpResponse(api_key)
 
   def create(self, request):
+    # if request.user.__len__() > 0:
+      # Create new key for the user
+    # if request.key.__len__() > 0:
+
     if request.user.keys.count() > 0:
       # Check if key exists
       values_query_set = request.user.keys.values('key')
       api_key = list(values_query_set)[0]['key']
-      return HttpResponse(api_key)
+      # return HttpResponse(api_key)
+      return api_key
     else:
       # Create API key
       api_key = ApiKey(user=request.user)
       api_key.save()
-    return HttpResponse(api_key)
+      return api_key
+    #   # return HttpResponse(api_key)
 
     
 
 class AnalyticHandler(BaseHandler):
 
-  allowed_methods = ('GET', 'POST')
+  allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
   model = Analytic
 
   def read(self, request, analytic_slug=None):
     if analytic_slug:
-      return Analytic.objects.get(slug=analytic_slug)
+      analytic = Analytic;
+      try:
+        analytic = Analytic.objects.get(slug=analytic_slug)
+        return analytic
+      except analytic.DoesNotExist:
+        raise Http404
     else:
       return Analytic.objects.all()
 
   def create(self, request):
+
     if request.content_type:
       data = request.data
 
-      em = self.model(name=data['name'], 
-        number_of_companies=data['number_of_companies'],
-        number_of_tp=data['number_of_tp'],
-        volatility=data['volatility'],
-        last_target_price=data['last_target_price'],
-        slug=data['slug'])
-
-      em.save()
-
-      return rc.CREATED
+      try:
+        analytic = self.model.objects.get(slug=data['slug'])
+        return rc.DUPLICATE_ENTRY
+      except analytic.DoesNotExist:
+        em = self.model(name=data['name'], 
+          number_of_companies=data['number_of_companies'],
+          number_of_tp=data['number_of_tp'],
+          volatility=data['volatility'],
+          last_target_price=data['last_target_price'],
+          slug=data['slug'])
+        em.save()
+        return rc.CREATED
     else:
       super(Analytic, self).create(request)
 
   def update(self, request):
-    pass
+    if request.content_type:
+      data = request.data
+
+      em = self.model.objects.get(slug=data['slug'])
+
+      em.name = data['name']
+      em.number_of_companies = data['number_of_companies']
+      em.number_of_tp = data['number_of_tp']
+      em.volatility = data['volatility']
+      em.last_target_price = data['last_target_price']
+
+      em.save()
+
+      return rc.ACCEPTED
+    else:
+      super(Analytic, self).create(request)
 
   def delete(self, request):
-    pass
+    if request.content_type:
+      data = request.data
+
+      em = self.model.objects.get(slug=data['slug'])
+
+      em.delete
+
+      return rc.DELETED
+    else:
+      super(Analytic, self).create(request)
 
 class TickerHandler(BaseHandler):
 
@@ -93,10 +132,31 @@ class TickerHandler(BaseHandler):
       super(Ticker, self).create(request)
 
   def update(self, request):
-    pass
+    if request.content_type:
+      data = request.data
+
+      try:
+        em = self.model.objects.get(slug=data['slug'])
+      except em.DoesNotExist:
+        return rc.NOT_FOUND
+
+      em.name = data['name']
+      em.long_name = data['long_name']
+      em.last_stock_price = data['last_stock_price']
+      em.number_of_analytics = data['number_of_analytics']
+      em.number_of_tp = data['number_of_tp']
+      em.consensus_min = data['consensus_min']
+      em.consensus_avg = data['consensus_avg']
+      em.consensus_max = data['consensus_max']
+
+      em.save()
+
+      return rc.ACCEPTED
+    else:
+      super(Ticker, self).create(request)
 
   def delete(self, request):
-    pass
+    rc.NOT_IMPLEMENTED
 
 class TargetPriceHandler(BaseHandler):
 
@@ -113,13 +173,21 @@ class TargetPriceHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
-      ticker_instance = Ticker.objects.get(slug=data['ticker_slug'])
-      analytic_instance = Analytic.objects.get(slug=data['analytic_slug'])
+      try:
+        ticker = Ticker.objects.get(slug=data['ticker_slug'])
+      except ticker.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        analytic = Analytic.objects.get(slug=data['analytic_slug'])
+      except analytic.DoesNotExist:
+        return rc.NOT_FOUND
+
 
       em = self.model(date=data['date'],
         price=data['price'],
-        ticker=ticker_instance.id,
-        analytic=analytic_instance.id)
+        ticker=ticker.id,
+        analytic=analytic.id)
 
       em.save()
 
@@ -128,14 +196,40 @@ class TargetPriceHandler(BaseHandler):
       super(TargetPrice, self).create(request)
 
   def update(self, request):
-    pass
+    if request.content_type:
+      data = request.data
+
+      try:
+        ticker = Ticker.objects.get(slug=data['ticker_slug'])
+      except ticker.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        analytic = Analytic.objects.get(slug=data['analytic_slug'])
+      except analytic.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        em = self.model.objects.get(id=data['target_price_id'])
+      except em.DoesNotExist:
+
+      em.date = data['date']
+      em.price = data['price']
+      em.ticker = ticker.id
+      em.analytic = analytic.id
+
+      em.save()
+
+      return rc.ACCEPTED
+    else:
+      super(TargetPrice, self).create(request)
 
   def delete(self, request):
-    pass
+    rc.NOT_IMPLEMENTED
 
 class FeatureHandler(BaseHandler):
 
-  allowed_methods = ('GET', 'POST')
+  allowed_methods = ('GET', 'POST', 'PUT')
   model = Feature
 
   def read(self, request, feature_id=None):
@@ -148,8 +242,13 @@ class FeatureHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
+      try:
+        unit = Unit.objects.get(id=data['unit'])
+      except unit.DoesNotExist:
+        return rc.NOT_FOUND
+
       em = self.model(name=data['name'],
-        unit=data['unit'], # FIXME: Change this buddy to id
+        unit=unit.id, # FIXME: Change this buddy to id
         display_in_frontpage=data['display_in_frontpage'],
         description=data['description'] 
         )
@@ -162,16 +261,34 @@ class FeatureHandler(BaseHandler):
       super(Feature, self).create(request)
 
   def update(self, request):
-    pass
+    if request.content_type:
+      data = request.data
+
+      try:
+        em = self.model.objects.get(id=data['feature_id'])
+      except em.DoesNotExist:
+        return rc.NOT_FOUND
+
+      em.name = data['name']
+      em.unit = data['unit']
+      em.display_in_frontpage = data['display_in_frontpage']
+      em.description = data['description']
+
+      em.save()
+
+      return rc.ACCEPTED
+
+    else:
+      super(Feature, self).create(request)
 
   def delete(self, request):
-    pass
+    rc.NOT_IMPLEMENTED
 
 class FeatureAnalyticTickerHandler(BaseHandler):
   allowed_methods = ('GET', 'POST', 'PUT')
   model = FeatureAnalyticTicker
 
-  def read(self, request, feature_analytic_ticker_id):
+  def read(self, request, feature_analytic_ticker_id=None):
     if feature_analytic_ticker_id:
       return FeatureAnalyticTicker.objects.get(id=feature_analytic_ticker_id)
     else:
@@ -181,13 +298,25 @@ class FeatureAnalyticTickerHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
-      analytic_instance = Analytic.objects.get(slug=data['analytic_slug'])
-      ticker_instance = Ticker.objects.get(slug=data['ticker_slug'])
+      try:
+        analytic = Analytic.objects.get(slug=data['analytic_slug'])
+      except analytic.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        ticker = Ticker.objects.get(slug=data['ticker_slug'])
+      except ticker.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        feature = Feature.objects.get(id=data['feature_id'])
+      except feature.DoesNotExist:
+        return rc.NOT_FOUND
 
       em = self.model(value=data['value'],
-        feature=data['feature'],
-        analytic=analytic_instance.id,
-        ticker=ticker_instance.id)
+        feature=feature.id,
+        analytic=analytic.id,
+        ticker=ticker.id)
 
       em.save()
 
@@ -197,7 +326,39 @@ class FeatureAnalyticTickerHandler(BaseHandler):
       super(FeatureAnalyticTicker, self).create(request)
 
   def update(self, request):
-    pass
+    if request.content_type:
+      data = request.data
+
+      try:
+        analytic = Analytic.objects.get(slug=data['analytic_slug'])
+      except analytic.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        ticker = Ticker.objects.get(slug=data['ticker_slug'])
+      except ticker.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        feature = Feature.objects.get(id=data['feature_id'])
+      except feature.DoesNotExist:
+        return rc.NOT_FOUND
+
+      try:
+        em = self.model.objects.get(id=data['feature_analytic_ticker_id'])
+      except em.DoesNotExist:
+        return rc.NOT_FOUND
+
+      em.feature = feature.id
+      em.analytic = analytic.id
+      em.ticker = ticker.id
+
+      em.save()
+
+      return rc.ACCEPTED
+
+    else:
+      super(FeatureAnalyticTicker, self).create(request)
 
   def delete(self, request):
-    pass
+    rc.NOT_IMPLEMENTED
