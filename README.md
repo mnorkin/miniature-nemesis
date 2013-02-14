@@ -4,13 +4,13 @@ Documentation and implementation of target price project
 
 ### Documentation
 
-* [Documentation in pdf format](dummas/miniature-nemesis/blob/master/Django/prototype/pdf/api.pdf)
-* [Graphical representation of database in pdf format](dummas/miniature-nemesis/blob/master/Django/prototype/database/beta_database_model.pdf)
+* [Documentation in pdf format](blob/master/Django/prototype/pdf/api.pdf)
+* [Graphical representation of database in pdf format](blob/master/Django/prototype/database/beta_database_model.pdf)
 
 ### Implementation
 
-* [Front-end](dummas/miniature-nemesis/blob/master/Django/prototype/prototype)
-* [Back-end](dummas/miniature-nemesis/blob/master/model)
+* [Front-end](blob/master/Django/prototype/prototype)
+* [Back-end](blob/master/model)
 
 ### Deployment
 
