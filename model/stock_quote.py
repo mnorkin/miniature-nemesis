@@ -1,3 +1,6 @@
+"""
+The Stock_Quete
+"""
 import urllib as u
 import string
 import datetime, time
@@ -22,3 +25,19 @@ def get_data(ticker):
     data.append(item)
   data.reverse()
   return data
+
+def get_ticker_data(ticker):
+  data = []
+  url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nb3x&e=.csv' % (ticker)
+  f = u.urlopen(url, proxies = {})
+  rows = f.readlines()
+  return rows
+  r = rows[0]
+  """Get the first entry"""
+  r = r[:-2].split(",")
+  """Remove the `\r\n` and split by comma"""
+  item = {"long_name": r[0],
+    "last_stock_price": r[1],
+    "stock_exchange": r[2]}
+
+  return item

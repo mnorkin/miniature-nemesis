@@ -1,3 +1,6 @@
+"""
+The Plot
+"""
 import pyqtgraph as pg
 
 class Plot():

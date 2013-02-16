@@ -1,9 +1,12 @@
-from morbid.models import ApiKey, FeatureAnalyticTicker, Feature, TargetPrice, Ticker, Analytic
+from morbid.models import ApiKey, FeatureAnalyticTicker, Feature, TargetPrice, Ticker, Analytic, Unit
 from piston.handler import BaseHandler
 from piston.utils import rc, validate
 from django.http import HttpResponse, Http404
 
 class ApiKeyHandler(BaseHandler):
+  """
+  * TODO
+  """
   model = ApiKey
   allowed_methods = ('GET', 'POST')
   fields = ('user', 'key')
@@ -15,10 +18,6 @@ class ApiKeyHandler(BaseHandler):
     return HttpResponse(api_key)
 
   def create(self, request):
-    # if request.user.__len__() > 0:
-      # Create new key for the user
-    # if request.key.__len__() > 0:
-
     if request.user.keys.count() > 0:
       # Check if key exists
       values_query_set = request.user.keys.values('key')
@@ -32,9 +31,11 @@ class ApiKeyHandler(BaseHandler):
       return api_key
     #   # return HttpResponse(api_key)
 
-    
 
 class AnalyticHandler(BaseHandler):
+  """
+  Analytic data handler
+  """
 
   allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
   model = Analytic
@@ -101,6 +102,9 @@ class AnalyticHandler(BaseHandler):
       super(Analytic, self).create(request)
 
 class TickerHandler(BaseHandler):
+  """
+  Ticker data handler
+  """
 
   allowed_methods = ('GET', 'POST')
   model = Ticker
@@ -159,6 +163,9 @@ class TickerHandler(BaseHandler):
     rc.NOT_IMPLEMENTED
 
 class TargetPriceHandler(BaseHandler):
+  """
+  Target price data handler
+  """
 
   allowed_methods = ('GET', 'POST')
   model = TargetPrice
@@ -212,6 +219,7 @@ class TargetPriceHandler(BaseHandler):
       try:
         em = self.model.objects.get(id=data['target_price_id'])
       except em.DoesNotExist:
+        return rc.NOT_FOUND
 
       em.date = data['date']
       em.price = data['price']
@@ -227,7 +235,50 @@ class TargetPriceHandler(BaseHandler):
   def delete(self, request):
     rc.NOT_IMPLEMENTED
 
+class UnitHandler(BaseHandler):
+  """
+  Units data handler
+  """
+  allowed_methods = ('GET', 'POST', 'PUT')
+  model = Unit
+
+  def read(self, request):
+    return rc.NOT_IMPLEMENTED
+
+  def create(self, request):
+    if request.content_type:
+      data = request.data
+
+      em = self.model(id=data['unit_id'],
+        name=data['name'],
+        value=data['value'])
+      em.save()
+
+      return rc.CREATED
+    else:
+      super(Unit, self).create(request)
+
+  def update(self, request):
+    if request.content_type:
+      data = request.data
+
+      em = self.model.objects.get(id=data['unit_id'])
+
+      em.name = data['name']
+      em.value = data['value']
+      em.save()
+
+      return rc.ACCEPTED
+    else:
+      super(Unit, self).create(request)
+
+  def delete(self, request):
+    return rc.NOT_IMPLEMENTED
+
 class FeatureHandler(BaseHandler):
+  """
+  Feature definition data handler
+  """
 
   allowed_methods = ('GET', 'POST', 'PUT')
   model = Feature
@@ -285,6 +336,9 @@ class FeatureHandler(BaseHandler):
     rc.NOT_IMPLEMENTED
 
 class FeatureAnalyticTickerHandler(BaseHandler):
+  """
+  Values of features to specific ticker on analytic and vice versa data handler
+  """
   allowed_methods = ('GET', 'POST', 'PUT')
   model = FeatureAnalyticTicker
 

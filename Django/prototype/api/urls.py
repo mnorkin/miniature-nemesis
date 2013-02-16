@@ -1,7 +1,7 @@
 from apikey.auth import ApiKeyAuthentication
 from django.conf.urls.defaults import *
 from piston.resource import Resource
-from api.handlers import AnalyticHandler, TickerHandler, TargetPriceHandler, FeatureHandler, FeatureAnalyticTickerHandler, ApiKeyHandler
+from api.handlers import AnalyticHandler, TickerHandler, TargetPriceHandler, FeatureHandler, FeatureAnalyticTickerHandler, ApiKeyHandler, UnitHandler
 
 # feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler, authentication=ApiKeyAuthentication())
 feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler)
@@ -13,6 +13,8 @@ ticker_handler = Resource(TickerHandler)
 target_price_handler = Resource(TargetPriceHandler)
 # feature_handler = Resource(FeatureHandler, authentication=ApiKeyAuthentication())
 feature_handler = Resource(FeatureHandler)
+# unit_handler = Resource(UnitHandler, authentication=ApiKeyAuthentication())
+unit_handler = Resource(UnitHandler)
 apikey_handler = Resource(ApiKeyHandler)
 
 urlpatterns = patterns('',
@@ -25,5 +27,6 @@ urlpatterns = patterns('',
   url(r'^target_prices/(?P<target_price_id>\d+)/$', target_price_handler),
   url(r'^features/$', feature_handler),
   url(r'^features/(?P<feature_id>\d+)/$', feature_handler),
+  url(r'^units/$', unit_handler),
   url(r'^apikeys/', apikey_handler)
 )
