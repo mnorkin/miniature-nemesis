@@ -129,17 +129,23 @@ class Daemon:
     You should override this method when you subclass Daemon. It will be called after the process has been
     daemonized by start() or restart().
     """
-    os.system('./manage.py run_gunicorn')
+    
+class guniron_reamon(Deamon):
+  def run(self):
+    os.system('cd /var/www/targetprice; source bin/activate; ./releases/current/morbid/manage.py run_gunicorn')
 
 if __name__ == '__main__':
-  deamon = Daemon('/tmp/gunicorn-deamon.pid')
+  deamon = guniron_reamon('/tmp/gunicorn-deamon.pid')
 
   if len(sys.argv) == 2:
     if 'start' == sys.argv[1]:
+      print "Starting server... "
       deamon.start()
     elif 'stop' == sys.argv[1]:
+      print "Stopping server... "
       deamon.stop()
     elif 'restart' == sys.argv[1]:
+      print "Restarting server... "
       deamon.restart()
     else:
       print "Unknown command"
