@@ -130,12 +130,12 @@ class Daemon:
     daemonized by start() or restart().
     """
     
-class guniron_reamon(Deamon):
+class guniron_daemon(Daemon):
   def run(self):
     os.system('cd /var/www/targetprice; source bin/activate; ./releases/current/morbid/manage.py run_gunicorn')
 
 if __name__ == '__main__':
-  deamon = guniron_reamon('/tmp/gunicorn-deamon.pid')
+  deamon = guniron_daemon('/tmp/gunicorn-deamon.pid')
 
   if len(sys.argv) == 2:
     if 'start' == sys.argv[1]:

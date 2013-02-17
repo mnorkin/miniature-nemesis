@@ -140,8 +140,8 @@ def symlink_current_release():
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
-  virtualenv('%s/releases/current/%s/manage.py syncdb' %(env.code_root, env.project_name))
-  virtualenv('%s/releases/current/%s/manage.py collectstatic' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/manage.py syncdb --noinput' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/manage.py collectstatic --noinput' %(env.code_root, env.project_name))
   virtualenv('%s/releases/current/%s/deamon.py start >> /tmp/gunicorn.log' %(env.code_root, env.project_name))
   """Launch deamon"""
 
