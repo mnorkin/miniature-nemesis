@@ -55,6 +55,10 @@ class Tickers:
       return None
 
   def send(data=None):
+    """
+    Sending data to the API
+    """
+    
     if data:
       if rest.send("POST","/api/tickers/", data):
         """Trying to send POST"""

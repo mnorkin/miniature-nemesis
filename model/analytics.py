@@ -26,7 +26,7 @@ class Analytics:
       """
       Get specific analytic data and parse it to the front-end
       """
-      analytic_data = collect(analytic)
+      analytic_data = self.collect(analytic)
       if analytic_data and self.send(analytic_data):
         return True
         """If everything was okay -- return true"""

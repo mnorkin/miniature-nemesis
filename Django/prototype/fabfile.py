@@ -134,26 +134,14 @@ def symlink_current_release():
   require('release', provided_by=[environment])
   sudo('cd %s; ln -s %s releases/current; chown %s -R releases/current; chgrp %s -R releases/current' %(env.code_root, env.release, env.user, env.user))
   put('nginx.conf', '/etc/nginx/sites-enabled/default')
-
-def install_site():
-  # TODO
-  pass
-
-def commit():
-  local('git add -p && git commit')
-
-def push():
-  local('git push')
-
-def prepare_deploy():
-  test()
-  commit()
-  push()
+  virtualenv('cd %s; chmod +x deamon.py' %(env.code_root))
+  """Make executable"""
 
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
-  virtualenv('%s/releases/current/%s/manage.py run_gunicorn >> /tmp/gunicorn.log &' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/deamon.py start >> /tmp/gunicorn.log' %(env.code_root, env.project_name))
+  """Launch deamon"""
 
 def restart_webserver():
   "Restart web server"

@@ -6,10 +6,10 @@ Then the new target price comes by, filter all the old ones and calculate all th
 
 TODO:
 * Make a trigger for the app to fetch the target price data (this thing needs all the data available from the database on specific stock)
-* Pass all the data from the trigger to this app
-* Get the stock data from the google (nearly done)
-* Calculate what is needed
-* Pass the arguments with the feature identification to the main database
+* Pass all the data from the trigger to this app 
+* Get the stock data from the yahoo (done)
+* Calculate what is needed (done)
+* Pass the arguments with the feature identification to the main database (almost done)
 """
 
 import unidecode
@@ -112,51 +112,70 @@ def fetch_features():
         if utils.DEBUG:
           print "Feature data update fail, nothing to try"
         return False
-      
-def fetch_featureanalytictickers():
-  """
-  Fetching the features to the server, which has the target prices
-
-  * A big TODO
-  """
-
-  for targetprice in database.get_targetprices():
-    """Get this date target prices"""
-    target_data = database.get_targetprices(targetprice['analytic'], targetprice['ticker'])
-    """Get all the target prices in before the current target price"""
-    if target_data.__len__() > 1:
-      """Check if there is any data"""
-      stock_data = stock_quote.get_data(targetprice['ticker'])
-      """Catch all the stocks"""
-      features = Features(target_data, stock_data)
-      """Calculate the features"""
-      for feature_method in inspect.getmembers(features, predicate=inspect.ismethod):
-        print feature_method[0]
-        # eval('feature.' + feature_method[0])
-
-
-  # for analytic in get_analytics():
-  #   for ticker in get_tickers(analytic):
-  #     target_date = get_targetprices(analytic, ticker)
-  #     stock_data = stock_quote.get_data(ticker)
-  #     if target_data.__len__() > 1:
-  #       feature = Feature(target_data, stock_data)
-  #     else:
-  #       if DEBUG:
-  #         print 'Not enough target price data for %s ticker' % ticker
 
 def main():
   """
   Main object 
 
   Logic:
-  * Main app is launched, then the crontab has fetched new target prices
+  * Main app is launched with contrab, then another crontab has fetched new target prices
   * Then this appears:
     * Get the target prices
     * Fetch analytic and ticker data, which is in target price list to the front-end
     * Calculate all the features and fetch them to the front-end
     * Finally, fetch the target price data to the front-end
+  TODO:
+  * Send the feature analytic ticker data
+  * Modify API to digest multiple data input 
   """
+
+  analytics = Analytics()
+  tickers = Tickers()
+
+  feature_analytic_ticker_data = []
+
+  for target_price in database.get_targetprices():
+    """
+    Get the most recent target prices
+    """
+    date = target_price['date']
+    price = target_price['date']
+    ticker_slug = utils.slugify(target_price['ticker'])
+    analytic_slug = utils.slugify(target_price['analytic'])
+
+    if not utils.DEBUG:
+      analytics.fetch(target_price['analytic'])
+    """Fetch analytics data"""
+    if not utils.DEBUG:
+      tickers.fetch(target_price['ticker'])
+    """Fetch ticker data"""
+    target_data = database.get_targetprices(target_price['analytic'], target_price['ticker'])
+    """Get all historical data of analytic and ticker relationship"""
+    if target_data.__len__() > 1:
+      if utils.DEBUG:
+        print "Enough data for ", target_price['ticker'], " on ", target_price['analytic']
+      """If we have any history data at all"""
+      stock_data = stock_quote.get_data(target_price['ticker'])
+      """Get stock data of ticker"""
+      if stock_data:
+        """Check if there is any stock data (happens, then ticker is too old or invalid)"""
+        features = Features(target_data, stock_data, False, True)
+        """Get all and calculate the defined features"""
+        features_values = features.values()
+        [ x.update({'ticker_slug': ticker_slug, 'analytic_slug': analytic_slug}) for x in features_values ]
+
+        if utils.DEBUG:
+          print "Feature values: ", features_values
+        feature_analytic_ticker_data.append(features_values)
+
+    else:
+      if utils.DEBUG:
+        print "Not enough data for ", target_price['ticker'], " on ", target_price['analytic']
+        print "Skipping"
+
+  if feature_analytic_ticker_data.__len__() > 1:
+    if utils.DEBUG:
+      print "The big feature analytic ticker data to send: ", feature_analytic_ticker_data
 
 if __name__ == '__main__':
   main()

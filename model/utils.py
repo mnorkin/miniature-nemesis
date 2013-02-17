@@ -2,6 +2,9 @@
 The Utils 
 """
 
+import unidecode
+import re
+
 # Settings
 DEBUG = True
 
