@@ -144,7 +144,7 @@ if __name__ == '__main__':
   * A better logging solution, by date for example
   """
   log_date = datetime.datetime.now().strftime('%Y-%m-%d')
-  log_path = "/var/log/gunicorn/" + log_date + "/everything.log"
+  log_path = "/var/log/gunicorn_everything_" + log_date  + ".log"
   deamon = guniron_daemon('/tmp/gunicorn-deamon.pid', '/dev/null', log_path, log_path)
 
   if len(sys.argv) == 2:
