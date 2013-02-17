@@ -117,6 +117,9 @@ class Daemon:
         print str(err)
         sys.exit(1)
 
+    os.system('pkill gunicorn')
+    """A fast and robust way to kill gunicorn server, otherwise not killable"""
+
   def restart(self):
     """
     Restart the daemon
@@ -132,10 +135,16 @@ class Daemon:
     
 class guniron_daemon(Daemon):
   def run(self):
-    os.system('./manage.py run_gunicorn')
+    os.system('cd /var/www/targetprice/releases/current/morbid; gunicorn prototype.wsgi')
 
 if __name__ == '__main__':
-  deamon = guniron_daemon('/tmp/gunicorn-deamon.pid')
+  """
+  TODO:
+  * A better logging solution, by date for example
+  """
+  log_date = datetime.datetime.now().strftime('%Y-%m-%d')
+  log_path = "/var/log/gunicorn/" + log_date + "/everything.log"
+  deamon = guniron_daemon('/tmp/gunicorn-deamon.pid', '/dev/null', log_path, log_path, log_path)
 
   if len(sys.argv) == 2:
     if 'start' == sys.argv[1]:
