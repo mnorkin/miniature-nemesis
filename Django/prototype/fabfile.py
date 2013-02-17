@@ -116,8 +116,6 @@ def upload_tar_from_git(path):
 
   sudo('cd %s && tar zxf ../../../packages/%s.tar.gz' %(env.whole_path, env.release))
   sudo('cp %s/nginx.conf /etc/nginx/sites-enabled/default' %(env.whole_path))
-  virtualenv('%s/releases/current/%s/manage.py syncdb' %(env.code_root, env.project_name))
-  virtualenv('%s/releases/current/%s/manage.py collectstatic' %(env.code_root, env.project_name))
   sudo('chown %s -R %s'% (env.user,env.whole_path))
   sudo('chgrp %s -R %s'% (env.user,env.whole_path))
   local('rm %s.tar.gz'% (env.release))
@@ -134,12 +132,16 @@ def symlink_current_release():
   require('release', provided_by=[environment])
   sudo('cd %s; ln -s %s releases/current; chown %s -R releases/current; chgrp %s -R releases/current' %(env.code_root, env.release, env.user, env.user))
   put('nginx.conf', '/etc/nginx/sites-enabled/default')
-  virtualenv('cd %s; chmod +x deamon.py' %(env.code_root))
+  virtualenv('cd %s; chmod +x releases/current/%s/deamon.py' %(env.code_root, env.project_name))
+  virtualenv('cd %s; mv releases/current/%s/prototype/settings.py releases/current/%s/prototype/settings_local.py' %(env.code_root, env.project_name, env.project_name))
+  virtualenv('cd %s; mv releases/current/%s/prototype/settings_dev.py releases/current/%s/prototype/settings.py' %(env.code_root, env.project_name, env.project_name))
   """Make executable"""
 
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
+  virtualenv('%s/releases/current/%s/manage.py syncdb' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/manage.py collectstatic' %(env.code_root, env.project_name))
   virtualenv('%s/releases/current/%s/deamon.py start >> /tmp/gunicorn.log' %(env.code_root, env.project_name))
   """Launch deamon"""
 
