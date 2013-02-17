@@ -142,7 +142,7 @@ def start_webserver():
   sudo("nginx -s reload")
   virtualenv('%s/releases/current/%s/manage.py syncdb --noinput' %(env.code_root, env.project_name))
   virtualenv('%s/releases/current/%s/manage.py collectstatic --noinput' %(env.code_root, env.project_name))
-  virtualenv('%s/releases/current/%s/deamon.py start >> /tmp/gunicorn.log' %(env.code_root, env.project_name))
+  virtualenv('cd %s/releases/current/%s/; ./deamon.py start >> /tmp/gunicorn.log' %(env.code_root, env.project_name))
   """Launch deamon"""
 
 def restart_webserver():

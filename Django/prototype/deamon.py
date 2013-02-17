@@ -132,7 +132,7 @@ class Daemon:
     
 class guniron_daemon(Daemon):
   def run(self):
-    os.system('cd /var/www/targetprice; source bin/activate; ./releases/current/morbid/manage.py run_gunicorn')
+    os.system('./manage.py run_gunicorn')
 
 if __name__ == '__main__':
   deamon = guniron_daemon('/tmp/gunicorn-deamon.pid')
