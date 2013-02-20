@@ -26,9 +26,10 @@
 		<li class="number">{{ ticker.number_of_tp }} <span>Active target prices</span> </li>
 		<li class='avg'>
 		<ul>
-			<li>Min: {{ ticker.consensus_min }}</li>
-			<li>Avg: {{ ticker.consensus_avg }}</li>
-			<li>Max: {{ ticker.consensus_max }}</li>
+			<li class='mn'><i>{{ ticker.consensus_min }}</i> min </li>
+			<!-- calculate avg value. left style is from min 45px to max 260px -->
+			<li class='av' style="left:113px;"><i>{{ ticker.consensus_avg }}</i>avg </li>
+			<li class='mx'><i>{{ ticker.consensus_max }}</i> max </li>
 		</ul>
 		</li>
 	</ul>

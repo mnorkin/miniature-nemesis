@@ -38,7 +38,7 @@ var index_page_type = "{{ptype}}";
 
 					<ul class="bar">
 						{% for fap in target.fap %}
-							<li id="{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}" class="feature"></li>
+							<li id="{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}" class="feature"><span>{{fap.feature.name}}</span></li>
 							<script type="text/javascript">
 								generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value }}", "{{fap.feature.name}}" )
 							</script>
