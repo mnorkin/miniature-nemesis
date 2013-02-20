@@ -44,24 +44,21 @@
 
 function generate_grid_element(id, dataset, posName) {
 	if (id != null && dataset != null) {
-
+		dataset = [dataset];
+		
+		var width = index_page_type == 'list' ? 143 : 356;
+		
 		var x = d3.scale.linear()
-		.domain([0, 100])
-		.range([0, 356]);
-
-		var y = d3.scale.ordinal()
-		.domain(dataset)
-		.rangeBands([0, 100]);
-
-		console.log(dataset)
-
-		var chart = d3.select("#" + id).append('svg').attr('width', 356).attr('height', '20').append('g');
+		.domain([0, 500])
+		.range([0, width]);
+		
+		var chart = d3.select("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
 		chart.selectAll('rect')
-			.data(function(d,i){  return dataset[i]})
+			.data(dataset)
 			.enter().append('rect')
 			.attr('class', function(d,i){ return posName[i]; })
 			.attr('height', 12)
-			.attr('y', y)
+			.attr('y', 0)
 			.attr('rx',4)
 			.attr('ry',4)
 			.attr('txt', function(d,i){ return d+'%';} )
@@ -69,12 +66,14 @@ function generate_grid_element(id, dataset, posName) {
 			.text( String );
 
 	} else {
-		return false;
+		return;
 	}	
 }
 
 function generate_pie(id, value) {
-
+	
+	if(index_page_type == 'list'){ return; }
+	
 	var percent = value;
 	var dataset = [percent,(100-percent)];
 
@@ -114,7 +113,7 @@ function generate_pie(id, value) {
 }
 
 /* tested only with 3 entries (target prices) */
-function run_list(){
+function run_list_NENAUDOJAMA(){
 
 	var dataset = [[20, 93, 45], [60, 73, 45], [20, 73, 25]];
 	var count = 3;
@@ -150,7 +149,7 @@ function run_list(){
 	.text( String );
 }
 
-function run_grid_pie(){
+function run_grid_pie_NENAUDOJAMA(){
 
 	var percent = 64;
 	var dataset = [percent,(100-percent)];
@@ -189,28 +188,21 @@ function run_grid_pie(){
 /* DOM ready */
 $(function(){
 
-	// run_grid();
-	// run_list();
-	// run_grid_pie();
 
 	/* Tooltip (percent info box) */
-	// $('.chart .bar rect').hover(function(){
-	// 	var obj = $(this);
-	// 	var tooltip = obj.parent('g').parent('svg').siblings('.bar_tooltip');
+	 $('.chart .bar rect').hover(function(){
+	 	var obj = $(this);
+	 	var chart = obj.closest('.chart');
+	 	var tooltip = chart.children('.bar_tooltip');
+	 	
+ 		var top = obj.offset().top - chart.offset().top - 2;
+ 		var left = obj.offset().left -chart.offset().left + parseInt(obj.attr('width')); ;
 
-	// 	if($('.title').hasClass('grid')){
-	// 		var top = parseInt( obj.attr('y') ) +17;
-	// 		var left = parseInt(obj.attr('width')) +14;
-	// 	} else {
-	// 		var top = -3;
-	// 		var left = parseInt(obj.attr('x')) + parseInt(obj.attr('width')) ;
-	// 	}
+	 	tooltip.fadeIn(100);
+	 	tooltip.text(obj.attr('txt')).css({top:top,left:left});
+	 }, function(){});
 
-	// 	tooltip.fadeIn(100);
-	// 	tooltip.text(obj.attr('txt')).css({top:top,left:left});
-	// }, function(){});
-
-	// $('.chart').hover(function(){}, function(){ $('.chart .bar_tooltip').fadeOut(150); })
+	 $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); })
 
 })
 

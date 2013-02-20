@@ -1,6 +1,9 @@
 {% extends "morbid/base.html" %}
 
 {% block content %}
+<script type="text/javascript">
+var index_page_type = "{{ptype}}";
+</script>
 
 <div class="latest_target_prices title {{ptype}}">
 	
@@ -20,7 +23,6 @@
 		</div>
 		<ul class="">
 			{% for target in latest_target_prices  %}
-
 				<li class="entry chart">
 					<a class="ticket" href="{{ target.ticker.get_absolute_url }}">{{ target.ticker }}</a>
 					<a class="analytic" href="{{ target.analytic.get_absolute_url }}">{{ target.analytic }}</a>
@@ -31,7 +33,7 @@
 					</span>
 
 					<script type="text/javascript">
-					generate_pie( "{{ target.analytic.slug}}_{{ target.ticker.slug }}", "{{ target.change }}" )
+						generate_pie( "{{ target.analytic.slug}}_{{ target.ticker.slug }}", "{{ target.change }}" )
 					</script>
 
 					<ul class="bar">
@@ -42,6 +44,7 @@
 							</script>
 						{% endfor %}
 					</ul>
+					<div class="bar_tooltip"></div>
 				</li>
 
 			{% endfor %}
@@ -50,6 +53,6 @@
 	{% else %}
 		<p>Error, no target prices</p>
 	{% endif %}
-
+	
 </div>
 {% endblock %}

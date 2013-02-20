@@ -28,16 +28,16 @@ def index(request):
 
 	feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct, feature__display_in_frontpage=True )
 	target_price_list = []
-
+	
 	for target_price in latest_target_prices:
 
 		target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
 		target_price_list.append(target_price)
-
+		
 	t = loader.get_template('morbid/index.html')
 
 	if 'ptype' in request.GET:
-		ptype = 'list'
+		ptype = request.GET['ptype']
 	else:
 		ptype = 'grid'
 
