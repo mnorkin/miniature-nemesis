@@ -620,7 +620,7 @@ li{ list-style: none; }
     margin-left: 230px;
     position: relative;
 }
-.analyser li{
+.analyser .bank li{
     background: #ffffff;
     height: 53px;
     border:1px solid #f6f4f2;
@@ -664,7 +664,12 @@ li{ list-style: none; }
     display: block;
 }
 
-.in_graph{
+.in_graph {
+    position: absolute;
+    width:177px;
+    right: 0;
+}
+.in_graph button{
     background: url('../images/analyse_1.png') 16px 50% no-repeat #e95200;
     color:#fff;
     float: right;
@@ -677,5 +682,52 @@ li{ list-style: none; }
     font-weight: bold;
     cursor: pointer;
 }
+.in_graph .sear{
+    display: none;
+}
+.in_graph.active .sear{
+    display: block;
+    position: absolute;
+    top:0;
+    left:0;
+    width:177px;
+}
 
+.in_graph .sear input{
+    width:162px;
+    padding:11px 0 11px 17px;
+    border: 1px solid #e7ded5;
+    border-bottom: 0;
+}
+.in_graph .sear ul{
+    border: 1px solid #e7ded5;
+    width:179px;
+    margin-bottom: 20px;
+    max-height: 263px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.in_graph .sear li{
+    width:162px;
+    padding:7px 0 7px 17px;
+    border-bottom: 1px dashed #e7ded5;
+    background: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+}
+.in_graph .sear li:last-child{
+    border-bottom: 0;
+}
+.in_graph .sear li:hover{
+    background: url('../images/in_graph_add_1.png') 85% 50% no-repeat #f3ede8;
+}
+.in_graph .sear li.active{
+    background: #ed702d;
+    color:#FFFFFF;
+    border-bottom: 1px solid #e7ded5;
+}
+.in_graph .sear li.active:hover{
+    background: url('../images/in_graph_remove_1.png') 85% 50% no-repeat #ed702d;
+}
 

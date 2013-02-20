@@ -202,9 +202,33 @@ $(function(){
 	 	tooltip.text(obj.attr('txt')).css({top:top,left:left});
 	 }, function(){});
 
-	 $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); })
+	 $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); });
+	 
+	 $('body').click(in_graph_click);
+	 $('.in_graph').click(in_graph_click);
+	 $('.in_graph .sear li').click(in_graph_entry_click);
 
 })
+
+function in_graph_click(){
+	var obj = $(this);
+	
+	if($('.in_graph').hasClass('tmp') ){
+		$('.in_graph').removeClass('tmp')
+		return;
+	}
+
+	if(obj.parents().length > 2){
+		obj.addClass('tmp');
+		obj.addClass('active');
+	}else{
+		$('.in_graph').removeClass('active')
+	}
+}
+
+function in_graph_entry_click(){
+	$(this).toggleClass('active');
+}
 
 function get_inner( object ) {
 	var i, n = object.length;
