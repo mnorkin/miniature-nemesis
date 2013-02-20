@@ -8,7 +8,9 @@ from itertools import chain
 from django.db import connection, transaction
 import json
 from django.conf import settings
+from prototype.decorators import logged_in_or_basicauth
 
+@logged_in_or_basicauth(realm="Limited access")
 def index(request):
 	"""
 	Index page

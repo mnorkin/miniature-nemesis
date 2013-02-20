@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication
 from api.handlers import FeatureAnalyticTickerHandler
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 auth = HttpBasicAuthentication(realm='morbid_realm')
 ad = { 'authentication' : auth }
@@ -32,3 +33,6 @@ urlpatterns = patterns('',
     # url(r'^api/feature_analytic_ticker/(?P<analytic_slug>[^/]+)/(?P<ticker_slug>[^/]+)/(?P<feature_id>\d+)/(?P<value>[^/]+)/$', feature_analytic_ticker_resource)
     url(r'^api/', include('api.urls'))
 )
+
+# Statics (need for gunicorn)
+urlpatterns += staticfiles_urlpatterns()

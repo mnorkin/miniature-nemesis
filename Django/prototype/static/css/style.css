@@ -456,13 +456,24 @@ li{ list-style: none; }
 .corp_info > li{
     float: left;
 }
+.corp_info .name .text-gradient {
+    background: url('../images/gradient.png') repeat-y 100% 50%;
+    position:absolute;
+    z-index:999;
+    width: 200px;
+    height: 27px;
+    margin-top: -27px;
+}
 
-.corp_info .name{
+.corp_info .name {
     font-weight: bold;
     font-size:18px;
-    padding: 21px 20px;
+    margin: 21px 20px;
+    overflow-x:hidden;
+    white-space: nowrap;
     width: 200px;
 }
+
 .corp_info .price{
     color:#e95200;
     font-size: 22px;
@@ -601,6 +612,7 @@ li{ list-style: none; }
     padding:8px 20px;
     height:37px;
     width: 155px;
+    white-space: nowrap;
     border-right: 1px solid #fbf8f6;
 }
 .analyser li .date{

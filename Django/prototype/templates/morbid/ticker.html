@@ -1,50 +1,75 @@
-<h1><a href="/">Ticker page</a></h1>
+{% extends "morbid/base.html" %}
 
-{% if ticker %}
-	
-<h2>General information</h2>
-<ul>
-	<li>{{ ticker.long_name }} ({{ ticker.name }})</li>
-	<li>Last stock price: {{ ticker.last_stock_price }} $</li>
-	<li>Number of banks {{ ticker.number_of_analytics }}</li>
-	<li>Number of target prices {{ ticker.number_of_tp }}</li>
-	<li>Consensus</li>
-	<ul>
-		<li>Min: {{ ticker.consensus_min }}</li>
-		<li>Avg: {{ ticker.consensus_avg }}</li>
-		<li>Max: {{ ticker.consensus_max }}</li>
+
+{% block sidebar %}
+  <div class="inner">
+        <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
+        <div class="search">
+            <form action="" method="get">
+                <input type="text" name="q" value="" class="inp-s" />
+                <input type="submit" value="Search" class="sub-s"/>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block content %}
+
+	{% if ticker %}
+		
+	<ul class="corp_info">
+		<li class="name">{{ ticker.long_name }} ({{ ticker.name }})<div class="text-gradient"></div></li>
+		<li class="price">{{ ticker.last_stock_price }}</li>
+		<li class="price_detail">1.50(<i></i>3.25%)</li>
+		<li class="number">{{ ticker.number_of_analytics }} <span>Analysis</span> </li>
+		<li class="number">{{ ticker.number_of_tp }} <span>Active target prices</span> </li>
+		<li class='avg'>
+		<ul>
+			<li>Min: {{ ticker.consensus_min }}</li>
+			<li>Avg: {{ ticker.consensus_avg }}</li>
+			<li>Max: {{ ticker.consensus_max }}</li>
+		</ul>
+		</li>
 	</ul>
-</ul>
-
-<ul>
-	<li>Valid target prices</li>
-	{# List of all the target prices for this ticker #}
-		{% if target_prices %}
+	
+	<div class="inner_buttons">
+		<a href="" class="active ta">Target prices</a>
+		<a href="" class="an">Analysis</a>
+		<br class="clear" />
+		<div class="line"></div>
+	</div>
+	
+	<div class="analyse_menu">
+		{% for feature in features %}
+			<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a>
+		{% endfor %}
+	</div>
+	
+	<div class="analyser">
 		<ul>
 			{% for target in target_prices %}
-				<li>{{ target.analytic }} on {{ target.date }} -- {{ target.price }} $</li>
+				<li>
+					<span class="corp">{{ target.analytic }}</span> 
+					<span class="date">{{ target.date }}</span>
+					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
+					<span class="number">35.1<strong>No of target prices</strong> </span>
+					<span class="number">-1<strong>Volatility</strong> </span>
+				</li>
 				{% if target.fap %}
-					<ul>
-						{% for feature in target.fap %}
-							<li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li>
-						{% endfor %}
-					</ul>
+					<!-- <ul> -->
+						<!-- {% for feature in target.fap %} -->
+							<!-- <li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li> -->
+						<!-- {% endfor %} -->
+					<!-- </ul> -->
 				{% endif %}
 			{% endfor %}
 		</ul>
-		{% endif %}
-	<li>Analysis</li>
-	{# Analysis of the data #}
-		<ul>
-			{% if features %}
-			<li>Features</li>
-				<ul>
-					{% for feature in features %}
-						<li><a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a></li>
-					{% endfor %}
-				</ul>
-			{% endif %}
-		</ul>
-</ul>
+		<button class="in_graph">In graph analysis</button>
+		<br class="clear" />
+	</div>
+	
+	<br class="clear" />
+	{% endif %}
+{% endblock %}
 
-{% endif %}

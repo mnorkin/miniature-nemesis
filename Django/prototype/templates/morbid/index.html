@@ -22,8 +22,8 @@
 			{% for target in latest_target_prices  %}
 
 				<li class="entry chart">
-					<a class="ticket" href="{{ target.ticket.get_absolute_url }}">{{ target.ticker }}</a>
-					<a class="analytic">{{ target.analytic }}</a>
+					<a class="ticket" href="{{ target.ticker.get_absolute_url }}">{{ target.ticker }}</a>
+					<a class="analytic" href="{{ target.analytic.get_absolute_url }}">{{ target.analytic }}</a>
 					<span class="price">{{ target.price }}</span>
 
 					<span id="{{ target.analytic.slug}}_{{ target.ticker.slug }}" class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
@@ -52,9 +52,4 @@
 	{% endif %}
 
 </div>
-<<<<<<< HEAD
 {% endblock %}
-=======
-
-<span>vidmantas test</span>
->>>>>>> 492bf2d10b6f8409a0fe2ecfb0165829a1ba57f3
