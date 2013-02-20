@@ -37,7 +37,7 @@ class AnalyticHandler(BaseHandler):
   Analytic data handler
   """
 
-  allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
+  allowed_methods = ('GET', 'POST', 'PUT')
   model = Analytic
 
   def read(self, request, analytic_slug=None):
@@ -55,6 +55,8 @@ class AnalyticHandler(BaseHandler):
 
     if request.content_type:
       data = request.data
+
+      analytic = Analytic;
 
       try:
         analytic = self.model.objects.get(slug=data['slug'])
@@ -85,7 +87,7 @@ class AnalyticHandler(BaseHandler):
 
       em.save()
 
-      return rc.ACCEPTED
+      return rc.ALL_OK
     else:
       super(Analytic, self).create(request)
 
@@ -106,7 +108,7 @@ class TickerHandler(BaseHandler):
   Ticker data handler
   """
 
-  allowed_methods = ('GET', 'POST')
+  allowed_methods = ('GET', 'POST', 'PUT')
   model = Ticker
 
   def read(self, request, ticker_slug=None):
@@ -116,20 +118,29 @@ class TickerHandler(BaseHandler):
       return Ticker.objects.all()
 
   def create(self, request):
+
     if request.content_type:
+
       data = request.data
 
-      em = self.model(name=data['name'],
-        long_name=data['long_name'],
-        last_stock_price=data['last_stock_price'],
-        number_of_analytics=data['number_of_analytics'],
-        number_of_tp=data['number_of_tp'],
-        consensus_min=data['consensus_min'],
-        consensus_avg=data['consensus_avg'],
-        consensus_max=data['consensus_max'],
-        slug=data['slug'])
+      ticker = Ticker
 
-      em.save()
+      try:
+        ticker = self.model.objects.get(slug=data['slug'])
+        return rc.DUPLICATE_ENTRY
+      except ticker.DoesNotExist:
+ 
+        em = self.model(name=data['name'],
+          long_name=data['long_name'],
+          last_stock_price=data['last_stock_price'],
+          number_of_analytics=data['number_of_analytics'],
+          number_of_tp=data['number_of_tp'],
+          consensus_min=data['consensus_min'],
+          consensus_avg=data['consensus_avg'],
+          consensus_max=data['consensus_max'],
+          slug=data['slug'])
+
+        em.save()
 
       return rc.CREATED
     else:
@@ -155,7 +166,7 @@ class TickerHandler(BaseHandler):
 
       em.save()
 
-      return rc.ACCEPTED
+      return rc.ALL_OK
     else:
       super(Ticker, self).create(request)
 
@@ -167,7 +178,7 @@ class TargetPriceHandler(BaseHandler):
   Target price data handler
   """
 
-  allowed_methods = ('GET', 'POST')
+  allowed_methods = ('GET', 'POST', 'PUT')
   model = TargetPrice
 
   def read(self, request, target_price_id=None):
@@ -180,6 +191,10 @@ class TargetPriceHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
+      ticker = Ticker
+      analytic = Analytic
+      targetprice = TargetPrice
+
       try:
         ticker = Ticker.objects.get(slug=data['ticker_slug'])
       except ticker.DoesNotExist:
@@ -190,15 +205,23 @@ class TargetPriceHandler(BaseHandler):
       except analytic.DoesNotExist:
         return rc.NOT_FOUND
 
+      try:
+        targetprice = TargetPrice.objects.get(analytic=analytic, ticker=ticker, date=data['date'])
+      except targetprice.DoesNotExist:
 
-      em = self.model(date=data['date'],
-        price=data['price'],
-        ticker=ticker.id,
-        analytic=analytic.id)
 
-      em.save()
 
-      return rc.CREATED
+        em = self.model(date=data['date'],
+          price=data['price'],
+          change=data['change'],
+          ticker=ticker,
+          analytic=analytic)
+        em.save()
+
+        return rc.CREATED
+
+      return rc.DUPLICATE_ENTRY
+
     else:
       super(TargetPrice, self).create(request)
 
@@ -206,6 +229,9 @@ class TargetPriceHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
+      ticker = Ticker
+      analytic = Analytic
+
       try:
         ticker = Ticker.objects.get(slug=data['ticker_slug'])
       except ticker.DoesNotExist:
@@ -217,18 +243,15 @@ class TargetPriceHandler(BaseHandler):
         return rc.NOT_FOUND
 
       try:
-        em = self.model.objects.get(id=data['target_price_id'])
+        em = self.model.objects.get(date=data['date'], analytic=analytic, ticker=ticker)
       except em.DoesNotExist:
         return rc.NOT_FOUND
 
-      em.date = data['date']
       em.price = data['price']
-      em.ticker = ticker.id
-      em.analytic = analytic.id
-
+      em.change = data['change']
       em.save()
 
-      return rc.ACCEPTED
+      return rc.ALL_OK
     else:
       super(TargetPrice, self).create(request)
 
@@ -268,7 +291,7 @@ class UnitHandler(BaseHandler):
       em.value = data['value']
       em.save()
 
-      return rc.ACCEPTED
+      return rc.ALL_OK
     else:
       super(Unit, self).create(request)
 
@@ -293,20 +316,30 @@ class FeatureHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
+      unit = Unit
+      feature = Feature
+
       try:
-        unit = Unit.objects.get(id=data['unit'])
-      except unit.DoesNotExist:
-        return rc.NOT_FOUND
+        feature = Feature.objects.get(slug=data['feature_slug'])
+      except feature.DoesNotExist:
 
-      em = self.model(name=data['name'],
-        unit=unit.id, # FIXME: Change this buddy to id
-        display_in_frontpage=data['display_in_frontpage'],
-        description=data['description'] 
-        )
+        try:
+          unit = Unit.objects.get(id=data['unit_id'])
+        except unit.DoesNotExist:
+          return rc.NOT_FOUND
 
-      em.save()
+        em = self.model(name=data['name'],
+          unit=unit,
+          display_in_frontpage=data['display_in_frontpage'],
+          description=data['description'],
+          slug=data['feature_slug']
+          )
 
-      return rc.CREATED
+        em.save()
+
+        return rc.CREATED
+
+      return rc.NOT_FOUND
 
     else:
       super(Feature, self).create(request)
@@ -315,19 +348,27 @@ class FeatureHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
+      feature = Feature
+      unit = Unit
+
       try:
-        em = self.model.objects.get(id=data['feature_id'])
-      except em.DoesNotExist:
+        feature = Feature.objects.get(slug=data['feature_slug'])
+      except feature.DoesNotExist:
         return rc.NOT_FOUND
 
-      em.name = data['name']
-      em.unit = data['unit']
-      em.display_in_frontpage = data['display_in_frontpage']
-      em.description = data['description']
+      try:
+        unit = Unit.objects.get(id=data['unit_id'])
+      except unit.DoesNotExist:
+        return rc.NOT_FOUND
 
-      em.save()
+      feature.name = data['name']
+      feature.unit = unit
+      feature.display_in_frontpage = data['display_in_frontpage']
+      feature.description = data['description']
 
-      return rc.ACCEPTED
+      feature.save()
+
+      return rc.ALL_OK
 
     else:
       super(Feature, self).create(request)
@@ -343,6 +384,7 @@ class FeatureAnalyticTickerHandler(BaseHandler):
   model = FeatureAnalyticTicker
 
   def read(self, request, feature_analytic_ticker_id=None):
+
     if feature_analytic_ticker_id:
       return FeatureAnalyticTicker.objects.get(id=feature_analytic_ticker_id)
     else:
@@ -352,6 +394,11 @@ class FeatureAnalyticTickerHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
+      analytic = Analytic
+      ticker = Ticker
+      feature = Feature
+      featureanalyticticker = FeatureAnalyticTicker
+
       try:
         analytic = Analytic.objects.get(slug=data['analytic_slug'])
       except analytic.DoesNotExist:
@@ -363,18 +410,24 @@ class FeatureAnalyticTickerHandler(BaseHandler):
         return rc.NOT_FOUND
 
       try:
-        feature = Feature.objects.get(id=data['feature_id'])
+        feature = Feature.objects.get(slug=data['feature_slug'])
       except feature.DoesNotExist:
         return rc.NOT_FOUND
 
-      em = self.model(value=data['value'],
-        feature=feature.id,
-        analytic=analytic.id,
-        ticker=ticker.id)
+      try:
+        featureanalyticticker = FeatureAnalyticTicker.objects.get(analytic=analytic,
+          ticker=ticker, feature=feature)
+      except featureanalyticticker.DoesNotExist:
 
-      em.save()
+        em = self.model(value=data['value'],
+          analytic=analytic,
+          ticker=ticker,
+          feature=feature)
+        em.save()
 
-      return rc.CREATED
+        return rc.CREATED
+
+      rc.DUPLICATE_ENTRY
 
     else:
       super(FeatureAnalyticTicker, self).create(request)
@@ -383,6 +436,12 @@ class FeatureAnalyticTickerHandler(BaseHandler):
     if request.content_type:
       data = request.data
 
+      analytic = Analytic
+      ticker = Ticker
+      feature = Feature
+
+      featureanalyticticker = FeatureAnalyticTicker
+
       try:
         analytic = Analytic.objects.get(slug=data['analytic_slug'])
       except analytic.DoesNotExist:
@@ -394,22 +453,21 @@ class FeatureAnalyticTickerHandler(BaseHandler):
         return rc.NOT_FOUND
 
       try:
-        feature = Feature.objects.get(id=data['feature_id'])
+        feature = Feature.objects.get(slug=data['feature_slug'])
       except feature.DoesNotExist:
         return rc.NOT_FOUND
 
       try:
-        em = self.model.objects.get(id=data['feature_analytic_ticker_id'])
-      except em.DoesNotExist:
+        featureanalyticticker = FeatureAnalyticTicker.objects.get(analytic=analytic, 
+          ticker=ticker, feature=feature)
+      except featureanalyticticker.DoesNotExist:
         return rc.NOT_FOUND
 
-      em.feature = feature.id
-      em.analytic = analytic.id
-      em.ticker = ticker.id
+      featureanalyticticker.value = data['value']
 
-      em.save()
+      featureanalyticticker.save()
 
-      return rc.ACCEPTED
+      return rc.ALL_OK
 
     else:
       super(FeatureAnalyticTicker, self).create(request)

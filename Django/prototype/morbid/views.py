@@ -25,19 +25,23 @@ def index(request):
 		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-365)).order_by('date').reverse()
 
 	feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct, feature__display_in_frontpage=True )
-
 	target_price_list = []
 
 	for target_price in latest_target_prices:
 
 		target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
-
 		target_price_list.append(target_price)
 
 	t = loader.get_template('morbid/index.html')
 
+	if 'ptype' in request.GET:
+		ptype = 'list'
+	else:
+		ptype = 'grid'
+
 	c = Context({
-		'latest_target_prices' : target_price_list
+		'latest_target_prices' : target_price_list,
+		'ptype' : ptype
 	})
 
 	return HttpResponse(t.render(c))

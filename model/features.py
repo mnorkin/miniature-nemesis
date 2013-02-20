@@ -23,25 +23,25 @@ class Features:
   calculated_feature_data = []
 
   units = {
-    'percent': {'id': 1, 'name': 'Percent', 'value': '%'},
-    'days': {'id': 2, 'name': 'Days', 'value': 'd'}
+    'percent': {'unit_id': 1, 'name': 'Percent', 'value': '%'},
+    'days': {'unit_id': 2, 'name': 'Days', 'value': 'd'}
     }
 
   features = {
     'accuracy': 
-      {'id': 1, 'name': 'Accuracy', 'display_in_frontpage': 1, 'unit': 1},
+      {'id': 1, 'name': 'Accuracy', 'display_in_frontpage': 1, 'unit_id': 1},
     'closeness': 
-      {'id': 2, 'name': 'Closeness', 'display_in_frontpage': 1, 'unit': 1},
+      {'id': 2, 'name': 'Closeness', 'display_in_frontpage': 1, 'unit_id': 1},
     'difference': 
-      {'id': 3, 'name': 'Difference', 'display_in_frontpage': 1, 'unit': 1},
+      {'id': 3, 'name': 'Difference', 'display_in_frontpage': 1, 'unit_id': 1},
     'profitability': 
-      {'id': 4, 'name': 'Profitability', 'display_in_frontpage': 0, 'unit': 1},
+      {'id': 4, 'name': 'Profitability', 'display_in_frontpage': 0, 'unit_id': 1},
     'max_profitability': 
-      {'id': 5, 'name': 'Max profitability', 'display_in_frontpage': 0, 'unit': 1},
+      {'id': 5, 'name': 'Max profitability', 'display_in_frontpage': 0, 'unit_id': 1},
     'impact_to_market': 
-      {'id': 6, 'name': 'Impact to market', 'display_in_frontpage': 0, 'unit': 1},
+      {'id': 6, 'name': 'Impact to market', 'display_in_frontpage': 0, 'unit_id': 1},
     'reach_time': 
-      {'id': 7, 'name': 'Reach time', 'display_in_frontpage': 0, 'unit': 2}
+      {'id': 7, 'name': 'Reach time', 'display_in_frontpage': 0, 'unit_id': 2}
     }
 
   def __init__(self, target_data=None, stock_data=None, plot=False, calculate=False):
@@ -70,7 +70,7 @@ class Features:
         if method != '__init__' and method != 'values':
           if utils.DEBUG:
             print method
-          item = {'feature_id': self.features[method]['id'], 'feature_slug': method,'value': bound()}
+          item = {'feature_slug': method,'value': bound()}
           if utils.DEBUG:
             print item
           self.calculated_feature_data.append(item)
@@ -149,7 +149,7 @@ class Features:
       print "Results: ", results
       print "Return result: ", float(sum(results)/self.local_target_data.__len__())
 
-    result = float(sum(results)/self.local_target_data.__len__())
+    result = float(sum(results)/self.local_target_data.__len__()) * 100
     return round(result,2);
 
   def closeness(self):
@@ -210,7 +210,7 @@ class Features:
       print "Results: ", results
       print "Return result: ", float(sum(results)/self.local_target_data.__len__())
 
-    result = float(sum(results)/self.local_target_data.__len__())
+    result = float(sum(results)/self.local_target_data.__len__()) * 100
     return round(result, 2)
 
   def difference(self):
@@ -279,7 +279,7 @@ class Features:
       print "Return result: ", float(sum(results)/self.local_target_data.__len__())
 
 
-    result = float(sum(results)/self.local_target_data.__len__())
+    result = float(sum(results)/self.local_target_data.__len__()) * 100
     return round(result, 2)
 
   def max_profitability(self):

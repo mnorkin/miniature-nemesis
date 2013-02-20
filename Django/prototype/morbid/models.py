@@ -46,6 +46,9 @@ class Feature(models.Model):
 	description = models.TextField()
 	"""Description of the feature
 	   @type: C{text}"""
+	slug = models.SlugField(max_length=200, unique=True)
+	"""Slug of the feature
+	   @type: C{str}"""
 
 	def __unicode__(self):
 		"""
@@ -58,7 +61,7 @@ class Analytic(models.Model):
 	Analysing analytic
 
 	"""
-
+	
 	name = models.CharField(max_length=200)
 	"""Name of analytic
 	   @type: C{str}"""
@@ -184,6 +187,9 @@ class TargetPrice(models.Model):
 	price = models.FloatField()
 	"""The price of the target price
 	   @type: C{Float}"""
+	change = models.FloatField()
+	"""The price change over the last price
+		 @type: C{Float}"""
 	ticker = models.ForeignKey(Ticker)
 	"""The Ticker on which target price was released
 	   @type: L{Ticker}"""

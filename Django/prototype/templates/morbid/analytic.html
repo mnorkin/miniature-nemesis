@@ -36,7 +36,7 @@
 				<ul>
 					{% for feature in features %}
 						<li><a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a></li>
-						<li>{{ feature.description|truncatewords_html:10 }}</li>
+						<li>Description: {{ feature.description|truncatewords_html:10 }}</li>
 					{% endfor %}
 				</ul>
 			{% endif %}

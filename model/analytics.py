@@ -7,7 +7,7 @@ class Analytics:
   Analytic object
   """
 
-  def fetch(analytic=None):
+  def fetch(self,analytic=None):
     """
     Fetching analytics data to the server
 
@@ -35,7 +35,7 @@ class Analytics:
         """If something went wrong -- return false"""
 
       
-  def collect(analytic=None):
+  def collect(self,analytic=None):
     """
     Method to collect analytic data
     """
@@ -66,7 +66,7 @@ class Analytics:
     else:
       return None
 
-  def send(data=None):
+  def send(self,data=None):
     """
     Method to send analytic data
     """

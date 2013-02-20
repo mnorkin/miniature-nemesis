@@ -5,17 +5,10 @@ when you run "manage.py test".
 The test manager, just to be on the safe side of the road
 """
 
-from django.test import TestCase
+from django.utils import unittest
+from django.test.client import Client
 
-
-# class SimpleTest(TestCase):
-#     def test_basic_addition(self):
-#         """
-#         Tests that 1 + 1 always equals 2.
-#         """
-#         self.assertEqual(1 + 1, 2)
-
-class ModelTest(TestCase):
+class ModelTest(unittest.TestCase):
   """
   Model test
   """
@@ -49,25 +42,43 @@ class ModelTest(TestCase):
     """
     pass
 
-class UrlTest(TestCase):
+class UrlTest(unittest.TestCase):
   """
   Url tester
   """
+
+  def setUp(self):
+    self.client = Client()
 
   def test_index(self):
     """
     Test for the index page
     """
-    pass
+    response = self.client.get('/')
+
+    self.assertEqual(response.status_code, 200)
 
   def test_analytic(self):
     """
     Test for the analytic page
     """
-    pass
+    response = self.client.get('/analytic/')
+    """Testing general request"""
+    self.assertEqual(response.status_code, 404)
+
+    response = self.client.get('/analytic/rbc-capital-markets')
+    """Testing specific request"""
+    self.assertEqual(response.status_code, 200)
 
   def test_ticker(self):
     """
     Test for the ticker page
     """
-    pass
+    response = self.client.get('/ticker/')
+    """Testing general request"""
+    self.assertEqual(response.status_code, 404)
+
+    response = self.client.get('/ticker/agn')
+    """Testing specific request"""
+    self.assertEqual(response.status_code, 200)
+    

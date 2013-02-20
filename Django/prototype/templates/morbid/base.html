@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    
+    <script type="text/javascript" src="/static/js/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/main.js"></script>
+    
+    <title>{% block title %}Target price{% endblock %}</title>
+</head>
+<body>
+    <div class="container">
+        <div id="header">
+        {% block sidebar %}
+            <div class="title">
+                <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
+                <div class="main_intro">We are still in private beta. Now we are analyzing companies which are in S&P500 index. You can find all the companies <a href=''>here.</a></div>
+                <div class="search">
+                    <form action="" method="get">
+                        <input type="text" name="q" value="" class="inp-s" />
+                        <input type="submit" value="Search" class="sub-s"/>
+                    </form>
+                </div>
+            </div>
+        {% endblock %}
+        </div>
+
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

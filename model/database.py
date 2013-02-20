@@ -68,6 +68,31 @@ def get_tickers(analytic=None):
 
   return results
 
+def get_previous_targetprice(analytic=None, ticker=None):
+  """
+  Method to return not current, but later target price
+  """
+  cur = connect_to_mysql()
+  if analytic and ticker:
+
+    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` FROM `entries` WHERE `analytic`='%s' and `ticket`='%s' AND (`price0` != 0 OR `price1` != 0 ) ORDER BY `date` DESC LIMIT 1,1" %(analytic, ticker)
+    cur.execute(query)
+
+    for row in cur.fetchall():
+      if row[1] != 0 or row[2] != 0:
+        # Checking the price variation (updated price or old)
+        if row[2] == 0:
+          price = row[1]
+        else:
+          price = row[2]
+        item = {'date': time.mktime(row[0].timetuple()), 
+          'price': price,
+          'analytic': row[3],
+          'ticker': row[4]}
+        return item
+  else:
+    return None
+  
 
 def get_targetprices(analytic=None, ticker=None):
   """
@@ -90,16 +115,21 @@ def get_targetprices(analytic=None, ticker=None):
   cur.execute(query)
 
   for row in cur.fetchall():
+    change = 0
     if row[1] != 0 or row[2] != 0:
       # Checking the price variation (updated price or old)
       if row[2] == 0:
         price = row[1]
       else:
         price = row[2]
+        previous_targetprice = get_previous_targetprice(row[3], row[4])
+        if previous_targetprice != None:
+          change = float(( price - previous_targetprice['price'] ) / price) * 100
       item = {'date': time.mktime(row[0].timetuple()), 
         'price': price,
         'analytic': row[3],
-        'ticker': row[4]}
+        'ticker': row[4],
+        'change': change}
       """Forming the dict"""
       if item not in results:
         """Escaping possible duplicates"""

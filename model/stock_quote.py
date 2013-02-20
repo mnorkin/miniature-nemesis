@@ -5,6 +5,7 @@ import urllib as u
 import string
 import datetime, time
 import utils
+import re
 
 def get_data(ticker):
   data = []
@@ -40,15 +41,21 @@ def get_data(ticker):
   return data
 
 def get_ticker_data(ticker):
+  PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
   data = []
   url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nb3x&e=.csv' % (ticker)
   f = u.urlopen(url, proxies = {})
   rows = f.readlines()
-  return rows
   r = rows[0]
   """Get the first entry"""
-  r = r[:-2].split(",")
+  r = PATTERN.split(r[:-2])[1::2]
   """Remove the `\r\n` and split by comma"""
+  if (not isinstance(r[2], int)) or (not isinstance(r[2], float)):
+    print "Data not available"
+    """Not available"""
+    r[2] = None
+    r[1] = 0
+
   item = {"long_name": r[0],
     "last_stock_price": r[1],
     "stock_exchange": r[2]}

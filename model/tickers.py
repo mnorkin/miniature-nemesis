@@ -8,7 +8,7 @@ class Tickers:
   Ticker object
   """
 
-  def fetch(ticker=None):
+  def fetch(self,ticker=None):
     """
     Fetching ticker information to the server
     """
@@ -25,7 +25,7 @@ class Tickers:
       else:
         return False
 
-  def collect(ticker=None):
+  def collect(self, ticker=None):
     """
     Collecting ticker data
     """
@@ -54,7 +54,7 @@ class Tickers:
     else:
       return None
 
-  def send(data=None):
+  def send(self, data=None):
     """
     Sending data to the API
     """

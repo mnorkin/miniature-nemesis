@@ -4,12 +4,12 @@
 -- CREATE EXTENSION wildspeed;
 
 ---
-INSERT INTO morbid_analytic (name, number_of_companies, number_of_tp, volatility, last_target_price, slug) VALUES 
-  ('Barclay',         '9',  '12', '3',    '123.54', 'barclay'),
-  ('Bernstein',       '15', '45', '-3',   '123.54', 'bernstein'),
-  ('Citigroup',       '11', '33', '-12',  '123.54', 'citigroup'),
-  ('Morgan Stanley',  '14', '23', '11',   '123.54', 'morgan-stanley'),
-  ('JP Morgan',       '21', '18', '1',    '123.54', 'jp-morgan'); -- initial data for the tickers
+-- INSERT INTO morbid_analytic (name, number_of_companies, number_of_tp, volatility, last_target_price, slug) VALUES 
+--   ('Barclay',         '9',  '12', '3',    '123.54', 'barclay'),
+--   ('Bernstein',       '15', '45', '-3',   '123.54', 'bernstein'),
+--   ('Citigroup',       '11', '33', '-12',  '123.54', 'citigroup'),
+--   ('Morgan Stanley',  '14', '23', '11',   '123.54', 'morgan-stanley'),
+--   ('JP Morgan',       '21', '18', '1',    '123.54', 'jp-morgan'); -- initial data for the tickers
 
 -- ALTER TABLE morbid_analytic ADD COLUMN name_tsv tsvector; -- text optimization for searching `name`
 

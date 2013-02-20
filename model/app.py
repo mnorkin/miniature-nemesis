@@ -13,11 +13,14 @@ TODO:
 """
 
 import unidecode
+import datetime
 import stock_quote
 import utils
-from features import *
-from analytics import *
-from tickers import *
+from features import Features
+from analytics import Analytics
+from tickers import Tickers
+from targetprices import TargetPrices
+from featureanalytictickers import FeatureAnalyticTickers
 import database
 import inspect
 import rest
@@ -80,19 +83,28 @@ def fetch_units():
   TODO:
   * Everything
   """
+  features = Features
+
+  for index, unit in enumerate(features.units):
+    data = features.units[unit]
+
+    if rest.send("POST","/api/units/", data):
+      """Trying to send POST"""
+      if utils.DEBUG:
+        print "Unit data sent"
+    else:
+      print "Unit data sent fail"
 
 def fetch_features():
   """
   Fetching all the features to the server
   """
-  feature = Feature()
+  feature = Features()
   for feature_index, feature_slug in enumerate(feature.features):
-    feature_id = feature.features[feature_slug]['id']
-    feature_name = feature.features[feature_slug]['name']
-    feature_unit_id = feature.features[feature_slug]['unit']
     
-    data = {'name': feature.features[feature_slug]['name'], 
-      'unit_id': feature.features[feature_slug]['unit'],
+    data = {'feature_slug': feature_slug,
+      'name': feature.features[feature_slug]['name'], 
+      'unit_id': feature.features[feature_slug]['unit_id'],
       'display_in_frontpage': feature.features[feature_slug]['display_in_frontpage'],
       'description': ''}
 
@@ -100,22 +112,23 @@ def fetch_features():
       """Trying to send POST"""
       if utils.DEBUG:
         print "Feature data create"
-      return True
     else:
       if rest.send("PUT", "/api/features/", data):
         """Trying to send PUT"""
         if utils.DEBUG:
           print "Feature data update"
-        return True
       else:
         # Something wrong on the front-end side
         if utils.DEBUG:
           print "Feature data update fail, nothing to try"
-        return False
 
 def main():
   """
   Main object 
+
+  First things to do on fresh copy:
+  * fetch_units
+  * fetch_features
 
   Logic:
   * Main app is launched with contrab, then another crontab has fetched new target prices
@@ -131,6 +144,8 @@ def main():
 
   analytics = Analytics()
   tickers = Tickers()
+  feature_analytic_tickers = FeatureAnalyticTickers()
+  targetprices = TargetPrices()
 
   feature_analytic_ticker_data = []
 
@@ -139,15 +154,15 @@ def main():
     Get the most recent target prices
     """
     date = target_price['date']
-    price = target_price['date']
+    price = target_price['price']
     ticker_slug = utils.slugify(target_price['ticker'])
     analytic_slug = utils.slugify(target_price['analytic'])
 
-    if not utils.DEBUG:
-      analytics.fetch(target_price['analytic'])
+    # if not utils.DEBUG:
+    analytics.fetch(target_price['analytic'])
     """Fetch analytics data"""
-    if not utils.DEBUG:
-      tickers.fetch(target_price['ticker'])
+    # if not utils.DEBUG:
+    tickers.fetch(target_price['ticker'])
     """Fetch ticker data"""
     target_data = database.get_targetprices(target_price['analytic'], target_price['ticker'])
     """Get all historical data of analytic and ticker relationship"""
@@ -164,18 +179,24 @@ def main():
         features_values = features.values()
         [ x.update({'ticker_slug': ticker_slug, 'analytic_slug': analytic_slug}) for x in features_values ]
 
-        if utils.DEBUG:
-          print "Feature values: ", features_values
-        feature_analytic_ticker_data.append(features_values)
+        if not feature_analytic_tickers.send(features_values):
+          if utils.DEBUG:
+            print "Something went wrong with feature analytic ticker update"
+
+      """After features goes target prices"""
+      data = {'date': datetime.datetime.fromtimestamp(date).strftime('%Y-%m-%d'),
+        'price': price,
+        'ticker_slug': ticker_slug,
+        'analytic_slug': analytic_slug,
+        'change': target_price['change']}
+
+      targetprices.send(data)
 
     else:
       if utils.DEBUG:
         print "Not enough data for ", target_price['ticker'], " on ", target_price['analytic']
         print "Skipping"
 
-  if feature_analytic_ticker_data.__len__() > 1:
-    if utils.DEBUG:
-      print "The big feature analytic ticker data to send: ", feature_analytic_ticker_data
 
 if __name__ == '__main__':
   main()
