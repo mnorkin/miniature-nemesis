@@ -2,3 +2,6 @@
 *.pot
 *.pyc
 local_settings.py
+
+Django\.project
+Django\.pydevproject
