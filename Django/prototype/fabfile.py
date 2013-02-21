@@ -3,6 +3,7 @@ from fabric.contrib.project import rsync_project
 from fabric.contrib import files, console
 from fabric import utils
 from fabric.operations import *
+import datetime
 
 # Configuration
 env.project_name = 'morbid'
@@ -11,7 +12,7 @@ def environment():
   env.user = 'root'
   env.hosts = ['185.5.55.178']
   env.deploy_user = 'root'
-  env.version = 1
+  env.version = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
   env.release = env.version
   # Virtualenv path root
   env.code_root = '/var/www/targetprice'
@@ -23,7 +24,7 @@ def environment():
 
 def virtualenv(command):
   with cd(env.code_root):
-    sudo(env.activate + '&&' + command, user=env.deploy_user)
+    sudo(env.activate + '; ' + command, user=env.deploy_user)
 
 # Tasks
 def test():
@@ -97,11 +98,12 @@ def deploy():
   symlink_current_release()
   start_webserver()
 
-def small_deploy():
+def update():
   require('hosts', provided_by=[environment])
   require('whole_path', provided_by=[environment])
   require('code_root')
   upload_tar_from_git(env.whole_path)
+  stop_webserver()
   symlink_current_release()
   start_webserver()
 
@@ -130,19 +132,29 @@ def install_requirements():
 def symlink_current_release():
   "Symlink current release"
   require('release', provided_by=[environment])
-  sudo('cd %s; ln -s %s releases/current; chown %s -R releases/current; chgrp %s -R releases/current' %(env.code_root, env.release, env.user, env.user))
+  symlink_path = "%s/releases/current" %(env.code_root)
+  if not files.exists(symlink_path):
+    sudo('cd %s; ln -s %s/ releases/current; chown %s -R releases/current; chgrp %s -R releases/current' %(env.code_root, env.release, env.user, env.user))
+  else:
+    sudo('cd %s; ln -nsf %s/ releases/current; chown %s -R releases/current; chgrp %s -R releases/current' %(env.code_root, env.release, env.user, env.user))
   put('nginx.conf', '/etc/nginx/sites-enabled/default')
   virtualenv('cd %s; chmod +x releases/current/%s/deamon.py' %(env.code_root, env.project_name))
   virtualenv('cd %s; mv releases/current/%s/prototype/settings.py releases/current/%s/prototype/settings_local.py' %(env.code_root, env.project_name, env.project_name))
   virtualenv('cd %s; mv releases/current/%s/prototype/settings_dev.py releases/current/%s/prototype/settings.py' %(env.code_root, env.project_name, env.project_name))
   """Make executable"""
 
+def stop_webserver():
+  "Stop webserver"
+  deamon_root = "%s/releases/current/%s/deamon.py" %(env.code_root, env.project_name)
+  if files.exists(deamon_root):
+    virtualenv('python2 %s/releases/current/%s/deamon.py stop' %(env.code_root, env.project_name))
+
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
   virtualenv('%s/releases/current/%s/manage.py syncdb --noinput' %(env.code_root, env.project_name))
   virtualenv('%s/releases/current/%s/manage.py collectstatic --noinput' %(env.code_root, env.project_name))
-  virtualenv('cd %s/releases/current/%s/; ./deamon.py start >> /tmp/gunicorn.log' %(env.code_root, env.project_name))
+  virtualenv('python2 %s/releases/current/%s/deamon.py start' %(env.code_root, env.project_name))
   """Launch deamon"""
 
 def restart_webserver():
