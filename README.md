@@ -25,7 +25,9 @@ Documentation and implementation of target price project
 * Handy commands list:
 
   $ fab environment stop_webserver
+
   $ fab environment start_webserver
+  
   $ fab environment restart_webserver
 
 Still a lot of bugs and conflicts, work in progress version
