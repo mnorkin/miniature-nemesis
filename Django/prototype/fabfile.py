@@ -143,18 +143,22 @@ def symlink_current_release():
   virtualenv('cd %s; mv releases/current/%s/prototype/settings_dev.py releases/current/%s/prototype/settings.py' %(env.code_root, env.project_name, env.project_name))
   """Make executable"""
 
+def restart_webserver():
+  stop_webserver()
+  start_webserver()
+
 def stop_webserver():
   "Stop webserver"
   deamon_root = "%s/releases/current/%s/deamon.py" %(env.code_root, env.project_name)
   if files.exists(deamon_root):
-    virtualenv('python2 %s/releases/current/%s/deamon.py stop' %(env.code_root, env.project_name))
+    virtualenv('%s/releases/current/%s/deamon.py stop' %(env.code_root, env.project_name))
 
 def start_webserver():
   "Start webserver server"
   sudo("nginx -s reload")
   virtualenv('%s/releases/current/%s/manage.py syncdb --noinput' %(env.code_root, env.project_name))
   virtualenv('%s/releases/current/%s/manage.py collectstatic --noinput' %(env.code_root, env.project_name))
-  virtualenv('python2 %s/releases/current/%s/deamon.py start' %(env.code_root, env.project_name))
+  virtualenv('%s/releases/current/%s/deamon.py start; sleep 2' %(env.code_root, env.project_name))
   """Launch deamon"""
 
 def restart_webserver():

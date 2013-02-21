@@ -16,11 +16,17 @@ Documentation and implementation of target price project
 
 * Full deployment of app (virtualenv with all dependencies, clean database)
 
-  $ fab setup
+  $ fab environment setup
 
 * Small deployment of app (just a code from git to current virtualenv)
   
-  $ fab small_deploy
+  $ fab environment update
+
+* Handy commands list:
+
+  $ fab environment stop_webserver
+  $ fab environment start_webserver
+  $ fab environment restart_webserver
 
 Still a lot of bugs and conflicts, work in progress version
 
