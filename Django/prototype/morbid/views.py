@@ -154,6 +154,10 @@ def feature_by_ticker(self, slug, feature_id):
 		feature_id = feature_id
 		).values('value', 'analytic__name', 'analytic__slug')
 
+	# return feature_analytic_tickers
+
+	[fat.update({'url': '/analytic/' + fat['analytic__slug']}) for fat in feature_analytic_tickers]
+
 	return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))
 
 def feature_by_analytic(self, slug, feature_id):
