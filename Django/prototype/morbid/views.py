@@ -11,7 +11,7 @@ from django.conf import settings
 from prototype.decorators import logged_in_or_basicauth
 
 @logged_in_or_basicauth(realm="Limited access")
-def index(request):
+def index(request, page=1):
 	"""
 	Index page
 
@@ -24,7 +24,7 @@ def index(request):
 		# Return week long entries
 		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
 	else:
-		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-365)).order_by('date').reverse()
+		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-1)).order_by('date').reverse()
 
 	feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct, feature__display_in_frontpage=True )
 	target_price_list = []
@@ -211,3 +211,13 @@ def search(self, search_me):
 	results['analytics'] = analytics
 
 	return HttpResponse(json.dumps(results, indent=4))
+
+
+def graph_01(request):
+	"""
+	
+	"""
+	t = loader.get_template('graph_01.html')
+	c = Context()
+
+	return HttpResponse(t.render(c))

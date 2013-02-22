@@ -87,7 +87,9 @@ def get_previous_targetprice(analytic=None, ticker=None):
   cur = connect_to_mysql()
   if analytic and ticker:
 
-    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` FROM `entries` WHERE `analytic`='%s' and `ticket`='%s' AND (`price0` != 0 OR `price1` != 0 ) ORDER BY `date` DESC LIMIT 1,1" %(analytic, ticker)
+    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
+      FROM `entries` WHERE `analytic`=\"%s\" AND `ticket`='%s' AND (`price0` != 0 OR `price1` != 0 ) \
+      ORDER BY `date` DESC LIMIT 1,1" %(analytic, ticker)
     cur.execute(query)
 
     for row in cur.fetchall():
@@ -121,15 +123,26 @@ def get_targetprices(analytic=None, ticker=None):
       ORDER BY `date`" % (re.escape(analytic), re.escape(ticker), re.escape(analytic), re.escape(ticker))
     """Query for the target prices, which are older than the maximum date (getting rid of the most recent one, because of model requires old data)"""
   elif not analytic and ticker:
-    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` FROM `entries` WHERE `ticket`='%s' AND (`price0` !=0 OR `price1`!=0) ORDER BY `date`" % (re.escape(ticker))
+    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
+      FROM `entries` \
+      WHERE `ticket`='%s' AND (`price0` !=0 OR `price1`!=0) \
+      ORDER BY `date`" % (re.escape(ticker))
     """Query for the target prices, which belongs only to ticker"""
   elif analytic and not ticker:
-    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` FROM `entries` WHERE `analytic`='%s' AND (`price0`!=0 OR `price1`!=0) ORDER BY `date`" % (re.escape(analytic))
+    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
+      FROM `entries` \
+      WHERE `analytic`='%s' AND (`price0`!=0 OR `price1`!=0) \
+      ORDER BY `date`" % (re.escape(analytic))
     """Query for the target prices, which belongs only to analytic"""
   else:
-    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` FROM `entries` WHERE `date`=(SELECT max(`date`) FROM `entries`) AND (`price0`!=0 OR `price1` != 0)"
+    # query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
+    #   FROM `entries` \
+    #   WHERE `date`=(SELECT max(`date`) FROM `entries`) AND (`price0`!=0 OR `price1` != 0)"
+    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
+      FROM `entries` \
+      WHERE `date` >= '2013-02-04' AND `date` <= '2013-02-07' AND (`price0`!=0 OR `price1` != 0)"
     """Query for the most recent dates"""
-  cur.execute(query)
+  print cur.execute(query)
 
   for row in cur.fetchall():
     change = 0

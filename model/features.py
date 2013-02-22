@@ -272,12 +272,6 @@ class Features:
         if self._show_plot:
           self._plot.plot_point(self.stock_dates[start_index], target_price)
 
-        for j in range(start_index, end_index):
-          if target_price > self.stock_lows[j] and target_price > self.stock_highs[j]:
-            measure = measure + abs(float(self.stock_highs[j] - target_price))/number_of_entries
-          elif target_price < self.stock_lows[j] and target_price < self.stock_highs[j]:
-            measure = measure + abs(float(self.stock_lows[j] - target_price))/number_of_entries
-
         measure = abs(float((target_price - self.stock_closes[start_index])/self.stock_closes[start_index]))
 
         results.append(measure)
@@ -295,7 +289,7 @@ class Features:
     result = float(sum(results)/self.local_target_data.__len__()) * 100
 
     if utils.DEBUG:
-      print "\n\Difference measure\n"
+      print "\n\nDifference measure\n"
       print "Results: ", results
       print "Return result: ", result
     

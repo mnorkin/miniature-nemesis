@@ -6,10 +6,10 @@ Then the new target price comes by, filter all the old ones and calculate all th
 
 TODO:
 * Make a trigger for the app to fetch the target price data (this thing needs all the data available from the database on specific stock)
-* Pass all the data from the trigger to this app 
+* Pass all the data from the trigger to this app (done)
 * Get the stock data from the yahoo (done)
 * Calculate what is needed (done)
-* Pass the arguments with the feature identification to the main database (almost done)
+* Pass the arguments with the feature identification to the main database (done)
 """
 
 import unidecode
@@ -124,7 +124,8 @@ def fetch_features():
 
 def debug():
   """
-  Debugging method
+  Debugging features method
+
   """
 
   analytics = Analytics()
@@ -208,11 +209,9 @@ def main():
     ticker_slug = utils.slugify(target_price['ticker'])
     analytic_slug = utils.slugify(target_price['analytic'])
 
-    if not utils.DEBUG:
-      analytics.fetch(target_price['analytic'])
+    analytics.fetch(target_price['analytic'])
     """Fetch analytics data"""
-    if not utils.DEBUG:
-      tickers.fetch(target_price['ticker'])
+    tickers.fetch(target_price['ticker'])
     """Fetch ticker data"""
     target_data = database.get_targetprices(target_price['analytic'], target_price['ticker'])
     """Get all historical data of analytic and ticker relationship"""
@@ -223,16 +222,16 @@ def main():
       stock_data = stock_quote.get_data(target_price['ticker'])
       beta = stock_quote.get_beta(target_price['ticker'])
       """Get stock data of ticker"""
-      if stock_data:
+      if stock_data and beta:
         """Check if there is any stock data (happens, then ticker is too old or invalid)"""
-        features = Features(target_data, stock_data, beta, True, False)
+        features = Features(target_data, stock_data, beta, False, True)
         """Get all and calculate the defined features"""
         features_values = features.values()
         [ x.update({'ticker_slug': ticker_slug, 'analytic_slug': analytic_slug}) for x in features_values ]
 
-        # if not feature_analytic_tickers.send(features_values):
-        #   if utils.DEBUG:
-        #     print "Something went wrong with feature analytic ticker update"
+        if not feature_analytic_tickers.send(features_values):
+          if utils.DEBUG:
+            print "Something went wrong with feature analytic ticker update"
 
       """After features goes target prices"""
       data = {'date': datetime.datetime.fromtimestamp(date).strftime('%Y-%m-%d'),
@@ -241,7 +240,7 @@ def main():
         'analytic_slug': analytic_slug,
         'change': target_price['change']}
 
-      # targetprices.send(data)
+      targetprices.send(data)
 
     else:
       if utils.DEBUG:

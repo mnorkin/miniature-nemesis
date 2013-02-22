@@ -1,0 +1,86 @@
+<html>
+<head>
+  <title>Graph 01</title>
+  <script type="text/javascript" src ="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript">
+  $(document).ready(function(){
+
+    var data = new Array()
+    var names = new Array()
+
+    d3.json("http://localhost:8000/feature_by_ticker/ngd/1/", function(error, json) {
+      for (var i = json.length - 1; i >= 0; i--) {
+        data[i] = json[i].value
+        names[i] = json[i].analytic__name
+      };
+
+      display_graph(data, names)
+    });
+  })
+  function display_graph( data, names ) {
+
+    var w = window.innerWidth - 20,
+    h = window.innerHeight - 40,
+    r = Math.min(w, h) / 30,
+    rhw = Math.min(w,h) /2,
+    color = d3.scale.category20c();
+
+    var sun = d3.select("#chart").append("svg:svg")
+      .attr("width", w)
+      .attr("height", h);
+
+    pi = Math.PI;
+
+    angle_scale = d3.scale.linear().domain([0, data.length]).range([0, 2*pi])
+
+    angle_arc = d3.svg.arc()
+      .innerRadius(r)
+      .outerRadius(function(d, i) { return rhw+r })
+      .startAngle(function(d, i) { return angle_scale(i)+pi/2 })
+      .endAngle(function(d, i) { return angle_scale(i)+pi/2 });
+
+    sun.selectAll('.stripes')
+      .data(data).enter()
+      .append('svg:path')
+      .attr("d", function(d, i) {
+        return angle_arc(d, i)
+      })
+      .attr('stroke-width', 0.3)
+      .attr('fill', 'none')
+      .attr("stroke", "grey")
+      .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
+
+    sun.selectAll('.stripes')
+      .data(data).enter()
+      .append('svg:circle')
+      .attr('cx', function(d, i) {
+        return (d/100*rhw+r)*Math.cos(angle_scale(i))
+      })
+      .attr('cy', function(d, i) {
+        return (d/100*rhw+r)*Math.sin(angle_scale(i))
+      })
+      .attr('r', function(d, i) {
+        return 7;
+      })
+      .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
+      .attr('fill', 'grey')
+      .attr('txt', function(d,i) { return names[i] })
+
+
+    sun.append('circle')
+      .style('stroke', 'grey')
+      .style('fill', 'white')
+      .attr('stroke-width', 0.5)
+      .attr('cx', w/2)
+      .attr('cy', h/2)
+      .attr('r', r);
+  }
+  </script>
+</head>
+<body>
+
+  <div id="chart"></div>
+
+</body>
+</html>
