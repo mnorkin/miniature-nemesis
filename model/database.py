@@ -6,6 +6,18 @@ import re
 import datetime, time
 import utils
 
+def connect_to_mysql_db():
+  """
+  Connecting to mysql and return database
+  """
+
+  db = MySQLdb.connect(host="localhost",
+    user="root",
+    passwd="classic",
+    db="morbid")
+
+  return db
+
 def connect_to_mysql():
   """
   Connecting to the database
@@ -101,7 +113,12 @@ def get_targetprices(analytic=None, ticker=None):
   cur = connect_to_mysql()
   results = []
   if analytic and ticker:
-    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` FROM `entries` WHERE `analytic`='%s' AND `ticket`='%s' AND (`price0`!=0 OR `price1` !=0) AND `date` < (SELECT max(`date`) FROM `entries`) ORDER BY `date`" % (re.escape(analytic), re.escape(ticker))
+    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
+      FROM `entries` \
+      WHERE `analytic`='%s' AND `ticket`='%s' \
+      AND (`price0`!=0 OR `price1` !=0) \
+      AND `date` < (SELECT max(`date`) FROM `entries` WHERE `analytic`='%s' AND `ticket`='%s') \
+      ORDER BY `date`" % (re.escape(analytic), re.escape(ticker), re.escape(analytic), re.escape(ticker))
     """Query for the target prices, which are older than the maximum date (getting rid of the most recent one, because of model requires old data)"""
   elif not analytic and ticker:
     query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` FROM `entries` WHERE `ticket`='%s' AND (`price0` !=0 OR `price1`!=0) ORDER BY `date`" % (re.escape(ticker))
@@ -136,3 +153,53 @@ def get_targetprices(analytic=None, ticker=None):
         results.append(item)
 
   return results
+
+def get_consensus(ticker=None):
+  """
+  Consensus measure calculation
+  """
+  if ticker:
+    return None
+  else:
+    return None
+
+def get_beta(ticker):
+  """
+  Function to return the beta value
+  """
+  cur = connect_to_mysql()
+
+  if ticker:
+    query = "SELECT `beta` FROM `tickers` WHERE `name`='%s' LIMIT 1" %(re.escape(ticker));
+    if cur.execute(query) != 0:
+      row = cur.fetchone()
+      return row[0]
+    else:
+      return None
+  else:
+    return None
+
+
+def write_beta(ticker, beta):
+  """
+  Function to write beta measure to the database (In case of multiple processing same ticker )
+  """
+  db = connect_to_mysql_db()
+
+  cur = db.cursor()
+
+  if ticker and beta:
+    print "Ticker and beta ok"
+    query = "SELECT `id` FROM `tickers` WHERE `name`='%s' LIMIT 1" %(re.escape(ticker))
+    if cur.execute(query) == 0:
+      print "Select returned 0"
+      query = "INSERT INTO `tickers` (`name`, `beta`) VALUES ('%s', %s)" %(re.escape(ticker), beta)
+      """Write beta measure"""
+      if cur.execute(query) == 1:
+        db.commit()
+    else:
+      query = "UPDATE `tickers` SET `beta`='%s' WHERE `name`='%s' LIMIT 1" %(re.escape(beta), re.escape(ticker))
+      """Update beta measure"""
+      cur.execute(query)
+  else:
+    return None

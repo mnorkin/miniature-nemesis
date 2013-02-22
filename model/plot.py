@@ -13,11 +13,15 @@ class Plot():
     x_data = [joined_data[i][0] for i in range(joined_data.__len__())]
     y_data = [joined_data[i][1] for i in range(joined_data.__len__())]
 
-    self.plot_widget.plot(x_data, y_data, pen=None, symbol='o')
+    self.plot_widget.plot(x_data, y_data, pen='r', symbol='o')
 
-  def plot_continue(self, joined_data, color='r'):
+  def plot_continue(self, joined_data, color='m'):
 
     x_data = [joined_data[i][0] for i in range(joined_data.__len__())]
     y_data = [joined_data[i][1] for i in range(joined_data.__len__())]
 
     self.plot_widget.plot(x_data, y_data, pen=color)
+
+  def plot_point(self, x_data, y_data, color='r'):
+
+    self.plot_widget.plot([x_data], [y_data], pen=color, symbol='o')

@@ -6,6 +6,23 @@ import string
 import datetime, time
 import utils
 import re
+import database
+
+from HTMLParser import HTMLParser
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ';'.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 def get_data(ticker):
   data = []
@@ -61,3 +78,32 @@ def get_ticker_data(ticker):
     "stock_exchange": r[2]}
 
   return item
+
+def get_beta(ticker):
+  """
+  Getting beta measure of ticker (currently only stock market is SP500 (^GSPC))
+  """
+
+  beta = None
+
+  if ticker:
+
+    beta = database.get_beta(ticker)
+
+    if beta:
+      return beta
+    else:
+      PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
+      url = 'http://finance.yahoo.com/q?s=%s' % (ticker)
+      f = u.urlopen(url, proxies={})
+      rows = f.readlines()
+      for row in rows:
+        row = strip_tags(row)
+        position = row.find('Beta:')
+        if position != -1:
+          r = PATTERN.split(row[position:])[1::2]
+          beta = r[1]
+          database.write_beta(ticker, beta)
+          """Write beta to database"""
+
+  return beta
