@@ -92,6 +92,7 @@ def get_beta(ticker):
 
     if beta:
       return beta
+
     else:
       PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
       url = 'http://finance.yahoo.com/q?s=%s' % (ticker)
@@ -102,7 +103,7 @@ def get_beta(ticker):
         position = row.find('Beta:')
         if position != -1:
           r = PATTERN.split(row[position:])[1::2]
-          beta = r[1]
+          beta = float(r[1])
           database.write_beta(ticker, beta)
           """Write beta to database"""
 

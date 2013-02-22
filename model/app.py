@@ -155,12 +155,13 @@ def debug():
         print "Enough data for ", target_price['ticker'], " on ", target_price['analytic']
 
       stock_data = stock_quote.get_data(target_price['ticker'])
+      beta = stock_quote.get_beta(target_price['ticker'])
       """Get stock data of ticker"""
 
       if stock_data:
         """Check if there is any stock data (happens, then ticker is too old or invalid)"""
-        features = Features(target_data, stock_data, True, False)
-        features.closeness()
+        features = Features(target_data, stock_data, beta, True, False)
+        features.impact_to_market()
         raw_input("Press ENTER to continue")
         """Get all and calculate the defined features"""
         # features_values = features.values()
@@ -220,10 +221,11 @@ def main():
         print "Enough data for ", target_price['ticker'], " on ", target_price['analytic']
       """If we have any history data at all"""
       stock_data = stock_quote.get_data(target_price['ticker'])
+      beta = stock_quote.get_beta(target_price['ticker'])
       """Get stock data of ticker"""
       if stock_data:
         """Check if there is any stock data (happens, then ticker is too old or invalid)"""
-        features = Features(target_data, stock_data, True, False)
+        features = Features(target_data, stock_data, beta, True, False)
         """Get all and calculate the defined features"""
         features_values = features.values()
         [ x.update({'ticker_slug': ticker_slug, 'analytic_slug': analytic_slug}) for x in features_values ]

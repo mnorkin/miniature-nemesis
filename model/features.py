@@ -14,6 +14,8 @@ class Features:
   """Target price data"""
   stock_data = []
   """Stock price data"""
+  market_data = []
+  """Market data"""
   local_target_data = []
   stock_dates = []
   stock_highs = array.array('f')
@@ -22,6 +24,7 @@ class Features:
   _plot = None
   _show_plot = False
   calculated_feature_data = []
+  beta = 1
 
   units = {
     'percent': {'unit_id': 1, 'name': 'Percent', 'value': '%'},
@@ -45,7 +48,7 @@ class Features:
       {'id': 7, 'name': 'Reach time', 'display_in_frontpage': 0, 'unit_id': 2}
     }
 
-  def __init__(self, target_data=None, stock_data=None, plot=False, calculate=False):
+  def __init__(self, target_data=None, stock_data=None, beta=None, plot=False, calculate=False):
     """
     Initialization of the class
     * Pass the arguments to fetch the target price data
@@ -67,6 +70,8 @@ class Features:
       self.market_highs = [self.market_data[i]['high'] for i in range(0, self.market_data.__len__())]
       self.market_closes = [self.market_data[i]['close'] for i in range(0, self.market_data.__len__())]
       self.market_lows = [self.market_data[i]['low'] for i in range(0, self.market_data.__len__())]
+
+      self.beta = beta
 
     if plot:
       self._plot = Plot()
@@ -444,34 +449,47 @@ class Features:
       self._plot.plot_continue([[self.market_data[i]['date'], self.market_data[i]['high']] for i in range(0, self.market_data.__len__()) ], 'y')
       self._plot.plot_continue([[self.market_data[i]['date'], self.market_data[i]['low']] for i in range(0, self.market_data.__len__()) ], 'r')
 
-    for target_entry in self.local_target_data:
+    for target_entry in self.local_target_data[-1:]:
       measure = 0
       target_date = target_entry[0]
       target_price = target_entry[1]
-      start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
-      end_index = start_index
+      try:
+        start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
+        end_index = start_index+2
 
-      if end_index > self.stock_dates.__len__():
-        end_index = self.stock_dates.__len__()-1
+        if end_index > self.stock_dates.__len__():
+          end_index = self.stock_dates.__len__()-1
 
-      if utils.DEBUG:
-        print "\nStart index: ", start_index, "\nEnd Index: ", end_index
-        print  "\nFrom: ", datetime.datetime.fromtimestamp(self.stock_dates[start_index]), "\nTo: ", datetime.datetime.fromtimestamp(self.stock_dates[end_index]), "\nStock from: ", datetime.datetime.fromtimestamp(self.stock_dates[0]), "\nStock to: ", datetime.datetime.fromtimestamp(self.stock_dates[self.stock_dates.__len__()-1])
+        if utils.DEBUG:
+          print "\nStart index: ", start_index, "\nEnd Index: ", end_index
+          print  "\nFrom: ", datetime.datetime.fromtimestamp(self.stock_dates[start_index]), "\nTo: ", datetime.datetime.fromtimestamp(self.stock_dates[end_index]), "\nStock from: ", datetime.datetime.fromtimestamp(self.stock_dates[0]), "\nStock to: ", datetime.datetime.fromtimestamp(self.stock_dates[self.stock_dates.__len__()-1])
 
-      if self._show_plot:
-        self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
+        if self._show_plot:
+          self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
 
-      start_close_price = self.stock_closes[start_index]
+        for index in range(start_index, end_index):
+          market_price_change = round((self.market_closes[index-1] - self.market_closes[index])/self.market_closes[index-1],4)
+          stock_price_change = round((self.stock_closes[index-1] - self.stock_closes[index])/self.stock_closes[index-1],4)
+          print "Beta measure: ", self.beta
+          print "Market price change: ", market_price_change
+          print "Stock price change: ", stock_price_change
+          print "Stock price should have change: ", market_price_change*self.beta
+          print "Measure: ", abs(stock_price_change - market_price_change*self.beta)
+          measure = measure + abs(stock_price_change - market_price_change*self.beta)
+      except StopIteration:
+        """Happens, then stock data is newer than the target data"""
+        measure = 0
 
-      for j in range(start_index, end_index):
-        measure = measure + 0
-
-        
       results.append(measure)
 
-    result = float(sum(results)/self.local_target_data.__len__())
-    return round(result, 2)
-    return 0
+    result = round(float(sum(results))*100,2)
+
+    if utils.DEBUG:
+      print "\n\nImpact to the market measure\n"
+      print "Results: ", results
+      print "Return result: ", result
+
+    return result
 
   def reach_time(self):
     """
