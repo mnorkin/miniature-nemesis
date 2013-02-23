@@ -23,7 +23,7 @@
 		<li class="price">{{ ticker.last_stock_price }}</li>
 		<li class="price_detail">1.50(<i></i>3.25%)</li>
 		<li class="number">{{ ticker.number_of_analytics }} <span>Analysis</span> </li>
-		<li class="number">{{ ticker.number_of_tp }} <span>Active target prices</span> </li>
+		<li class="number n2">{{ ticker.number_of_tp }} <span>Active target prices</span> </li>
 		<li class='avg'>
 		<ul>
 			<li class='mn'><i>{{ ticker.consensus_min }}</i> min </li>
@@ -36,15 +36,29 @@
 	
 	<div class="inner_buttons">
 		<a href="" class="active ta">Target prices</a>
-		<a href="" class="an">Analysis</a>
+		<a href="" class="an">Analytics</a>
 		<br class="clear" />
 		<div class="line"></div>
 	</div>
 	
-	<div class="analyse_menu">
-		{% for feature in features %}
-			<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a>
-		{% endfor %}
+	<div class="left">
+		<div class="analyse_menu">
+			{% for feature in features %}
+				<div>
+					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a>
+					<span></span>
+				</div>
+			{% endfor %}
+		</div>
+		
+		<div class="info">
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+			Suspendisse commodo scelerisque dolor, eget feugiat ligula commodo nec. 
+			Aliquam neque arcu, faucibus id consequat vel, egestas tempus turpis.
+			Morbi ac aliquet leo. Maecenas commodo est vel velit dictum at vestibulum tortor commodo. 
+			Sed tempus justo a tortor dapibus vestibulum. Phasellus consequat mi aliquet tellus auctor
+		 	dapibus. Aenean eu tincidunt purus. Aenean sit amet ligula quis arcu condimentum porta.
+		</div>
 	</div>
 	
 	<div class="analyser">
@@ -66,10 +80,11 @@
 				{% endif %}
 			{% endfor %}
 		</ul>
+		
 		<div class="in_graph">
 			<button class="btn">In graph analysis</button>
 			<div class="sear">
-				<input type="text" name="sear" value="Search" />
+				<input type="text" name="sear" placeholder="Search" />
 				<ul>
 					<li>Lorem imsum </li>
 					<li>Lorem imsum 8</li>

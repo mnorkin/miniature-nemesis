@@ -1,57 +1,106 @@
-<h1><a href="/">Analytic page</a></h1>
+{% extends "morbid/base.html" %}
+
+{% block sidebar %}
+  <div class="inner">
+        <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
+        <div class="search">
+            <form action="" method="get">
+                <input type="text" name="q" value="" class="inp-s" />
+                <input type="submit" value="Search" class="sub-s"/>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block content %}
 
 {% if analytic %}
 
-<h2>General information 2</h2>
-<ul>
-	<li>{{ analytic.name }}</li>
-	<li>Analyzing {{ analytic.number_of_companies }} companies</li>
-	<li>{{ analytic.number_of_tp }} valid target prices</li>
-</ul>
-
-<ul>
-	<li>Valid target prices</li>
-	{# List of all valid target prices #}
-	{% if target_prices %}
-		<ul>
-			{% for target in target_prices %}
-				<li>{{ target.ticker }} on {{ target.date }} {{ target.price }}$</li>
-				{% if target.fap %}
-					<ul>
-						{% for feature in target.fap %}
-							<li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li>
-						{% endfor %}
-					</ul>
-				{% endif %}
-			{% endfor %}
-		</ul>
-	{% endif %}
-	<li>Analysis</li>
-	{# Graph by features #}
-
-	{# List of features #}
-	<ul>
-		<li>List of features</li>
-			{% if features %}
-				<ul>
-					{% for feature in features %}
-						<li><a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a></li>
-						<li>Description: {{ feature.description|truncatewords_html:10 }}</li>
-					{% endfor %}
-				</ul>
-			{% endif %}
+	<ul class="corp_info analytic">
+		<li class="name">{{ analytic.name }}</li>
+		<li class="thirteen"><strong>{{ analytic.number_of_companies }}</strong> Companies</li>
+		<li class="thirteen"><strong>{{ analytic.number_of_tp }}</strong> Active target prices</li>
 	</ul>
 
-	<li>Tickets / Companies</li>
-	{# List of tickets, which analytic works on #}
-	{% if target_prices %}
-		<ul>
+
+	<div class="inner_buttons">
+			<a href="" class="active ta">Target prices</a>
+			<a href="" class="an">Analytics</a>
+			<br class="clear" />
+			<div class="line"></div>
+	</div>
+
+	
+	<div class="left">
+		<div class="analyse_menu">
+			{% for feature in features %}
+			<div>
+				<a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a>
+				<span></span>
+			</div>
+			{% endfor %}
+		</div>
+		<div class="info">
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+			Suspendisse commodo scelerisque dolor, eget feugiat ligula commodo nec. 
+		</div>
+	</div>
+	
+	<div style="display: none;">
+		Valid target prices
+		{# List of all valid target prices #}
+		{% if target_prices %}
+			<ul>
+				{% for target in target_prices %}
+					<li>{{ target.ticker }} on {{ target.date }} {{ target.price }}$</li>
+					{% if target.fap %}
+						<ul>
+							{% for feature in target.fap %}
+								<li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				{% endfor %}
+			</ul>
+		{% endif %}
+	</div>
+	
+	<div class="analyser">
+		<ul class="bank">
 			{% for target in target_prices %}
-				<li><a href="{{ target.ticker.get_absolute_url }}" name="{{target.ticker.long_name}}">{{ target.ticker.long_name }}</a></li>
+				<li>
+					<span class="corp">{{ target.analytic }}</span> 
+					<span class="date">{{ target.date }}</span>
+					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
+					<span class="number">35.1<strong>No of target prices</strong> </span>
+					<span class="number">-1<strong>Volatility</strong> </span>
+				</li>
 			{% endfor %}
 		</ul>
-	{% endif %}
-
-</ul>
+		
+		<div class="in_graph">
+			<button class="btn">In graph analysis</button>
+			<div class="sear">
+				<input type="text" name="sear" placeholder="Search" />
+				<ul>
+					{% for target in target_prices %}
+						<li><a href="{{ target.ticker.get_absolute_url }}" name="{{target.ticker.long_name}}">{{ target.ticker.long_name }}</a></li>
+					{% endfor %}
+					<li>Lom imsum 9</li>
+					<li class="active">Lorem sum 4</li>
+					<li class="active">Lorem imsum 1</li>
+					<li>Lorem imsum 41</li>
+					<li>Lorem imsum </li>
+					<li>Loresrghum 1</li>
+					<li>Lorem imsum 8</li>
+				</ul>
+			</div>
+		</div>
+		<br class="clear" />
+	</div>
+	
+	<br class="clear" />
 
 {% endif %}
+{% endblock %}

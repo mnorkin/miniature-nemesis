@@ -196,7 +196,7 @@ $(function(){
 	 	var tooltip = chart.children('.bar_tooltip');
 	 	
  		var top = obj.offset().top - chart.offset().top - 2;
- 		var left = obj.offset().left -chart.offset().left + parseInt(obj.attr('width')); ;
+ 		var left = obj.offset().left -chart.offset().left + parseInt(obj.attr('width')) -2; 
 
 	 	tooltip.fadeIn(100);
 	 	tooltip.text(obj.attr('txt')).css({top:top,left:left});
