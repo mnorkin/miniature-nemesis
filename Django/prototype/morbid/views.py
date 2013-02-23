@@ -219,9 +219,20 @@ def search(self, search_me):
 
 def graph_01(request):
 	"""
-	
+	Example of graph 01
 	"""
 	t = loader.get_template('graph_01.html')
+	c = Context()
+
+	return HttpResponse(t.render(c))
+
+def graph_02(request):
+	"""
+	Example of graph 02
+	"""
+
+	t = loader.get_template("graph_02.html")
+
 	c = Context()
 
 	return HttpResponse(t.render(c))
