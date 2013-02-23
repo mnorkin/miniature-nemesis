@@ -269,15 +269,22 @@ var graphs = (function() {
       .attr("height", h);
 
       linear.selectAll("#" + _element_id).data(linear_data).enter()
-      .append("svg:line")
-      .attr("stroke", "black")
-      .attr("stroke-width", 0.5)
+      .append("svg:rect")
+      .attr('fill', "black")
       .attr('width', function() { return w-w/16 })
-      .attr('height', 0.1)
-      .attr("x1", function(d) { return 0 } )
-      .attr("y1", function(d) { return -d*rhw} )
-      .attr("x2", function(d) { return w-w/10 } )
-      .attr("y2", function(d) { return -d*rhw} )
+      .attr('height', 1)
+      .attr("x", function(d) { return 10} )
+      .attr("y", function(d) { return d == 0 ? -10 : -d*rhw-10 } )
+      .attr("transform", "translate(" + w/16 + "," + h + ")");
+
+      linear.selectAll("#"+_element_id).data(linear_data).enter()
+      .append("svg:text")
+      .style("text-anchor", "middle")
+      .style("width", "10px")
+      .style("height", "10px")
+      .style("fill", "#000")
+      .attr("dy", function(d, i) { return d == 0 ? -10 : -d*rhw-10 })
+      .text(function(d) { return d })
       .attr("transform", "translate(" + w/16 + "," + h + ")");
 
     },

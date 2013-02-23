@@ -131,6 +131,39 @@ def analytic(request, slug):
 
 	return HttpResponse(t.render(c))
 
+def target_prices(self, analytic_slug=None, ticker_slug=None):
+
+	if analytic_slug:
+
+		analytic = Analytic
+		try:
+			analytic = Analytic.objects.get(slug=analytic_slug)
+			target_prices = TargetPrice.objects.filter(analytic=analytic)
+
+		except analytic.DoesNotExist:
+			raise Http404
+
+	elif ticker_slug:
+
+		ticker = Ticker
+		try:
+			ticker = Ticker.objects.get(slug=ticker_slug)
+			target_prices = TargetPrice.objects.filter(ticker=ticker)
+
+		except ticker.DoesNotExist:
+			raise Http404
+
+	else:
+		raise Http404
+
+	t = loader.get_template('morbid/target_prices.html')
+
+	c = Context({
+		'target_prices' : target_prices,
+	})
+
+	return HttpResponse(t.render(c))
+
 def feature_by_ticker(self, slug, feature_id):
 	"""
 	The feature return management on the Ticker page
