@@ -63,23 +63,29 @@ li{ list-style: none; }
     padding: 30px 0;
     text-align: center;
 }
+#header .title .search form{
+    width: 508px;
+    display: inline-block;
+}
 #header .title .search .inp-s{
-    padding: 0px 10px;
-    height: 38px;
+    padding: 4px 10px;
+    height: 30px;
     width: 370px;
     margin-right: -5px;
     border: 1px solid #e5dbd2;
+    float: left;
 }
 #header .title .search .sub-s{
-    padding: 0 10px;
+    padding: 4px 10px;
+    height: 40px;
     width: 120px;
-    height: 39px;
     background-color: #e95200;
     border: 1px solid #e95200;
     color: #FFF;
     font-weight: bold;
     cursor: pointer;
     font-size: 15px;
+    float: left;
 }
 
 #content{
@@ -111,12 +117,12 @@ li{ list-style: none; }
     box-shadow: 0 0 30px 5px #dcd9d8;
 }
 .title.grid .entry .ticket{
-    font-size: 16px;
+    font-size: 14px;
     display:block;
     font-weight: bold;
 }
 .title.grid .entry .analytic{
-    font-size: 14px;
+    font-size: 12px;
     display:block;
     font-weight: bold;
 }
@@ -136,9 +142,9 @@ li{ list-style: none; }
     position:absolute;
     top:13px;
     left:-130px;
-    padding:5px 0px;
+    padding-top:6px;
     width:110px;
-    height: 16px;
+    height: 20px;
     font-size:12px;
     text-align: center;
 }
@@ -152,14 +158,14 @@ li{ list-style: none; }
     top:0;
 }
 .title .toggle{
-    height: 16px;
+    height: 20px;
     color:#fff;
     background: #e95200;
     display:inline-block;
     position:absolute;
     top:13px;
     right:-131px;
-    padding:5px 0px;
+    padding-top:6px;
     text-align: center;
     width:110px;
     text-align:center;
@@ -654,6 +660,7 @@ li{ list-style: none; }
 .analyse_menu a.active, .analyse_menu div:first-child a{
     background:#e95200;
     color:#fff;
+    box-shadow: inset 0 0 10px #ac460f;
 }
 
 .analyse_menu div:nth-child(2n) span{
