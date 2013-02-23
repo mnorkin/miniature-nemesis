@@ -53,6 +53,7 @@ li{ list-style: none; }
     font-weight: 400;
     color:rgb(111, 111, 111);
     text-align: center;
+    font-weight: 200;
 }
 #header .title .main_intro a{
     color: inherit;
@@ -62,6 +63,7 @@ li{ list-style: none; }
 #header .title .search{
     padding: 30px 0;
     text-align: center;
+    position: relative;
 }
 #header .title .search form{
     width: 508px;
@@ -86,6 +88,34 @@ li{ list-style: none; }
     cursor: pointer;
     font-size: 15px;
     float: left;
+}
+
+.search_res {
+    position:absolute;
+    top:69px;
+    width: 385px;
+    border-bottom:1px solid #e5dbd2;    
+    border-left:1px solid #e5dbd2;    
+    border-right:1px solid #e5dbd2;    
+    z-index: 10;
+}
+.search_res li{
+    padding-top: 10px;
+    padding-left:10px;
+    height: 25px;
+    width: 375px;
+    background: #fff;
+    border-bottom:1px solid #ede7e1;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+}
+.search_res li.inf{
+    background: #d1c1b0;
+    color:#fff;
+}
+.search_res li.active{
+    background: #d1c1b0;
 }
 
 #content{
@@ -125,6 +155,7 @@ li{ list-style: none; }
     font-size: 12px;
     display:block;
     font-weight: bold;
+    margin-top: 7px;
 }
 .title.grid .entry .price{
     color:#e95200;
@@ -199,8 +230,11 @@ li{ list-style: none; }
     color:#b78f65;
 }
 .title.grid .chart .bar > li span{
-    height: 19px;
+    height: 15px;
+    margin-top:4px;
     display: inline-block;
+    font-weight: bold;
+    font-size:11px;
 }
 
 .title.grid .chart .bar svg{
@@ -326,7 +360,7 @@ li{ list-style: none; }
     margin: 8px 0 0px 0px;
     padding-top:5px;
     height:26px;
-    width:63px;
+    width:53px;
     display: block;
     float:left;
     border-right: 1px solid #f4eee8;
@@ -340,7 +374,7 @@ li{ list-style: none; }
     margin: 8px 0 0px 0px;
     padding-top:5px;
     height:26px;
-    width:63px;
+    width:73px;
     display: block;
     float:left;
     border-right: 1px solid #f4eee8;
@@ -364,7 +398,7 @@ li{ list-style: none; }
     border-right: 6px solid transparent;
     border-left: 6px solid transparent;
     top:12px;
-    left:2px;
+    left:7px;
 }
 .title.list .circle.up strong:before{
     position:absolute;
@@ -373,7 +407,7 @@ li{ list-style: none; }
     border-right: 6px solid transparent;
     border-left: 6px solid transparent;
     top:12px;
-    left:2px;
+    left:7px;
 }
 
 .title.list .bar{
@@ -545,6 +579,7 @@ li{ list-style: none; }
     letter-spacing: normal;
     font-weight: normal;
     margin-top:-2px;
+    font-weight: 200;
 }
 .corp_info .avg{
     width: 340px;
@@ -562,6 +597,7 @@ li{ list-style: none; }
     text-align:center;
     display: inline-block;
     color:#c7a17a;
+    font-weight: 200;
 }
 .corp_info .avg li.av{
     left:150px;
@@ -569,7 +605,7 @@ li{ list-style: none; }
 }
 
 .corp_info .avg li.mx{
-    left:289px;
+    left:290px;
 }
 .corp_info .avg li i{
     display: block;
@@ -609,6 +645,7 @@ li{ list-style: none; }
     padding: 10px 0;
     color:#b78f65;
     font-size: 18px;
+    font-weight: bold;
 }
 .inner_buttons a.ta{
     margin-left: 14px;
@@ -691,9 +728,9 @@ li{ list-style: none; }
 }
 .analyser li .corp{
     font-size:18px;
-    padding:8px 20px;
+    padding:8px 10px;
     height:37px;
-    width: 170px;
+    width: 180px;
     white-space: nowrap;
     border-right: 1px solid #fbf8f6;
     font-weight: bold;
@@ -721,6 +758,7 @@ li{ list-style: none; }
     font-weight: normal;
     font-size: 14px;
     display: block;
+    font-weight: 200;
 }
 
 .in_graph {
@@ -753,8 +791,8 @@ li{ list-style: none; }
 }
 
 .in_graph .sear input{
-    width:162px;
-    padding:11px 0 11px 17px;
+    width:158px;
+    padding:11px 0 10px 17px;
     border: 1px solid #e7ded5;
     border-bottom: 0;
 }
@@ -762,6 +800,7 @@ li{ list-style: none; }
     border: 1px solid #e7ded5;
     width:179px;
     margin-bottom: 20px;
+    mar
     max-height: 263px;
     overflow-y: scroll;
     overflow-x: hidden;
@@ -791,11 +830,14 @@ li{ list-style: none; }
     background: url('../images/in_graph_remove_1.png') 85% 50% no-repeat #ed702d;
 }
 
-.info{
+.info_box{
     width: 160px;
     border:1px solid #ddc8b7;
     margin-top:30px;
     padding:15px 10px;
     border-radius: 3px;
 }
+
+
+
 

@@ -184,6 +184,84 @@ function run_grid_pie_NENAUDOJAMA(){
 }
 
 
+function process_search(dom_obj, e){
+	
+	// TODO: optimise / cleanup
+	e.preventDefault();
+	var key = e.keyCode ? e.keyCode : e.charCode
+	var obj = $('#search_inp');
+	var url = '/search/'+ obj.val();
+	if($(dom_obj).attr('type') == "submit"){ alert('soon'); return; }
+	if (key == 40 || key == 38){ return process_search_nav(key); }
+
+	if(obj.val() == '') { $('.search_res').html(''); return; }
+	
+	$.ajax({
+	  url: url,
+	  dataType: "json",
+	}).done(function(resp) {
+		console.log(resp, resp.tickers[2])
+  		var resp_html = '';
+  		
+  		if(resp.tickers.length){
+  			resp_html += '<li class="inf">Companies</li>';
+  		}
+  		for(i=0; i < resp.tickers.length ; i++){
+  			resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+'</a></li>';
+  		}
+  		
+  		if(resp.analytics.length){
+  			resp_html += '<li class="inf">Analytics</li>';
+  		}
+  		for(i=0; i < resp.analytics.length ; i++){
+  			resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
+  		}
+  		
+  		$('.search_res').html(resp_html);
+	});	
+}
+
+function process_search_nav(key){
+	if(key == 40){ // nav button down
+		var list = $('.search_res li.entry');
+		var exit = 0, first_time = ($('.search_res li.active').length == 0);
+		
+		var i = 0;
+		$('.search_res li').each(function(){
+			if($(this).hasClass('inf') == 0 && first_time){
+				$(this).addClass('active'); exit = 1; first_time = 0;
+				$('#search_inp').val($(this).text());
+				
+				
+			}else if ($(this).hasClass('active') && exit == 0){
+				var lil = $(this);
+					$('#search_inp').val(lil.next().text());
+					lil.next().addClass('active');
+					lil.removeClass('active');
+				exit = 1;
+			}
+		}); 
+		
+	}else if(key == 38){
+		var list = $('.search_res li.entry');
+		var exit = 0, first_time = ($('.search_res li.active').length == 0);
+		
+		$('.search_res li').each(function(){
+			
+				
+			if ($(this).hasClass('active') && exit == 0){
+				var lil = $(this);
+					
+			 	if(lil.prev().length == 0) { return; }
+				lil.removeClass('active');
+				lil.prev().addClass('active');
+				$('#search_inp').val(lil.prev().text());
+				exit = 1;
+			}
+		}); 
+	}
+}
+
 
 /* DOM ready */
 $(function(){
@@ -196,7 +274,7 @@ $(function(){
 	 	var tooltip = chart.children('.bar_tooltip');
 	 	
  		var top = obj.offset().top - chart.offset().top - 2;
- 		var left = obj.offset().left -chart.offset().left + parseInt(obj.attr('width')) -2; 
+ 		var left = obj.offset().left -chart.offset().left + parseInt(obj.attr('width')) -4; 
 
 	 	tooltip.fadeIn(100);
 	 	tooltip.text(obj.attr('txt')).css({top:top,left:left});

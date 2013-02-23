@@ -18,8 +18,10 @@
                 <div class="main_intro">We are still in private beta. Now we are analyzing companies which are in S&P500 index. You can find all the companies <a href=''>here.</a></div>
                 <div class="search">
                     <form action="" method="get">
-                        <input type="text" name="q" value="" class="inp-s" />
-                        <input type="submit" value="Search" class="sub-s"/>
+                        <input type="text" name="q" autocomplete="off" value="" class="inp-s" id="search_inp" onkeyup="process_search(this, event)" />
+                        <input type="submit" value="Search" class="sub-s" onclick="process_search(this, event)" />
+                        <ul class="search_res">
+						</ul>
                     </form>
                 </div>
             </div>
