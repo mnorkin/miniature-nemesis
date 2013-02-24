@@ -6,8 +6,9 @@
         <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
         <div class="search">
             <form action="" method="get">
-                <input type="text" name="q" value="" class="inp-s" />
-                <input type="submit" value="Search" class="sub-s"/>
+                <input type="text" name="q" value="" class="inp-s" id="search_inp" onkeyup="process_search(this, event)"  />
+                <input type="submit" value="Search" class="sub-s" onclick="process_search(this, event)"  />
+                <ul class="search_res"></ul>
             </form>
         </div>
     </div>
@@ -21,7 +22,7 @@
 	<ul class="corp_info">
 		<li class="name">{{ ticker.long_name }} ({{ ticker.name }})<div class="text-gradient"></div></li>
 		<li class="price">{{ ticker.last_stock_price }}</li>
-		<li class="price_detail">1.50(<i></i>3.25%)</li>
+		<li class="price_detail">1.50 (<i></i>3.25%)</li>
 		<li class="number">{{ ticker.number_of_analytics }} <span>Analysts</span> </li>
 		<li class="number n2">{{ ticker.number_of_tp }} <span>Active target prices</span> </li>
 		<li class='avg'>

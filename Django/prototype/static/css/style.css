@@ -9,7 +9,7 @@
 body{
     font-family: "helvetica neue",arial,sans-serif;
     font-size: 12px;
-    background: url('../images/bg_2.jpg') 0 0 no-repeat;
+    background: url('../images/bg_3.jpg') 0 0 no-repeat;
     background-size: cover;
     min-height: 100%;
     color:#444444;
@@ -99,6 +99,10 @@ li{ list-style: none; }
     border-right:1px solid #e5dbd2;    
     z-index: 10;
 }
+.inner .search_res {
+    top:53px;
+    width: 232px;
+}
 .search_res li{
     padding-top: 10px;
     padding-left:10px;
@@ -110,12 +114,15 @@ li{ list-style: none; }
     text-align: left;
     cursor: pointer;
 }
+.inner .search_res li{
+    width: 222px;
+}
 .search_res li.inf{
     background: #d1c1b0;
     color:#fff;
 }
 .search_res li.active{
-    background: #d1c1b0;
+    background: #e7e0d9;
 }
 
 #content{
@@ -234,7 +241,7 @@ li{ list-style: none; }
     margin-top:4px;
     display: inline-block;
     font-weight: bold;
-    font-size:11px;
+    font-size:12px;
 }
 
 .title.grid .chart .bar svg{
@@ -287,7 +294,7 @@ li{ list-style: none; }
     position: absolute;
     width:81px;
     height: 81px;
-    background: url('../images/circle_1.png') 0 0 no-repeat;
+    background: url('../images/circle_2.png') 0 0 no-repeat;
     top:14px;
     right: 20px;
     text-align: center;
@@ -513,6 +520,7 @@ li{ list-style: none; }
     height: 62px;
     border-radius: 3px;
     margin-bottom: 20px;
+    box-shadow: 0 0 25px -7px #dcd9d8;
 }
 
 .corp_info > li{
@@ -534,13 +542,12 @@ li{ list-style: none; }
     margin: 21px 20px;
     overflow-x:hidden;
     white-space: nowrap;
-    width: 210px;
+    width: 225px;
 }
 
 .corp_info .price{
     color:#e95200;
     font-size: 22px;
-    letter-spacing:-2px;
     font-weight: bolder;    
     width: 120px;
     padding-top: 11px;
@@ -583,7 +590,6 @@ li{ list-style: none; }
 }
 .corp_info .avg{
     width: 340px;
-    margin-left:20px;
     border-left: 1px solid #e7e0da;
     height: 62px;
     background: url('../images/min_max_1.png') 30px 20px no-repeat;
@@ -722,6 +728,7 @@ li{ list-style: none; }
     border-radius: 4px;
     width:582px;
     float: left;
+    box-shadow: 0 0 25px -7px #dcd9d8;
 }
 .analyser li span{
     float:left;
@@ -798,15 +805,14 @@ li{ list-style: none; }
 }
 .in_graph .sear ul{
     border: 1px solid #e7ded5;
-    width:179px;
+    width:175px;
     margin-bottom: 20px;
-    mar
     max-height: 263px;
     overflow-y: scroll;
     overflow-x: hidden;
 }
 .in_graph .sear li{
-    width:162px;
+    width:158px;
     padding:7px 0 7px 17px;
     border-bottom: 1px solid #f5f2ee;
     background: #fff;
