@@ -9,11 +9,12 @@ import re
 DEBUG = True
 
 # Handy utils
-def message(str):
+def log(str):
   """
-  Message parser (logging the activity of the app)
+  Logging method
   """
-  pass
+
+  print str
 
 def slugify(str):
   """

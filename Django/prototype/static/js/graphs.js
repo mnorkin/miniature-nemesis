@@ -826,19 +826,23 @@ var graphs = (function() {
         .attr("stroke", "#fff")
         .attr('fill', '#8dc6b3')
         .on("mouseover", function() {
-          var element = d3.event.srcElement
+          var element = d3.event.target
           console.log(d3.event)
-          console.log(element)
-          var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator')))+angle_scale(parseFloat(d3.select(this).attr('enumerator'))+1))/2-pi
-          var radius = parseFloat(d3.select(this).attr('txt'))
+          // var angle = calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)+calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)/2
+          var angle = (calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) + calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) ) /2+pi
+          // var angle = calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)+calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)/2-pi
+          // var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator')))+angle_scale(parseFloat(d3.select(this).attr('enumerator'))+1))/2-pi
+          var radius = sun_data[2]/100*rhw+r
           console.log("angle", angle, "radius", radius)
           d3.select(this).attr("fill", "#e95201")
           d3.select("#chart")
             .append('div')
             .attr('class', 'bar_tooltip')
             .text( d3.select(this).attr('txt') + ' %'  )
-            .style("left", w/2-Math.sin(angle)*(radius*rhw/110+r) + "px" )
-            .style("top", (h-h/8)+Math.cos(angle)*(radius*rhw/100+r) + "px" )
+            // .style("left", element.x)
+            // .style("top", element.y)
+            .style("left", w/2-Math.sin(angle)*radius + "px" )
+            .style("top", (h-h/8)+Math.cos(angle)*radius + "px" )
             .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
         })
         .on("mouseout", function() {
