@@ -269,3 +269,14 @@ def graph_02(request):
 	c = Context()
 
 	return HttpResponse(t.render(c))
+
+def graph_03(request):
+	"""
+	Example of graph 03
+	"""
+
+	t = loader.get_template("graph_03.html")
+
+	c = Context()
+
+	return HttpResponse(t.render(c))

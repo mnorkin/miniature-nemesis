@@ -275,6 +275,32 @@ function process_search_nav(key){
 }
 
 
+function open_graph(){
+	obj = $(this);
+	var type = obj.attr('class');
+	type = type.toLowerCase();
+	type = type.replace(' ', '_');
+	var url = obj.attr('href');
+	$('#chart').html('').attr('class', type);
+	var graph_fx = eval('graphs.'+type);
+
+	if(typeof(graph_fx) === 'function') {
+		graph_fx(url);
+	}else{
+		console.log('Graph not ready yet. ' + type)
+	}
+
+	// for testing, because of bulk data
+	if(type == 'max_profitability'){
+		eval('graphs.aggressiveness("'+url+'");');
+	}
+
+	$('.analyse_menu a').removeClass('active');
+	obj.addClass('active');
+	return false; // prevent href
+}
+
+
 /* DOM ready */
 $(function(){
 
@@ -299,6 +325,7 @@ $(function(){
 	 $('.in_graph .sear li').click(in_graph_entry_click);
 	 // to clear search proposals
 	 $('body').click(function () { $('.search_res').html(''); });
+	 $('.analyse_menu a').click(open_graph);
 
 })
 
