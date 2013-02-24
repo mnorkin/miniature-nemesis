@@ -26,7 +26,6 @@ var graphs = (function() {
       _urls = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
     },
 
-    /* Agressivness */
     aggressiveness: function(url) {
       d3.json(host + url, function(error, json) {
         if ( !error ) {
@@ -339,22 +338,50 @@ var graphs = (function() {
     },
 
     /* WORK ON THIS */
-    draw_accuracy: function( phase ) {
+    draw_accuracy: function() {
 
       pi = Math.PI;
 
-      phase = typeof phase !== 'undefined' ? phase : 0;
+      phase = 0
+
       var sun_data = [0, 20, 40, 60, 80, 100];
 
       var w = $("#" + _element_id).width() - 20,
-        h = $("#" + _element_id).height()*2,
-        h = h-h/32,
-        r = Math.min(w, h) / 30,
-        rhw = Math.min(w,h) / 2.4,
+        h = $("#" + _element_id).height(),
+        r = Math.min(w, h) / 15,
+        rhw = Math.min(w,h) / 2,
         color = d3.scale.category20c();
       
+      line_width = w/7
       rect_w = 20;
-      angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi-phase, pi-phase]);
+      angle_scale = d3.scale.linear().domain([0, _data.length]).range([-phase, 2*pi-phase]);
+      line_angle_scale = d3.scale.linear().domain([-w/14, w/14]).range([0, 2*pi])
+
+      var dragCircle = d3.behavior.drag()
+        .on('dragstart', function(){
+          d3.event.sourceEvent.stopPropagation();
+          console.log('Start Dragging Circle');
+          console.log(d3.event)
+        })
+        .on('dragend', function(d, i) {
+          console.log("Drag end", d.cx)
+          d3.select(this).attr('cx', d.cx)
+        })
+        .on('drag', function(d,i){
+          d.cx += d3.event.dx;
+          if ( d.cx > w/14 ) {
+            d.cx = w/14
+          }
+          if (d.cx < -w/14) {
+            d.cx = -w/14
+          }
+          d3.select(this).attr('cx', d.cx)
+          phase = line_angle_scale(d.cx)
+          angle_scale = d3.scale.linear().domain([0, _data.length]).range([-phase, 2*pi-phase]);
+          sun.selectAll("path.data")
+            .data(_data)
+            .attr("d", data_arc)
+        });
 
       var angle_arc = d3.svg.arc()
         .innerRadius(function(d, i) { return r })
@@ -366,9 +393,84 @@ var graphs = (function() {
           return pi/2
         });
 
+      var calculate_start_angle = function(i, angle_scale) {
+        start_angle = angle_scale(i)
+        if ( start_angle <= -pi && start_angle > -3/2*pi ) {
+            start_angle = -3/2*pi
+          }
+          if ( start_angle >= -pi && start_angle <= -pi/2) {
+            start_angle = -pi/2
+          }
+          if ( start_angle >= pi && start_angle <= 3/2*pi ) {
+            start_angle = 3/2*pi
+          }
+          if ( start_angle <= pi && start_angle >= pi/2) {
+            start_angle = pi/2
+          }
+          return start_angle
+      }
+
+      var calculate_end_angle = function(i, angle_scale) {
+        end_angle = angle_scale(i+1)
+        start_angle = calculate_start_angle(i, angle_scale)
+
+        if ( end_angle <= -pi && end_angle > -3/2*pi ) {
+          end_angle = -3/2*pi
+        }
+        if ( end_angle >= -pi && end_angle <= -pi/2) {
+          end_angle = -pi/2
+        }
+        if ( end_angle >= pi && end_angle <= 3/2*pi ) {
+          end_angle = 3/2*pi
+        }
+        if ( end_angle <= pi && end_angle >= pi/2) {
+          end_angle = pi/2
+        }
+
+        if ( end_angle - start_angle < 0 )  {
+          end_angle = start_angle
+        }
+
+        if ( end_angle - start_angle == pi ) {
+          end_angle = start_angle
+        }
+
+        return end_angle
+      }
+      
+      var data_arc = d3.svg.arc()
+        .innerRadius(function(d, i) { return r })
+        .startAngle(function(d, i) {
+          start_angle = calculate_start_angle(i, angle_scale);
+          return start_angle
+        })
+        .endAngle(function(d, i) {
+          end_angle = calculate_end_angle(i, angle_scale)
+          return end_angle
+        })
+        .outerRadius(function(d, i) {
+
+          radius = r;
+
+          if (Math.abs(calculate_start_angle(i, angle_scale) - calculate_end_angle(i, angle_scale)) != 0) {
+            radius = d/100*rhw+r;
+          }
+
+          return radius
+        })
+
       var sun = d3.select("#"+_element_id).append("svg:svg")
         .attr("width", w)
         .attr("height", h);
+
+      sun.append('svg:line')
+        .attr("x1", w/2-w/14)
+        .attr("y1", h-h/32)
+        .attr('x2', w/2+w/14)
+        .attr("y2", h-h/32)
+        .attr('stroke', "black")
+        .attr("width", w/2)
+        .attr("height", 1)
 
       sun.selectAll('#'+_element_id)
         .data(sun_data).enter()
@@ -377,60 +479,104 @@ var graphs = (function() {
         .attr('stroke-width', 0.3)
         .attr('fill', 'transparent')
         .attr("stroke", "grey")
-        .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
+        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
 
-      var circle = sun.selectAll('#' + _element_id)
-      .data(_data).enter()
-      .append('svg:circle')
-      .attr('cx', function(d, i) {
-        if (angle_scale(i) < pi && angle_scale(i) > -pi) {
-          console.log(angle_scale(i))
-          return -(d/100*rhw+r)*Math.cos(angle_scale(i))
-        } else {
-          return 0;
-        }
-        
-      })
-      .attr('cy', function(d, i) {
-        if (angle_scale(i) < pi && angle_scale(i) > -pi) {
-          console.log(angle_scale(i))
-          return -(d/100*rhw+r)*Math.sin(angle_scale(i))
-        } else {
-          return 0;
-        }
-      })
-      .attr('r', function(d, i) {
-        if (angle_scale(i) < pi && angle_scale(i) > -pi) {
-          console.log(angle_scale(i))
-          return 7;
-        } else {
-          return 0;
-        }
-      })
-      .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
-      .attr('fill', '#c0be81')
-      .attr('txt', function(d,i) { return _data[i] + ' %' })
+      sun.selectAll("#" + _element_id)
+        .data(_data.reverse()).enter()
+        .append('svg:path')
+        .attr('class', 'data')
+        .attr("d", data_arc)
+        .attr('stroke-width', 1)
+        .attr("stroke", "#fff")
+        .attr('fill', '#8dc6b3')
+        .on("mouseover", function() {
+          var element = d3.event.srcElement
+          console.log(d3.event)
+          console.log(element)
+          var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator')))+angle_scale(parseFloat(d3.select(this).attr('enumerator'))+1))/2-pi
+          var radius = parseFloat(d3.select(this).attr('txt'))
+          console.log("angle", angle, "radius", radius)
+          d3.select(this).attr("fill", "#e95201")
+          d3.select("#chart")
+            .append('div')
+            .attr('class', 'bar_tooltip')
+            .text( d3.select(this).attr('txt') + ' %'  )
+            .style("left", w/2-Math.sin(angle)*(radius*rhw/110+r) + "px" )
+            .style("top", (h-h/8)+Math.cos(angle)*(radius*rhw/100+r) + "px" )
+            .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+        })
+        .on("mouseout", function() {
+          d3.select(this).attr("fill", "#8dc6b3")
+          d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+        })
+        .attr('txt', function(d) { return d })
+        .attr('enumerator', function(d, i) { return i })
+        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")")
 
-      .on('mouseover', function(d, i) {
-        d3.select(this).style("fill", "#e95201")
-        d3.select("#chart")
-        .append('div')
-        .attr('class', 'bar_tooltip')
-        .text( d3.select(this).attr('txt') )
-        .style("left", w/2+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2 + "px") 
-        .style("top", h/2+parseFloat(d3.select(this).attr('cy')) - 20 + "px" )
-        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
-      })
-      .on("mouseout", function() {
-        d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
-        d3.select(this).style("fill", "#c0be81");
-      })
-      .style("opacity", 0)
-      .transition().duration(600).style("opacity", 1);
+      var circle = sun.append("g");
+      circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
+        .enter().append('circle')
+        .attr('cx', function(d){ return d.cx })
+        .attr('cy', function(d){ return d.cy })
+        .attr('r', 8)
+        .call(dragCircle)
+        .attr('fill', 'blue')
+        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
 
-      circle.selectAll(".title")
-      .append('svg:title')
-      .text(function(d, i) { return _data[i] + ' %' })
+      
+      // var circle = sun.selectAll('#' + _element_id)
+      // .data(_data).enter()
+      // .append('svg:circle')
+      // .attr('cx', function(d, i) {
+      //   // if (angle_scale(i) < pi && angle_scale(i) > -pi) {
+          
+      //   //   return -(d/100*rhw+r)*Math.cos(angle_scale(i))
+      //   // } else {
+      //   //   return 0;
+      //   // }
+      //   return -(d/100*rhw+r)*Math.cos(angle_scale(i))
+      // })
+      // .attr('cy', function(d, i) {
+      //   // if (angle_scale(i) < pi && angle_scale(i) > -pi) {
+      //   //   return -(d/100*rhw+r)*Math.sin(angle_scale(i))
+      //   // } else {
+      //   //   return 0;
+      //   // }
+      //   return -(d/100*rhw+r)*Math.sin(angle_scale(i))
+      // })
+      // .attr('r', function(d, i) {
+      //   console.log(0, angle_scale(i), pi)
+      //   if (angle_scale(i) <= pi && angle_scale(i) >= 0 ) {
+      //     return 7;
+      //   } else {
+      //     return 3;
+      //   }
+      // })
+      // .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
+      // .attr('fill', '#c0be81')
+      // .attr('txt', function(d,i) { return _data[i] + ' %' })
+      // .on('mouseover', function(d, i) {
+      //   d3.select(this).style("fill", "#e95201")
+      //   d3.select("#chart")
+      //   .append('div')
+      //   .attr('class', 'bar_tooltip')
+
+      //   .text( d3.select(this).attr('txt') )
+      //   .style("left", w/2+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2 + "px") 
+      //   .style("top", h/2+parseFloat(d3.select(this).attr('cy')) - 20 + "px" )
+      //   .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+      // })
+      // .on("mouseout", function() {
+      //   d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+      //   d3.select(this).style("fill", "#c0be81");
+      // })
+      // .style("opacity", 0)
+      // .transition().duration(600).style("opacity", 1);
+
+      // TODO: titles
+      // sun.selectAll("#" + _element_id).data(_data).enter()
+      // .append('title')
+      // .text(function(d, i) { return _data[i] + ' %' })
 
     },
 
@@ -517,6 +663,13 @@ var graphs = (function() {
 
     draw_impact_to_stock: function() {
 
+    },
+
+    /* Helpers, 
+      Angle start calculator for accuracy
+     */
+    start_angle: function(i) {
+      
     }
 
   };
