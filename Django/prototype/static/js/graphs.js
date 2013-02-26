@@ -236,7 +236,7 @@ var graphs = (function() {
       .append("svg:rect")
       .attr("width", function(d) { return d.toString().length*10 })
       .attr("height", 20)
-      .attr("fill", "white")
+      .attr("fill", "#FFFBF8")
       .attr("y", function(d) { return -(d/100*rhw+r)-10} )
       .attr("x", function(d) { return -d.toString().length/2*10 } )
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")");
@@ -246,6 +246,7 @@ var graphs = (function() {
       .style("text-anchor", "middle")
       .style("width", "10px")
       .style("height", "10px")
+      .style("font-size", "10px")
       .style("fill", "#dfc8b6")
       .attr("dy", function(d, i) { return -(d/100*rhw+r)+5 })
       .text(function(d) { return d })
@@ -261,7 +262,7 @@ var graphs = (function() {
         return (d/100*rhw+r)*Math.sin(angle_scale(i))
       })
       .attr('r', function(d, i) {
-        return 7;
+        return 5;
       })
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
       .attr('fill', '#71859e')
@@ -278,8 +279,9 @@ var graphs = (function() {
       })
       .on("mouseout", function() {
         d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
-        d3.select(this).style("fill", "#71859e");
+        d3.select(this).style("fill", "#c0be81");
       })
+      .style('opacity', 0)
       .append('svg:title')
       .text(function(d, i) { return _data[i] + ' %' })
 
@@ -293,7 +295,7 @@ var graphs = (function() {
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
       r = Math.min(w, h) / 30,
-      rhw = Math.min(w,h) / 115,
+      rhw = Math.min(w,h) / 75,
       color = d3.scale.category20c();
 
       translate_w = w/16;
@@ -343,7 +345,7 @@ var graphs = (function() {
       .attr('r', function(d, i) {
         return 7;
       })
-      .attr('fill', '#71859e')
+      .attr('fill', '#91bcc5')
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
@@ -352,13 +354,14 @@ var graphs = (function() {
         .attr('class', 'bar_tooltip')
         .text( d3.select(this).attr('txt') )
         .style("left", translate_w+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2 + "px") 
-        .style("top", h+parseFloat(d3.select(this).attr('cy')) - 20 + "px" )
+        .style("top", h+parseFloat(d3.select(this).attr('cy')) - 37 + "px" )
         .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
         .attr("transform", "translate(" + translate_w + "," + h + ")");
+        $('.bank .corp').text(_slugs[i]);
       })
       .on("mouseout", function() {
         d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
-        d3.select(this).style("fill", "#71859e");
+        d3.select(this).style("fill", "#91bcc5");
       })
       .attr("transform", "translate(" + translate_w + "," + h + ")")
       .append('svg:title')
