@@ -157,7 +157,51 @@ li{ list-style: none; }
     font-size: 14px;
     display:block;
     font-weight: bold;
+    position: relative;
 }
+
+/** Long company names moving. If you find a better solution for that, I will buy you a beer! */
+.title .entry .ticket .ln{
+    display: inline-block;
+    width: 130px;
+    position: relative;
+    text-align: left;
+    overflow: hidden;
+    height: 14px;
+}
+.title .entry .ticket .ln span{
+    display: inline-block;
+    position: relative;
+    top:0;
+    left: 0px;
+    height: 14px;
+    width: 500px;
+}
+.title .entry .ticket .sn{
+    background: url('../images/gradient_3.png') 0px 0 repeat;
+    position: relative;
+    left: -29px;
+    padding-left: 30px;
+    width: 50px;
+}
+.title.list .entry .ticket .sn{
+    position: absolute;
+    top:1px;
+    right: 0px;
+    left: auto;
+    width: 40px;
+    padding-left: 23px;
+}
+.title .entry  .goust{
+    visibility: hidden;
+    position: absolute;
+    left: -100px;
+    top:-100px;
+    height: 14px;
+}
+/* END */
+
+
 .title.grid .entry .analytic{
     font-size: 12px;
     display:block;
@@ -166,11 +210,13 @@ li{ list-style: none; }
 }
 .title.grid .entry .price{
     color:#e95200;
-    font-size: 24px;
+    font-size: 22px;
+    width: 85px;
+    text-align: right;
     font-weight: bold;
     position:absolute;
-    top:30px;
-    left:231px;
+    top:39px;
+    left:200px;
 }
 
 .title .now{
@@ -249,18 +295,18 @@ li{ list-style: none; }
     top:0px;
 }
 .title.grid .chart .bar rect {
-    stroke:#dededb;
+    /*stroke:#dededb; */
     cursor: pointer;
 }
 
 /*.title .bar rect.ac { fill:#90c7b5; }
 .title .bar rect.pr { fill:#a387bc; }
 .title .bar rect.re { fill:#6f859f; }*/
-
+/*
 .bar li:nth-child(1) rect { fill: #90c7b5; }
 .bar li:nth-child(3) rect { fill: #a387bc; }
 .bar li:nth-child(5) rect { fill: #6f859f; }
-
+*/
 .title .bar text {
     fill:#DDD;
     font-size: 12px;
@@ -295,14 +341,15 @@ li{ list-style: none; }
     width:81px;
     height: 81px;
     background: url('../images/circle_2.png') 0 0 no-repeat;
-    top:14px;
-    right: 20px;
+    top:15px;
+    right: 12px;
     text-align: center;
 }
 .title.grid .chart .circle strong{
     color:#b9d240;
     font-size:18px;
-    padding: 27px 14px;
+    padding-top: 29px;
+    padding-left: 2px;
     display: inline-block;
 }
 .title.grid .chart .circle.down strong{
@@ -314,7 +361,7 @@ li{ list-style: none; }
     border-bottom: 6px solid #b7ce44;
     border-right: 6px solid transparent;
     border-left: 6px solid transparent;
-    top:21px;
+    top:22px;
     left:33px;
 }
 .title.grid .chart .circle.down strong:after{
@@ -323,7 +370,7 @@ li{ list-style: none; }
     border-top: 6px solid #da1e1e;
     border-right: 6px solid transparent;
     border-left: 6px solid transparent;
-    top:49px;
+    top:50px;
     left:33px;
 }
 
@@ -349,11 +396,12 @@ li{ list-style: none; }
     color:#444444;
     margin: 8px 0 0px 12px;
     height:32px;
-    width:165px;
+    width:168px;
     display: block;
     float:left;
     font-weight: bold;
     border-right: 1px solid #f4eee8;
+    position: relative;
 }
 .title.list .analytic{
     position: absolute;
@@ -367,7 +415,7 @@ li{ list-style: none; }
     margin: 8px 0 0px 0px;
     padding-top:5px;
     height:26px;
-    width:53px;
+    width:76px;
     display: block;
     float:left;
     border-right: 1px solid #f4eee8;
@@ -381,7 +429,7 @@ li{ list-style: none; }
     margin: 8px 0 0px 0px;
     padding-top:5px;
     height:26px;
-    width:73px;
+    width:85px;
     display: block;
     float:left;
     border-right: 1px solid #f4eee8;
@@ -389,9 +437,9 @@ li{ list-style: none; }
     position: relative;
 }
 .title.list .circle strong{
-    margin-left: 14px;
+    margin-left: 8px;
+    width: 46px; 
     display: inline-block;
-    width: 46px;
     text-align: center;
 }
 .title.list .circle.up{
@@ -408,27 +456,27 @@ li{ list-style: none; }
     left:7px;
 }
 .title.list .circle.up strong:before{
-    position:absolute;
     content:'';
     border-bottom: 6px solid #c2d859;
     border-right: 6px solid transparent;
     border-left: 6px solid transparent;
+    position:absolute;
     top:12px;
     left:7px;
 }
 
 .title.list .bar{
     position: absolute;
-    left:320px;
-    top:20px;
-    width: 495px;
+    left:353px;
+    top:17px;
+    width: 445px;
 }
 .title.list .bar > li{
-    background: url('../images/bar_b1.png') 0 0 no-repeat;
-    width:143px;
-    height:14px;
+    background: url('../images/bar_b2.png') 0 0 no-repeat;
+    width:135px;
+    height:10px;
     display: inline-block;
-    margin-right: 15px;
+    margin-right: 11px;
     color:transparent;
 }
 .title.list .bar > li span{
@@ -448,18 +496,18 @@ li{ list-style: none; }
 .title.list .pre_info{
     position: relative;
     height:20px;
-    left:230px;
+    left:259px;
 }
 .title.list .pre_info span{
     height:20px;
     position: relative;
-    width:154px;
+    width:140px;
     display: block;
     float: left;
     padding-left: 9px;
 }
 .title.list .pre_info span.cr{
-    width: 81px;
+    width: 86px;
     text-align: center;
     padding-left: 0px;
 }

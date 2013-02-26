@@ -59,6 +59,7 @@ function generate_grid_element(id, dataset, posName) {
 			.attr('class', function(d,i){ return posName[i]; })
 			.attr('height', 12)
 			.attr('y', 0)
+			.attr('fill', 'url(#first_grad)')
 			.attr('rx',4)
 			.attr('ry',4)
 			.attr('txt', function(d,i){ return d+'%';} )
@@ -326,6 +327,14 @@ $(function(){
 	 // to clear search proposals
 	 $('body').click(function () { $('.search_res').html(''); });
 	 $('.analyse_menu a').click(open_graph);
+	 // long company names moving
+	 $('.title .entry').hover(
+	 	function(){ 
+	 		var left = Math.min(0, (125 - $(this).find('.goust').width()) );
+	 		$(this).find('.ln span').animate({'left': left}, (left * -15) ); 
+	 	},
+	 	function(){ $(this).find('.ln span').stop().css({'left': 0})}
+	 );
 
 })
 
