@@ -3,11 +3,11 @@
   <title>Graph 01</title>
   <script type="text/javascript" src ="http://code.jquery.com/jquery-1.9.1.min.js"></script>
   <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-  <script type="text/javascript" src="http://localhost:8000/static/js/graphs.js"></script>
+  <script type="text/javascript" src="/static/js/graphs.js"></script>
   <script type="text/javascript">
   
   $(document).ready(function(){
-    graphs.accuracy("/feature_by_ticker/expe/1/");
+    graphs.reach_time("/feature_by_ticker/expe/1/");
   })
 
   </script>
@@ -33,14 +33,11 @@
     width: 1200px;
     height: 500px;
     border: 1px solid #000;
-    overflow: hidden;
   }
 
   </style>
 </head>
-<body>
-
-  <div id="chart"></div>
-
-</body>
+  <body>
+    <div id="chart"></div>
+  </body>
 </html>
