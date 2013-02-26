@@ -7,6 +7,10 @@ var graphs = (function() {
   var _urls = new Array();
   var host = "";
 
+  var _number_of_graphs = 0
+
+  d3.selectAll("#" + _element_id + " svg").remove()
+
   return {
 
     set_url: function(url) {
@@ -15,18 +19,36 @@ var graphs = (function() {
 
     populate: function(json) {
 
-      // for (var i = json.length - 1; i >= 0; i--) {
-      //   _data[i] = json[i].value
-      //   _slugs[i] = json[i].slug
-      //   _urls[i] = json[i].url
-      // };
+      if ( _number_of_graphs >= 1 ) {
 
-      _data = [0, 11, 22, 33, 44, 55, 66, 77, 88, 99]
-      _slugs = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
-      _urls = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
+        console.log("dual graph")
+
+      } else {
+
+        console.log("single graph")
+
+        d3.selectAll("#" + _element_id + " svg").remove()
+
+        // for (var i = json.length - 1; i >= 0; i--) {
+        //   _data[i] = json[i].value
+        //   _slugs[i] = json[i].slug
+        //   _urls[i] = json[i].url
+        // };
+
+        _data = [ 11, 22, 33, 44, 55, 66, 77, 88, 99,11, 22, 33, 44, 55, 66, 77, 88, 99, 11, 22, 33, 44, 55, 66, 77, 88, 99]
+        // _data = [99, 99, 99, 99, 1]
+        _data.sort()
+        _slugs = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
+        _urls = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
+      }
+      
+      _number_of_graphs += 1
+
+      return this
     },
 
     aggressiveness: function(url) {
+
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
@@ -37,6 +59,7 @@ var graphs = (function() {
           console.log("Error on fetch data: ", error.status)
         }
       });
+      return graphs
     },
 
     profitability: function(url) {
@@ -50,6 +73,7 @@ var graphs = (function() {
           console.log("Error on fetch data: ", error.status)
         }
       });
+      return graphs
     },
 
     accuracy: function(url, phase) {
@@ -61,6 +85,7 @@ var graphs = (function() {
           console.log("Error on fetch data: ", error.status)
         }
       });
+      return graphs
     },
 
     reach_time: function(url) {
@@ -74,6 +99,7 @@ var graphs = (function() {
           console.log("Error on fetch data: ", error.status)
         }
       });
+      return graphs
     },
 
     impact_to_stock: function(url) {
@@ -87,6 +113,7 @@ var graphs = (function() {
           console.log("Error on fetch data: ", error.status)
         }
       });
+      return graphs
     },
 
     proximity: function(url) {
@@ -99,7 +126,7 @@ var graphs = (function() {
           console.log("Error on fetch data: ", error.status)
         }
       });
-
+      return graphs
     },
 
     draw_proximity: function() {
@@ -173,6 +200,8 @@ var graphs = (function() {
       .attr('cx', w/2)
       .attr('cy', h/2)
       .attr('r', r);
+
+      return graphs
     },
 
     draw_aggressiveness: function() {
@@ -253,7 +282,8 @@ var graphs = (function() {
       })
       .append('svg:title')
       .text(function(d, i) { return _data[i] + ' %' })
-      
+
+      return graphs
     },
 
     draw_profitability: function() {
@@ -333,17 +363,19 @@ var graphs = (function() {
       .attr("transform", "translate(" + translate_w + "," + h + ")")
       .append('svg:title')
       .text(function(d, i) { return _data[i] + ' %' })
-      
+        
+      return graphs
 
     },
 
     
     draw_accuracy: function() {
+    /**
+      * Method to draw accuracy
+      */
 
       pi = Math.PI;
-
       phase = 0
-
       var sun_data = [0, 20, 40, 60, 80, 100];
 
       var w = $("#" + _element_id).width() - 20,
@@ -351,11 +383,19 @@ var graphs = (function() {
         r = Math.min(w, h) / 15,
         rhw = Math.min(w,h) / 2,
         color = d3.scale.category20c();
+
+      number_of_data_for_full_graph = 40
       
       line_width = w/7
       rect_w = 20;
-      angle_scale = d3.scale.linear().domain([0, _data.length]).range([-phase, 2*pi-phase]);
-      line_angle_scale = d3.scale.linear().domain([-w/14, w/14]).range([0, 2*pi])
+      
+      if (_data.length <= number_of_data_for_full_graph) {
+        angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2, pi/2]);
+      } else {
+        angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2-phase, pi-phase]);
+      }
+      
+      line_angle_scale = d3.scale.linear().domain([-w/14, w/14]).range([0, 1/2*pi])
 
       var dragCircle = d3.behavior.drag()
         .on('dragstart', function(){
@@ -377,7 +417,7 @@ var graphs = (function() {
           }
           d3.select(this).attr('cx', d.cx)
           phase = line_angle_scale(d.cx)
-          angle_scale = d3.scale.linear().domain([0, _data.length]).range([-phase, 2*pi-phase]);
+          angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2-phase, pi-phase]);
           sun.selectAll("path.data")
             .data(_data)
             .attr("d", data_arc)
@@ -463,14 +503,27 @@ var graphs = (function() {
         .attr("width", w)
         .attr("height", h);
 
-      sun.append('svg:line')
-        .attr("x1", w/2-w/14)
-        .attr("y1", h-h/32)
-        .attr('x2', w/2+w/14)
-        .attr("y2", h-h/32)
-        .attr('stroke', "black")
-        .attr("width", w/2)
-        .attr("height", 1)
+      if (_data.length > number_of_data_for_full_graph) {
+        sun.append('svg:line')
+          .attr("x1", w/2-w/14)
+          .attr("y1", h-h/32)
+          .attr('x2', w/2+w/14)
+          .attr("y2", h-h/32)
+          .attr('stroke', "black")
+          .attr("width", w/2)
+          .attr("height", 1)
+
+        var circle = sun.append("g");
+        circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
+          .enter().append('circle')
+          .attr('cx', function(d){ return d.cx })
+          .attr('cy', function(d){ return d.cy })
+          .attr('r', 8)
+          .call(dragCircle)
+          .attr('fill', 'blue')
+          .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
+      }
+      
 
       sun.selectAll('#'+_element_id)
         .data(sun_data).enter()
@@ -513,85 +566,26 @@ var graphs = (function() {
         .attr('enumerator', function(d, i) { return i })
         .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")")
 
-      var circle = sun.append("g");
-      circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
-        .enter().append('circle')
-        .attr('cx', function(d){ return d.cx })
-        .attr('cy', function(d){ return d.cy })
-        .attr('r', 8)
-        .call(dragCircle)
-        .attr('fill', 'blue')
-        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
-
-      
-      // var circle = sun.selectAll('#' + _element_id)
-      // .data(_data).enter()
-      // .append('svg:circle')
-      // .attr('cx', function(d, i) {
-      //   // if (angle_scale(i) < pi && angle_scale(i) > -pi) {
-          
-      //   //   return -(d/100*rhw+r)*Math.cos(angle_scale(i))
-      //   // } else {
-      //   //   return 0;
-      //   // }
-      //   return -(d/100*rhw+r)*Math.cos(angle_scale(i))
-      // })
-      // .attr('cy', function(d, i) {
-      //   // if (angle_scale(i) < pi && angle_scale(i) > -pi) {
-      //   //   return -(d/100*rhw+r)*Math.sin(angle_scale(i))
-      //   // } else {
-      //   //   return 0;
-      //   // }
-      //   return -(d/100*rhw+r)*Math.sin(angle_scale(i))
-      // })
-      // .attr('r', function(d, i) {
-      //   console.log(0, angle_scale(i), pi)
-      //   if (angle_scale(i) <= pi && angle_scale(i) >= 0 ) {
-      //     return 7;
-      //   } else {
-      //     return 3;
-      //   }
-      // })
-      // .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
-      // .attr('fill', '#c0be81')
-      // .attr('txt', function(d,i) { return _data[i] + ' %' })
-      // .on('mouseover', function(d, i) {
-      //   d3.select(this).style("fill", "#e95201")
-      //   d3.select("#chart")
-      //   .append('div')
-      //   .attr('class', 'bar_tooltip')
-
-      //   .text( d3.select(this).attr('txt') )
-      //   .style("left", w/2+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2 + "px") 
-      //   .style("top", h/2+parseFloat(d3.select(this).attr('cy')) - 20 + "px" )
-      //   .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
-      // })
-      // .on("mouseout", function() {
-      //   d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
-      //   d3.select(this).style("fill", "#c0be81");
-      // })
-      // .style("opacity", 0)
-      // .transition().duration(600).style("opacity", 1);
-
-      // TODO: titles
-      // sun.selectAll("#" + _element_id).data(_data).enter()
-      // .append('title')
-      // .text(function(d, i) { return _data[i] + ' %' })
-
+      return graphs
     },
 
     draw_reach_time: function() {
+    /**
+      * Method to draw reach time
+      */
 
       var linear_data = [0, 20, 40, 60, 80, 100];
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
       r = Math.min(w, h) / 30,
-      rhw = Math.min(w,h) / 43,
+      rhw = Math.min(w,h) / 46,
       color = d3.scale.category20c();
 
       translate_w = w/16;
 
-      graph_height = h-(h/8-h/32)
+      graph_height = h-(h/8-h/12)
+
+      number_of_data_for_scroll = 12
 
       var linear = d3.select("#" + _element_id).append("svg:svg")
       .attr("width", w)
@@ -622,7 +616,7 @@ var graphs = (function() {
       .attr("fill", "#dec7b5")
       .attr('width', function(d, i) { return d*rhw })
       .attr('height', 1)
-      .attr('y', function(d, i) { return -(i+1)*graph_height/(_data.length) } )
+      .attr('y', function(d, i) { return -graph_height/(_data.length+1)*(i+2) } )
       .attr('x', function(d, i) { return 0 } )
       .attr('txt', function(d,i) { return d + ' %' })
       .attr("transform", "translate(" + translate_w/3*2 + "," + h + ")");
@@ -633,7 +627,7 @@ var graphs = (function() {
         return d*rhw
       })
       .attr('cy', function(d, i) {
-        return -graph_height/(_data.length)*(i+1)
+        return -graph_height/(_data.length+1)*(i+2)
       })
       .attr('r', function(d, i) {
         return 7;
@@ -659,10 +653,13 @@ var graphs = (function() {
       .append('svg:title')
       .text(function(d, i) { return _data[i] + ' %' })
 
+      return graphs
     },
 
-    /* WORK ON THIS */
     draw_impact_to_stock: function() {
+    /**
+      * Method to draw impact to market
+      */
       pi = Math.PI;
 
       phase = 0
@@ -675,10 +672,23 @@ var graphs = (function() {
         rhw = Math.min(w,h) / 4,
         color = d3.scale.category20c();
       
+      number_of_data_for_full_graph = 4
+
       line_width = w/7
       rect_w = 20;
-      angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-phase, 2*pi-phase]);
-      line_angle_scale = d3.scale.linear().domain([-w/14, w/14]).range([0, 2*pi])
+      // if (_data.length <= number_of_data_for_full_graph) {
+      //   angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2, pi/2]);
+      // } else {
+      //   angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2-phase, pi-phase]);
+      // }
+
+      if ( _data.length <= number_of_data_for_full_graph ) {
+        angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-pi/2, pi/2]);
+      } else {
+        angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-pi/2-phase, pi-phase]);
+      }
+      
+      line_angle_scale = d3.scale.linear().domain([-w/14, w/14]).range([0, 1/2*pi])
 
       var dragCircle = d3.behavior.drag()
         .on('dragstart', function(){
@@ -700,7 +710,7 @@ var graphs = (function() {
           }
           d3.select(this).attr('cx', d.cx)
           phase = line_angle_scale(d.cx)
-          angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-phase, 2*pi-phase]);
+          angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-pi/2-phase, pi-phase]);
           sun.selectAll("path.data")
             .data(_data)
             .attr("d", data_arc)
@@ -799,14 +809,27 @@ var graphs = (function() {
         .attr("width", w)
         .attr("height", h);
 
-      sun.append('svg:line')
-        .attr("x1", w/2-w/14)
-        .attr("y1", h-h/32)
-        .attr('x2', w/2+w/14)
-        .attr("y2", h-h/32)
-        .attr('stroke', "black")
-        .attr("width", w/2)
-        .attr("height", 1)
+      if ( _data.length > number_of_data_for_full_graph ) {
+        sun.append('svg:line')
+          .attr("x1", w/2-w/14)
+          .attr("y1", h-h/32)
+          .attr('x2', w/2+w/14)
+          .attr("y2", h-h/32)
+          .attr('stroke', "black")
+          .attr("width", w/2)
+          .attr("height", 1)
+
+        var circle = sun.append("g");
+        circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
+          .enter().append('circle')
+          .attr('cx', function(d){ return d.cx })
+          .attr('cy', function(d){ return d.cy })
+          .attr('r', 8)
+          .call(dragCircle)
+          .attr('fill', 'blue')
+          .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
+      }
+      
 
       sun.selectAll('#'+_element_id)
         .data(sun_data).enter()
@@ -826,21 +849,13 @@ var graphs = (function() {
         .attr("stroke", "#fff")
         .attr('fill', '#8dc6b3')
         .on("mouseover", function() {
-          var element = d3.event.target
-          console.log(d3.event)
-          // var angle = calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)+calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)/2
           var angle = (calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) + calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) ) /2+pi
-          // var angle = calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)+calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)/2-pi
-          // var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator')))+angle_scale(parseFloat(d3.select(this).attr('enumerator'))+1))/2-pi
           var radius = sun_data[2]/100*rhw+r
-          console.log("angle", angle, "radius", radius)
           d3.select(this).attr("fill", "#e95201")
           d3.select("#chart")
             .append('div')
             .attr('class', 'bar_tooltip')
             .text( d3.select(this).attr('txt') + ' %'  )
-            // .style("left", element.x)
-            // .style("top", element.y)
             .style("left", w/2-Math.sin(angle)*radius + "px" )
             .style("top", (h-h/8)+Math.cos(angle)*radius + "px" )
             .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
@@ -854,15 +869,7 @@ var graphs = (function() {
         .attr('data_sum', function(d, i) { return d3.sum(_data) })
         .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")")
 
-      var circle = sun.append("g");
-      circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
-        .enter().append('circle')
-        .attr('cx', function(d){ return d.cx })
-        .attr('cy', function(d){ return d.cy })
-        .attr('r', 8)
-        .call(dragCircle)
-        .attr('fill', 'blue')
-        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
+      return graphs
     }
   };
 })();
