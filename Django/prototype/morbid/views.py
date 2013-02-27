@@ -11,7 +11,7 @@ from django.conf import settings
 from prototype.decorators import logged_in_or_basicauth
 
 @logged_in_or_basicauth(realm="Limited access")
-def index(request, page=1):
+def index(request, page=0):
 	"""
 	Index page
 
@@ -20,13 +20,23 @@ def index(request, page=1):
 	@return: Http Response
 	"""
 
-	if not settings.DEBUG:
+	# if not settings.DEBUG:
 		# Return week long entries
-		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
-	else:
-		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-1)).order_by('date').reverse()
+		# latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
+	# else:
+		# latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-1)).order_by('date').reverse()
+	# latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
 
-	feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct, feature__display_in_frontpage=True )
+	dates = [tp['date'] for tp in TargetPrice.objects.order_by('-date').distinct('date').values()]
+
+	page = int(page)
+
+	if page > dates.__len__() or page >= 7:
+		raise Http404
+
+	latest_target_prices = TargetPrice.objects.filter(date=dates[page]).order_by('id').reverse()
+
+	feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct, feature__display_in_frontpage=True)
 	target_price_list = []
 	
 	for target_price in latest_target_prices:
@@ -41,8 +51,14 @@ def index(request, page=1):
 	else:
 		ptype = 'grid'
 
+	if page == 0:
+		extends_template = 'morbid/base.html'
+	else:
+		extends_template = 'morbid/base_page.html'
+
 	c = Context({
 		'latest_target_prices' : target_price_list,
+		'extends_template': extends_template,
 		'ptype' : ptype
 	})
 
@@ -81,9 +97,9 @@ def ticker(request, slug):
 	t = loader.get_template('morbid/ticker.html')
 
 	c = Context({
-		'ticker' : ticker,
-		'target_prices' : target_price_list,
-		'features' : list_of_features
+		'ticker': ticker,
+		'target_prices': target_price_list,
+		'features': list_of_features
 	})
 
 	return HttpResponse(t.render(c))
@@ -133,12 +149,20 @@ def analytic(request, slug):
 
 def target_prices(self, analytic_slug=None, ticker_slug=None):
 
+	target_price_list = []
+
 	if analytic_slug:
 
 		analytic = Analytic
 		try:
 			analytic = Analytic.objects.get(slug=analytic_slug)
 			target_prices = TargetPrice.objects.filter(analytic=analytic)
+			feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+				analytic=analytic, feature__display_in_frontpage=True).order_by('id')
+
+			for target_price in target_prices:
+				target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
+				target_price_list.append(target_price)
 
 		except analytic.DoesNotExist:
 			raise Http404
@@ -149,6 +173,12 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
 		try:
 			ticker = Ticker.objects.get(slug=ticker_slug)
 			target_prices = TargetPrice.objects.filter(ticker=ticker)
+			feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+				ticker=ticker, feature__display_in_frontpage=True).order_by('id')
+
+			for target_price in target_prices:
+				target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
+				target_price_list.append(target_price)
 
 		except ticker.DoesNotExist:
 			raise Http404
@@ -156,10 +186,11 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
 	else:
 		raise Http404
 
+
 	t = loader.get_template('morbid/target_prices.html')
 
 	c = Context({
-		'target_prices' : target_prices,
+		'target_prices' : target_price_list,
 	})
 
 	return HttpResponse(t.render(c))

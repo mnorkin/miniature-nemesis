@@ -981,4 +981,11 @@ li{ list-style: none; }
     left: 16px;
  }
 
+/* Graph bank transitions */
+#bank .passive {
+    display: none;
+}
 
+#bank .active {
+    display: block;
+}

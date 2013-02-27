@@ -16,8 +16,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'prototype.views.home', name='home'),
+    url(r'^page/(?P<page>\d+)/$', 'morbid.views.index'),
     url(r'^$', 'morbid.views.index'),
-    url(r'^next/(?P<page>\d+)/$', 'morbid.views.index'),
     url(r'^analytic/target_prices/(?P<analytic_slug>[^/]+)/$', 'morbid.views.target_prices'),
     url(r'^ticker/target_prices/(?P<ticker_slug>[^/]+)/$', 'morbid.views.target_prices'),
     url(r'^analytic/(?P<slug>[^/]+)/$', 'morbid.views.analytic'),

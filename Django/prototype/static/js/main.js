@@ -44,6 +44,8 @@
 
 var list_type;
 
+var page_number = Number();
+
 function generate_grid_element(id, dataset, posName) {
 	console.log('grid el', id)
 	if (id != null && dataset != null) {
@@ -280,6 +282,7 @@ function process_search_nav(key){
 
 
 function open_graph(){
+
 	obj = $(this);
 	var type = obj.attr('class');
 	type = type.toLowerCase();
@@ -295,9 +298,9 @@ function open_graph(){
 	}
 
 	// for testing, because of bulk data
-	if(type == 'max_profitability'){
-		eval('graphs.aggressiveness("'+url+'");');
-	}
+	// if(type == 'max_profitability'){
+	// 	eval('graphs.aggressiveness("'+url+'");');
+	// }
 
 	$('.analyse_menu a').removeClass('active');
 	obj.addClass('active');
@@ -399,14 +402,12 @@ $(function(){
 	 $('.in_graph .sear li').click(in_graph_entry_click);
 	 // to clear search proposals
 	 $('body').click(function () { $('.search_res').html(''); });
-
 	 $('.analyse_menu a').click(open_graph);
 	
 	 $('.inner_buttons a').click(load_target_prices);
 
 	 binds_for_target_price_list();
 });
-
 
 
 function in_graph_click(){
@@ -461,3 +462,20 @@ function join_array( array0, array1, array2 ) {
 		return false;
 	}
 }
+
+/**
+  * Scroll
+  */
+$(window).scroll(function() {
+	if ( $(window).scrollTop() + $(window).height() == $(document).height() ) {
+		page_number +=1
+		/* Make a query */
+		_url = "/page/" + page_number + "/"
+		$.ajax({
+			url: _url,
+			context: $("#target-price-list")
+		}).done(function(data){
+			$("#target-price-list br").before(data)
+		})
+	}
+})

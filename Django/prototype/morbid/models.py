@@ -71,8 +71,11 @@ class Analytic(models.Model):
 	number_of_tp = models.IntegerField()
 	"""Number of target prices released by analytic
 	   @type: C{integer}"""
-	volatility = models.IntegerField()
-	"""Measure of uncertainty
+	volatility_positive = models.IntegerField()
+	"""Measure of uncertainty, total number of target prices
+	   @type: C{integer}"""
+	volatility_negative = models.IntegerField()
+	"""Measure of uncertainty, total number of target prices, failed to keep the 250 days 
 	   @type: C{integer}"""
 	last_target_price = models.FloatField()
 	"""Last target price analytic released

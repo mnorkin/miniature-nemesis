@@ -1,3 +1,11 @@
+/**
+  * Graph drawing library for Target Price project
+  *
+  * Usage:
+  * graphs.method(url)
+  * - method: accuracy/proximity/...
+  * - url: url from where to fetch data
+  */
 var graphs = (function() {
 
   var _url = '';
@@ -9,12 +17,46 @@ var graphs = (function() {
 
   var _number_of_graphs = 0
 
+  /* Clear the current graph (in case of `active` graph update) */
   d3.selectAll("#" + _element_id + " svg").remove()
 
   return {
 
     set_url: function(url) {
+      /**
+        * Setting url
+        * (not sure if needed anymore)
+        */
       _url = url
+    },
+
+    topbar_show: function(slug) {
+      // d3.selectAll(".bank li[class='active']").style('class', 'passive')
+      d3.select(".bank li[name='"+slug+"']").style('opacity', 0).transition().duration(400).style('opacity', 1).attr('class', 'active')
+    },
+
+    topbar_hide: function() {
+      d3.selectAll(".bank li[class='active']").transition().duration(400).attr('class', 'passive')
+    },
+
+    tooltip_show: function(top, left, text) {
+      /**
+        * Show tooltip method
+        */
+      d3.select("#chart")
+        .append('div')
+        .attr('class', 'bar_tooltip')
+        .text( text )
+        .style("left", left + "px") 
+        .style("top", top + "px" )
+        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+    },
+
+    tooltip_hide: function() {
+      /**
+        * Hide tooltip method
+        */
+      d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
     },
 
     populate: function(json) {
@@ -29,17 +71,20 @@ var graphs = (function() {
 
         d3.selectAll("#" + _element_id + " svg").remove()
 
-        // for (var i = json.length - 1; i >= 0; i--) {
-        //   _data[i] = json[i].value
-        //   _slugs[i] = json[i].slug
-        //   _urls[i] = json[i].url
-        // };
+        for (var i = json.length - 1; i >= 0; i--) {
+          _data[i] = json[i].value
+          _slugs[i] = json[i].analytic__slug
+          _urls[i] = json[i].url
+        };
 
-        _data = [ 11, 22, 33, 44, 55, 66, 77, 88, 99,11, 22, 33, 44, 55, 66, 77, 88, 99, 11, 22, 33, 44, 55, 66, 77, 88, 99]
+        console.log(_slugs)
+
+        /* Foo data */
+        // _data = [ 11, 22, 33, 44, 55, 66, 77, 88, 99,11, 22, 33, 44, 55, 66, 77, 88, 99, 11, 22, 33, 44, 55, 66, 77, 88, 99]
         // _data = [99, 99, 99, 99, 1]
-        _data.sort()
-        _slugs = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
-        _urls = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
+        // _data.sort()
+        // _slugs = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
+        // _urls = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
       }
       
       _number_of_graphs += 1
@@ -48,6 +93,9 @@ var graphs = (function() {
     },
 
     aggressiveness: function(url) {
+      /**
+        * Aggressiveness request
+        */
 
       d3.json(host + url, function(error, json) {
         if ( !error ) {
@@ -63,6 +111,9 @@ var graphs = (function() {
     },
 
     profitability: function(url) {
+      /**
+        * Profitability request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
@@ -77,6 +128,9 @@ var graphs = (function() {
     },
 
     accuracy: function(url, phase) {
+      /**
+        * Accuracy request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
           graphs.populate(json)
@@ -89,6 +143,9 @@ var graphs = (function() {
     },
 
     reach_time: function(url) {
+      /**
+        * Reach time request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
@@ -103,6 +160,9 @@ var graphs = (function() {
     },
 
     impact_to_stock: function(url) {
+      /**
+        * Impact to stock request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
@@ -117,10 +177,16 @@ var graphs = (function() {
     },
 
     proximity: function(url) {
+      /**
+        * Proximity graph request
+        */
 
       d3.json(host + url, function(error, json) {
+        /* XHR check */
         if ( !error ) {
+          /* Populate the data */
           graphs.populate(json)
+          /* Draw the graph */
           graphs.draw_proximity();
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -130,6 +196,11 @@ var graphs = (function() {
     },
 
     draw_proximity: function() {
+      /**
+        * Method to draw proximity graphic
+        */
+
+      /* Calculate constants */
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
       r = Math.min(w, h) / 30,
@@ -177,18 +248,18 @@ var graphs = (function() {
       .attr('fill', '#c0be81')
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
+        /* Change to active */
         d3.select(this).style("fill", "#e95201")
-        d3.select("#chart")
-        .append('div')
-        .attr('class', 'bar_tooltip')
-        .text( d3.select(this).attr('txt') )
-        .style("left", w/2+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2 + "px") 
-        .style("top", h/2+parseFloat(d3.select(this).attr('cy')) - 20 + "px" )
-        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+        /* Show tooltip */
+        var top = w/2+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2
+        var left = h/2+parseFloat(d3.select(this).attr('cy')) - 20
+        var text = d3.select(this).attr('txt')
+        graphs.tooltip_show(top, left, text)
+        /* TODO: REQUEST */
       })
       .on("mouseout", function() {
-        d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
         d3.select(this).style("fill", "#c0be81");
+        graphs.tooltip_hide()
       })
       .append('svg:title')
       .text(function(d, i) { return _data[i] + ' %' })
@@ -271,16 +342,13 @@ var graphs = (function() {
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
-        d3.select("#"+_element_id)
-        .append('div')
-        .attr('class', 'bar_tooltip')
-        .text( d3.select(this).attr('txt') )
-        .style("left", w/2+parseFloat(d3.select(this).attr('cx')) - 22.5 + "px") 
-        .style("top", h/2+parseFloat(d3.select(this).attr('cy')) - 34 + "px" )
-        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+        var top = h/2+parseFloat(d3.select(this).attr('cy')) - 34
+        var left = w/2+parseFloat(d3.select(this).attr('cx')) - 22.5
+        var text = d3.select(this).attr('txt')
+        graphs.tooltip_show(top, left, text)
       })
       .on("mouseout", function() {
-        d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+        graphs.tooltip_hide()
         d3.select(this).style("fill", "#c0be81");
       })
       .style('opacity', 0)
@@ -355,18 +423,14 @@ var graphs = (function() {
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
-        d3.select("#" + _element_id)
-        .append('div')
-        .attr('class', 'bar_tooltip')
-        .text( d3.select(this).attr('txt') )
-        .style("left", translate_w+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2 + "px") 
-        .style("top", h+parseFloat(d3.select(this).attr('cy')) - 37 + "px" )
-        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
-        .attr("transform", "translate(" + translate_w + "," + h + ")");
+        var top = h+parseFloat(d3.select(this).attr('cy')) - 37
+        var left = translate_w+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2
+        var text = d3.select(this).attr('txt')
+        graphs.tooltip_show(top, left, text)
         $('.bank .corp').text(_slugs[i]);
       })
       .on("mouseout", function() {
-        d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+        graphs.tooltip_hide()
         d3.select(this).style("fill", "#91bcc5");
       })
       .attr("transform", "translate(" + translate_w + "," + h + ")")
@@ -552,24 +616,17 @@ var graphs = (function() {
         .attr("stroke", "#fff")
         .attr('fill', '#8dc6b3')
         .on("mouseover", function() {
-          var element = d3.event.srcElement
-          console.log(d3.event)
-          console.log(element)
+          d3.select(this).attr("fill", "#e95201")
           var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator')))+angle_scale(parseFloat(d3.select(this).attr('enumerator'))+1))/2-pi
           var radius = parseFloat(d3.select(this).attr('txt'))
-          console.log("angle", angle, "radius", radius)
-          d3.select(this).attr("fill", "#e95201")
-          d3.select("#chart")
-            .append('div')
-            .attr('class', 'bar_tooltip')
-            .text( d3.select(this).attr('txt') + ' %'  )
-            .style("left", w/2-Math.sin(angle)*(radius*rhw/110+r) + "px" )
-            .style("top", (h-h/8)+Math.cos(angle)*(radius*rhw/100+r) + "px" )
-            .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+          var top = (h-h/8)+Math.cos(angle)*(radius*rhw/100+r)
+          var left = w/2-Math.sin(angle)*(radius*rhw/110+r)
+          var text = d3.select(this).attr('txt')
+          graphs.tooltip_show(top, left, text)
         })
         .on("mouseout", function() {
           d3.select(this).attr("fill", "#8dc6b3")
-          d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+          graphs.tooltip_hide()
         })
         .attr('txt', function(d) { return d })
         .attr('enumerator', function(d, i) { return i })
@@ -585,6 +642,8 @@ var graphs = (function() {
 
       var linear_data = [0, 20, 40, 60, 80, 100];
       _data.sort(function(a,b){return b-a});
+
+      var mouse_click = 0
 
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
@@ -626,7 +685,7 @@ var graphs = (function() {
       .attr("fill", "#dec7b5")
       .attr('width', function(d, i) { return d*rhw })
       .attr('height', 1)
-      .attr('y', function(d, i) { return -graph_height/(_data.length+1)*(i+2) } )
+      .attr('y', function(d, i) { return -graph_height/(_data.length+1)*(i+1) } )
       .attr('x', function(d, i) { return 0 } )
       .attr('txt', function(d,i) { return d + ' %' })
       .attr("transform", "translate(" + translate_w/3*2 + "," + h + ")");
@@ -637,7 +696,7 @@ var graphs = (function() {
         return d*rhw
       })
       .attr('cy', function(d, i) {
-        return -graph_height/(_data.length+1)*(i+2)
+        return -graph_height/(_data.length+1)*(i+1)
       })
       .attr('r', function(d, i) {
         return 7;
@@ -646,20 +705,25 @@ var graphs = (function() {
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
-        d3.select("#chart")
-        .append('div')
-        .attr('class', 'bar_tooltip')
-        .text( d3.select(this).attr('txt') )
-        .style("left", translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 23 + "px") 
-        .style("top", h+parseFloat(d3.select(this).attr('cy')) - 37 + "px" )
-        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
-        .attr("transform", "translate(" + translate_w + "," + h + ")");
+        var top = h+parseFloat(d3.select(this).attr('cy')) - 61
+        var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 50
+        var text = d3.select(this).attr('txt')
+        graphs.tooltip_show(top, left, text)
+        graphs.topbar_hide()
+        graphs.topbar_show(_slugs[i])
         // text block
         $('.bank .corp').text(_slugs[i]);
       })
       .on("mouseout", function() {
-        d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+
+        // graphs.topbar_hide()
         d3.select(this).style("fill", "#91bcc5");
+        graphs.tooltip_hide()
+
+      })
+      .on("click", function() {
+
+        d3.select(this).style("fill", "#e95201")
       })
       .attr("transform", "translate(" + translate_w/3*2 + "," + h + ")");
 
@@ -862,17 +926,15 @@ var graphs = (function() {
           var angle = (calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) + calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) ) /2+pi
           var radius = sun_data[2]/100*rhw+r
           d3.select(this).attr("fill", "#e95201")
-          d3.select("#chart")
-            .append('div')
-            .attr('class', 'bar_tooltip')
-            .text( d3.select(this).attr('txt') + ' %'  )
-            .style("left", w/2-Math.sin(angle)*radius + "px" )
-            .style("top", (h-h/8)+Math.cos(angle)*radius + "px" )
-            .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+
+          var top = (h-h/8)+Math.cos(angle)*radius
+          var left = w/2-Math.sin(angle)*radius
+          var text = d3.select(this).attr('txt')
+          graphs.tooltip_show(top, left, text)
         })
         .on("mouseout", function() {
           d3.select(this).attr("fill", "#8dc6b3")
-          d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+          graphs.tooltip_hide()
         })
         .attr('txt', function(d) { return d })
         .attr('enumerator', function(d, i) { return i })

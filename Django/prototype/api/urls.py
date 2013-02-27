@@ -18,8 +18,8 @@ unit_handler = Resource(UnitHandler)
 apikey_handler = Resource(ApiKeyHandler)
 
 urlpatterns = patterns('',
-  url(r'^feature_analytic_tickers/', feature_analytic_ticker_handler),
-  url(r'^analytics/', analytic_handler),
+  url(r'^feature_analytic_tickers/$', feature_analytic_ticker_handler),
+  url(r'^analytics/$', analytic_handler),
   url(r'^analytics/(?P<analytic_slug>[^/]+)/$', analytic_handler),
   url(r'^tickers/$', ticker_handler),
   url(r'^tickers/(?P<ticker_slug>[^/]+)/$', ticker_handler),

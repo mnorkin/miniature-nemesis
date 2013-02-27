@@ -35,17 +35,17 @@ class Features:
     'accuracy': 
       {'id': 1, 'name': 'Accuracy', 'display_in_frontpage': 1, 'unit_id': 1},
     'closeness': 
-      {'id': 2, 'name': 'Closeness', 'display_in_frontpage': 1, 'unit_id': 1},
+      {'id': 2, 'name': 'Closeness', 'display_in_frontpage': 0, 'unit_id': 1},
     'difference': 
-      {'id': 3, 'name': 'Difference', 'display_in_frontpage': 1, 'unit_id': 1},
+      {'id': 3, 'name': 'Difference', 'display_in_frontpage': 0, 'unit_id': 1},
     'profitability': 
-      {'id': 4, 'name': 'Profitability', 'display_in_frontpage': 0, 'unit_id': 1},
+      {'id': 4, 'name': 'Profitability', 'display_in_frontpage': 1, 'unit_id': 1},
     'max_profitability': 
       {'id': 5, 'name': 'Max profitability', 'display_in_frontpage': 0, 'unit_id': 1},
     'impact_to_market': 
       {'id': 6, 'name': 'Impact to market', 'display_in_frontpage': 0, 'unit_id': 1},
     'reach_time': 
-      {'id': 7, 'name': 'Reach time', 'display_in_frontpage': 0, 'unit_id': 2}
+      {'id': 7, 'name': 'Reach time', 'display_in_frontpage': 1, 'unit_id': 2}
     }
 
   def __init__(self, target_data=None, stock_data=None, beta=None, plot=False, calculate=False):
@@ -110,10 +110,11 @@ class Features:
         start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
         end_index = start_index+249
 
-        if end_index > self.stock_dates.__len__():
-          end_index = self.stock_dates.__len__()-1
+        if end_index >= self.stock_dates.__len__():
+          end_index = self.stock_dates.__len__()-2
 
         if utils.DEBUG:
+          print "\nTotal length: ", self.stock_dates.__len__()
           print "\nStart index: ", start_index, "\nEnd Index: ", end_index
           print  "\nFrom: ", datetime.datetime.fromtimestamp(self.stock_dates[start_index]), "\nTo: ", datetime.datetime.fromtimestamp(self.stock_dates[end_index]), "\nStock from: ", datetime.datetime.fromtimestamp(self.stock_dates[0]), "\nStock to: ", datetime.datetime.fromtimestamp(self.stock_dates[-1])
 
@@ -204,7 +205,7 @@ class Features:
         else:
           next_start_index = self.stock_dates.__len__()-1
 
-        if end_index > next_start_index:
+        if end_index >= next_start_index:
           end_index = next_start_index
 
         if utils.DEBUG:
@@ -313,7 +314,7 @@ class Features:
         start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
         end_index = start_index+249
 
-        if end_index > self.stock_dates.__len__():
+        if end_index >= self.stock_dates.__len__():
           end_index = self.stock_dates.__len__()-1
 
         if utils.DEBUG:
@@ -370,7 +371,7 @@ class Features:
         start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
         end_index = start_index+249
 
-        if end_index > self.stock_dates.__len__():
+        if end_index >= self.stock_dates.__len__():
           end_index = self.stock_dates.__len__()-1
 
         if utils.DEBUG:
@@ -451,7 +452,7 @@ class Features:
         start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
         end_index = start_index+2
 
-        if end_index > self.stock_dates.__len__():
+        if end_index >= self.stock_dates.__len__():
           end_index = self.stock_dates.__len__()-1
 
         if utils.DEBUG:
@@ -503,7 +504,7 @@ class Features:
         start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
         end_index = start_index+249
 
-        if end_index > self.stock_dates.__len__():
+        if end_index >= self.stock_dates.__len__():
           end_index = self.stock_dates.__len__()-1
 
         if utils.DEBUG:
