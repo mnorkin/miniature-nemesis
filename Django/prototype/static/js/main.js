@@ -47,11 +47,12 @@ var list_type;
 var page_number = Number();
 
 function generate_grid_element(id, dataset, posName) {
+	console.log('grid el', id)
 	if (id != null && dataset != null) {
 		dataset = [dataset];
 		
 		var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
-		var gradiends = {'Accuracy': 'url(#first_grad)', 'Closeness': 'url(#second_grad)', 'Difference': 'url(#third_grad)'}
+		var gradiends = {'accuracy': 'url(#first_grad)', 'closeness': 'url(#second_grad)', 'difference': 'url(#third_grad)'}
 
 		var x = d3.scale.linear()
 		.domain([0, 500])
@@ -77,9 +78,7 @@ function generate_grid_element(id, dataset, posName) {
 
 function generate_pie(id, value) {
 	
-
-	if (typeof(list_type) == "undefined" || list_type == 'list'){ return; }
-	console.log(list_type);
+	if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
 
 	var percent = value;
 	var dataset = [percent,(100-percent)];
@@ -336,30 +335,37 @@ function load_target_prices(){
  }
 
 /*
- * Remove content, change info and load again from html container
+ * Remove content, add to another list 
  * Because need to rerun javascript for graphs
  */ 
 function change_target_prices_list(){
-	$('.latest_target_prices').removeClass('grid').removeClass('list');
-	$('#temp_container').html( $('.title_container').html() );
-	$('#temp_container .latest_target_prices svg').remove();
-	$('.title_container').html(' ');
 
 	list_type = (list_type == 'list') ? 'grid' : 'list';
-	$('#temp_container .latest_target_prices').addClass(list_type);
-	$('.title_container').html( $('#temp_container').html() );
-	$('#temp_container').html(' ');
+	$('.latest_target_prices svg').remove();
+
+	// set list page
+	if($('.latest_target_prices.hidden').hasClass('list')){
+		
+		$('.latest_target_prices.list').removeClass('hidden');
+		$('.latest_target_prices.grid').addClass('hidden');
+		var content = $('.latest_target_prices.grid').html()
+		$('.latest_target_prices.grid').html('');
+		$('.latest_target_prices.list').html(content);
+	// set grid page
+	}else{
+		$('.latest_target_prices.grid').removeClass('hidden');
+		$('.latest_target_prices.list').addClass('hidden');
+		var content = $('.latest_target_prices.list').html();
+		$('.latest_target_prices.list').html('');
+		$('.latest_target_prices.grid').html(content);
+	}
 
 	// new content, bind again
-	document_ready();
+	binds_for_target_price_list();
 }
 
 
-
-/* DOM ready */
-$(document_ready)
-
-function document_ready(){
+function binds_for_target_price_list(){
 	/* Tooltip (percent info box) */
 	 $('.chart .bar rect').hover(function(){
 	 	var obj = $(this);
@@ -374,14 +380,8 @@ function document_ready(){
 	 }, function(){});
 
 	 $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); });
-	 
-	 $('body').click(in_graph_click);
-	 $('.in_graph').click(in_graph_click);
-	 $('.in_graph .sear li').click(in_graph_entry_click);
-	 // to clear search proposals
-	 $('body').click(function () { $('.search_res').html(''); });
-	 $('.analyse_menu a').click(open_graph);
-	 // long company names moving
+
+	  // long company names moving
 	 $('.title .entry').hover(
 	 	function(){ 
 	 		var left = Math.min(0, (125 - $(this).find('.goust').width()) );
@@ -389,12 +389,28 @@ function document_ready(){
 	 	},
 	 	function(){ $(this).find('.ln span').stop().css({'left': 0})}
 	 );
-
-	 $('.inner_buttons a').click(load_target_prices);
-	 $('.latest_target_prices .toggle').click(change_target_prices_list);
-
 	 $('.title .entry').click(function(){ location.href = $(this).find('a').attr('href'); })
+	 $('.latest_target_prices .toggle').click(change_target_prices_list);
 }
+
+
+/* DOM ready */
+$(function(){
+	
+	 $('body').click(in_graph_click);
+	 $('.in_graph').click(in_graph_click);
+	 $('.in_graph .sear li').click(in_graph_entry_click);
+	 // to clear search proposals
+	 $('body').click(function () { $('.search_res').html(''); });
+
+	 $('.analyse_menu a').click(open_graph);
+	
+	 $('.inner_buttons a').click(load_target_prices);
+
+	 binds_for_target_price_list();
+});
+
+
 
 function in_graph_click(){
 	var obj = $(this);

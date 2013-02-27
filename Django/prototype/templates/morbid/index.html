@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="title_container">
-<div class="latest_target_prices title {{ptype}}">
+<div class="latest_target_prices title grid">
 	
 	<div class="now">Nov. 17, 2013</div>
 	<a class="toggle">Compare</a>
@@ -24,9 +24,10 @@
 	{% else %}
 		<p>Error, no target prices</p>
 	{% endif %}
-	
 </div>
+<div class="latest_target_prices title list hidden"></div>
 </div>
+
 {% endblock %}
 
 
