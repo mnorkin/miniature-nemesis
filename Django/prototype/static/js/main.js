@@ -44,6 +44,8 @@
 
 var list_type;
 
+var page_number = Number();
+
 function generate_grid_element(id, dataset, posName) {
 	if (id != null && dataset != null) {
 		dataset = [dataset];
@@ -281,7 +283,7 @@ function process_search_nav(key){
 
 
 function open_graph(){
-	
+
 	obj = $(this);
 	var type = obj.attr('class');
 	type = type.toLowerCase();
@@ -446,3 +448,20 @@ function join_array( array0, array1, array2 ) {
 		return false;
 	}
 }
+
+/**
+  * Scroll
+  */
+$(window).scroll(function() {
+	if ( $(window).scrollTop() + $(window).height() == $(document).height() ) {
+		page_number +=1
+		/* Make a query */
+		_url = "/page/" + page_number + "/"
+		$.ajax({
+			url: _url,
+			context: $("#target-price-list")
+		}).done(function(data){
+			$("#target-price-list br").before(data)
+		})
+	}
+})

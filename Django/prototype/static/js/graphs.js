@@ -30,6 +30,15 @@ var graphs = (function() {
       _url = url
     },
 
+    topbar_show: function(slug) {
+      // d3.selectAll(".bank li[class='active']").style('class', 'passive')
+      d3.select(".bank li[name='"+slug+"']").style('opacity', 0).transition().duration(400).style('opacity', 1).attr('class', 'active')
+    },
+
+    topbar_hide: function() {
+      d3.selectAll(".bank li[class='active']").transition().duration(400).attr('class', 'passive')
+    },
+
     tooltip_show: function(top, left, text) {
       /**
         * Show tooltip method
@@ -64,9 +73,11 @@ var graphs = (function() {
 
         for (var i = json.length - 1; i >= 0; i--) {
           _data[i] = json[i].value
-          _slugs[i] = json[i].slug
+          _slugs[i] = json[i].analytic__slug
           _urls[i] = json[i].url
         };
+
+        console.log(_slugs)
 
         /* Foo data */
         // _data = [ 11, 22, 33, 44, 55, 66, 77, 88, 99,11, 22, 33, 44, 55, 66, 77, 88, 99, 11, 22, 33, 44, 55, 66, 77, 88, 99]
@@ -632,6 +643,8 @@ var graphs = (function() {
       var linear_data = [0, 20, 40, 60, 80, 100];
       _data.sort(function(a,b){return b-a});
 
+      var mouse_click = 0
+
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
       r = Math.min(w, h) / 30,
@@ -696,12 +709,21 @@ var graphs = (function() {
         var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 50
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
+        graphs.topbar_hide()
+        graphs.topbar_show(_slugs[i])
         // text block
         $('.bank .corp').text(_slugs[i]);
       })
       .on("mouseout", function() {
+
+        // graphs.topbar_hide()
         d3.select(this).style("fill", "#91bcc5");
         graphs.tooltip_hide()
+
+      })
+      .on("click", function() {
+
+        d3.select(this).style("fill", "#e95201")
       })
       .attr("transform", "translate(" + translate_w/3*2 + "," + h + ")");
 

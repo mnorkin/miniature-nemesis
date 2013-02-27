@@ -64,14 +64,14 @@
 	</div>
 	
 	<div class="analyser">
-		<ul class="bank">
+		<ul class="bank" id="bank">
 			{% for target in target_prices %}
-				<li>
+				<li name="{{ target.analytic.slug }}" class="passive">
 					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }}</a></span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
-					<span class="number">35.1<strong>No of target prices</strong> </span>
-					<span class="number">-1<strong>Volatility</strong> </span>
+					<span class="number">{{ target.analytic.number_of_tp }}<strong>No of target prices</strong> </span>
+					<span class="number">{{ target.analytic.volatility_positive }}/{{ target.analytic.volatility_negative }}<strong>Volatility</strong> </span>
 				</li>
 				{% if target.fap %}
 					<!-- <ul> -->

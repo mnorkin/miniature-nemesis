@@ -234,14 +234,15 @@ def main():
             if utils.DEBUG:
               print "Something went wrong with feature analytic ticker update"
 
-      """After features goes target prices"""
-      data = {'date': datetime.datetime.fromtimestamp(date).strftime('%Y-%m-%d'),
-        'price': price,
-        'ticker_slug': ticker_slug,
-        'analytic_slug': analytic_slug,
-        'change': target_price['change']}
+        """Do not send any target price data, unless there is stock data"""
+        """After features goes target prices"""
+        data = {'date': datetime.datetime.fromtimestamp(date).strftime('%Y-%m-%d'),
+          'price': price,
+          'ticker_slug': ticker_slug,
+          'analytic_slug': analytic_slug,
+          'change': target_price['change']}
 
-      targetprices.send(data)
+        targetprices.send(data)
 
     else:
       if utils.DEBUG:

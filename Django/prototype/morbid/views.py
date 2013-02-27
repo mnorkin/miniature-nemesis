@@ -11,7 +11,7 @@ from django.conf import settings
 from prototype.decorators import logged_in_or_basicauth
 
 @logged_in_or_basicauth(realm="Limited access")
-def index(request, page=1):
+def index(request, page=0):
 	"""
 	Index page
 
@@ -20,11 +20,21 @@ def index(request, page=1):
 	@return: Http Response
 	"""
 
-	if not settings.DEBUG:
+	# if not settings.DEBUG:
 		# Return week long entries
-		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
-	else:
-		latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-1)).order_by('date').reverse()
+		# latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
+	# else:
+		# latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-1)).order_by('date').reverse()
+	# latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
+
+	dates = [tp['date'] for tp in TargetPrice.objects.order_by('-date').distinct('date').values()]
+
+	page = int(page)
+
+	if page > dates.__len__() or page >= 7:
+		raise Http404
+
+	latest_target_prices = TargetPrice.objects.filter(date=dates[page]).order_by('id').reverse()
 
 	feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct, feature__display_in_frontpage=True)
 	target_price_list = []
@@ -41,8 +51,14 @@ def index(request, page=1):
 	else:
 		ptype = 'grid'
 
+	if page == 0:
+		extends_template = 'morbid/base.html'
+	else:
+		extends_template = 'morbid/base_page.html'
+
 	c = Context({
 		'latest_target_prices' : target_price_list,
+		'extends_template': extends_template,
 		'ptype' : ptype
 	})
 
@@ -81,9 +97,9 @@ def ticker(request, slug):
 	t = loader.get_template('morbid/ticker.html')
 
 	c = Context({
-		'ticker' : ticker,
-		'target_prices' : target_price_list,
-		'features' : list_of_features
+		'ticker': ticker,
+		'target_prices': target_price_list,
+		'features': list_of_features
 	})
 
 	return HttpResponse(t.render(c))

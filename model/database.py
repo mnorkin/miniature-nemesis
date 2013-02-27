@@ -268,7 +268,7 @@ def get_targetprices(analytic=None, ticker=None):
     #   WHERE `date`=(SELECT MAX(`date`) FROM `entries`) AND (`price0`!=0 OR `price1` != 0)"
     query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
       FROM `entries` \
-      WHERE `date`='2013-01-31' AND (`price0` != 0 OR `price1` != 0) \
+      WHERE `date`='2013-02-05' AND (`price0` != 0 OR `price1` != 0) \
       GROUP BY `analytic`, `date` \
       ORDER BY `date` DESC"
     """Query for the most recent dates"""
