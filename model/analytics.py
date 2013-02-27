@@ -40,11 +40,13 @@ class Analytics:
     Method to collect analytic data
     """
     if analytic:
+      analytic_stats = database.get_analytic(analytic)
       analytic_data = database.get_analytics(analytic)
-      number_of_companies = 0
-      number_of_tp = 0
-      last_target_price = 0
-      volatility = 0 # TODO
+      number_of_companies = analytic_stats['number_of_companies']
+      number_of_tp = analytic_stats['number_of_tp']
+      last_target_price = analytic_stats['last_target_price']
+      volatility_positive = analytic_stats['volatility_positive']
+      volatility_negative = analytic_stats['volatility_negative']
       slug = utils.slugify(str(analytic))
       for ticker in database.get_tickers(analytic):
         # Get all the tickers
@@ -55,11 +57,12 @@ class Analytics:
           if last_target_price == 0:
             last_target_price = targetprice['price']
 
-      data = {'name': analytic, 
+      data = {'name': analytic.replace('"',''),
         'number_of_companies': number_of_companies, 
         'number_of_tp': number_of_tp,
         'last_target_price': last_target_price,
-        'volatility': volatility,
+        'volatility_positive': volatility_positive,
+        'volatility_negative': volatility_negative,
         'slug': slug}
 
       return data

@@ -229,9 +229,10 @@ def main():
         features_values = features.values()
         [ x.update({'ticker_slug': ticker_slug, 'analytic_slug': analytic_slug}) for x in features_values ]
 
-        if not feature_analytic_tickers.send(features_values):
-          if utils.DEBUG:
-            print "Something went wrong with feature analytic ticker update"
+        if features_values:
+          if not feature_analytic_tickers.send(features_values):
+            if utils.DEBUG:
+              print "Something went wrong with feature analytic ticker update"
 
       """After features goes target prices"""
       data = {'date': datetime.datetime.fromtimestamp(date).strftime('%Y-%m-%d'),

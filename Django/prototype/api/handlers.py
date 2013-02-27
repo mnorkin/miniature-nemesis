@@ -65,7 +65,8 @@ class AnalyticHandler(BaseHandler):
         em = self.model(name=data['name'], 
           number_of_companies=data['number_of_companies'],
           number_of_tp=data['number_of_tp'],
-          volatility=data['volatility'],
+          volatility_positive=data['volatility_positive'],
+          volatility_negative=data['volatility_negative'],
           last_target_price=data['last_target_price'],
           slug=data['slug'])
         em.save()
@@ -82,7 +83,7 @@ class AnalyticHandler(BaseHandler):
       em.name = data['name']
       em.number_of_companies = data['number_of_companies']
       em.number_of_tp = data['number_of_tp']
-      em.volatility = data['volatility']
+      em.volatility_positive = data['volatility_negative']
       em.last_target_price = data['last_target_price']
 
       em.save()

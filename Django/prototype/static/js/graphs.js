@@ -1,3 +1,11 @@
+/**
+  * Graph drawing library for Target Price project
+  *
+  * Usage:
+  * graphs.method(url)
+  * - method: accuracy/proximity/...
+  * - url: url from where to fetch data
+  */
 var graphs = (function() {
 
   var _url = '';
@@ -9,12 +17,37 @@ var graphs = (function() {
 
   var _number_of_graphs = 0
 
+  /* Clear the current graph (in case of `active` graph update) */
   d3.selectAll("#" + _element_id + " svg").remove()
 
   return {
 
     set_url: function(url) {
+      /**
+        * Setting url
+        * (not sure if needed anymore)
+        */
       _url = url
+    },
+
+    tooltip_show: function(top, left, text) {
+      /**
+        * Show tooltip method
+        */
+      d3.select("#chart")
+        .append('div')
+        .attr('class', 'bar_tooltip')
+        .text( text )
+        .style("left", left + "px") 
+        .style("top", top + "px" )
+        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+    },
+
+    tooltip_hide: function() {
+      /**
+        * Hide tooltip method
+        */
+      d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
     },
 
     populate: function(json) {
@@ -35,6 +68,7 @@ var graphs = (function() {
         //   _urls[i] = json[i].url
         // };
 
+        /* Foo data */
         _data = [ 11, 22, 33, 44, 55, 66, 77, 88, 99,11, 22, 33, 44, 55, 66, 77, 88, 99, 11, 22, 33, 44, 55, 66, 77, 88, 99]
         // _data = [99, 99, 99, 99, 1]
         _data.sort()
@@ -48,6 +82,9 @@ var graphs = (function() {
     },
 
     aggressiveness: function(url) {
+      /**
+        * Aggressiveness request
+        */
 
       d3.json(host + url, function(error, json) {
         if ( !error ) {
@@ -63,6 +100,9 @@ var graphs = (function() {
     },
 
     profitability: function(url) {
+      /**
+        * Profitability request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
@@ -77,6 +117,9 @@ var graphs = (function() {
     },
 
     accuracy: function(url, phase) {
+      /**
+        * Accuracy request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
           graphs.populate(json)
@@ -89,6 +132,9 @@ var graphs = (function() {
     },
 
     reach_time: function(url) {
+      /**
+        * Reach time request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
@@ -103,6 +149,9 @@ var graphs = (function() {
     },
 
     impact_to_stock: function(url) {
+      /**
+        * Impact to stock request
+        */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
@@ -117,10 +166,16 @@ var graphs = (function() {
     },
 
     proximity: function(url) {
+      /**
+        * Proximity graph request
+        */
 
       d3.json(host + url, function(error, json) {
+        /* XHR check */
         if ( !error ) {
+          /* Populate the data */
           graphs.populate(json)
+          /* Draw the graph */
           graphs.draw_proximity();
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -130,6 +185,11 @@ var graphs = (function() {
     },
 
     draw_proximity: function() {
+      /**
+        * Method to draw proximity graphic
+        */
+
+      /* Calculate constants */
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
       r = Math.min(w, h) / 30,
@@ -177,18 +237,18 @@ var graphs = (function() {
       .attr('fill', '#c0be81')
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
+        /* Change to active */
         d3.select(this).style("fill", "#e95201")
-        d3.select("#chart")
-        .append('div')
-        .attr('class', 'bar_tooltip')
-        .text( d3.select(this).attr('txt') )
-        .style("left", w/2+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2 + "px") 
-        .style("top", h/2+parseFloat(d3.select(this).attr('cy')) - 20 + "px" )
-        .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
+        /* Show tooltip */
+        var top = w/2+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2
+        var left = h/2+parseFloat(d3.select(this).attr('cy')) - 20
+        var text = d3.select(this).attr('txt')
+        graphs.tooltip_show(top, left, text)
+        /* TODO: REQUEST */
       })
       .on("mouseout", function() {
-        d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
         d3.select(this).style("fill", "#c0be81");
+        graphs.tooltip_hide()
       })
       .append('svg:title')
       .text(function(d, i) { return _data[i] + ' %' })
