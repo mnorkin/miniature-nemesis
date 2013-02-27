@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="title_container">
-<div class="latest_target_prices title {{ptype}}">
+<div class="latest_target_prices title grid">
 	
 	<div class="now">Nov. 17, 2013</div>
 	<a class="toggle">Compare</a>
@@ -39,7 +39,7 @@
 						{% for fap in target.fap %}
 							<li id="{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}" class="feature"><span>{{fap.feature.name}}</span></li>
 							<script type="text/javascript">
-								generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value }}", "{{fap.feature.name}}" )
+								generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value }}", "{{fap.feature.slug}}" )
 							</script>
 						{% endfor %}
 					</ul>
@@ -52,9 +52,10 @@
 	{% else %}
 		<p>Error, no target prices</p>
 	{% endif %}
-	
 </div>
+<div class="latest_target_prices title list hidden"></div>
 </div>
+
 {% endblock %}
 
 
