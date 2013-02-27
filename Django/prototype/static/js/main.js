@@ -42,12 +42,15 @@
 // 	// .text( String );
 // }
 
+var list_type;
+
 function generate_grid_element(id, dataset, posName) {
 	if (id != null && dataset != null) {
 		dataset = [dataset];
 		
-		var width = index_page_type == 'list' ? 143 : 356;
-		
+		var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
+		var gradiends = {'Accuracy': 'url(#first_grad)', 'Closeness': 'url(#second_grad)', 'Difference': 'url(#third_grad)'}
+
 		var x = d3.scale.linear()
 		.domain([0, 500])
 		.range([0, width]);
@@ -56,10 +59,9 @@ function generate_grid_element(id, dataset, posName) {
 		chart.selectAll('rect')
 			.data(dataset)
 			.enter().append('rect')
-			.attr('class', function(d,i){ return posName[i]; })
-			.attr('height', 12)
+			.attr('height', 13)
 			.attr('y', 0)
-			.attr('fill', 'url(#first_grad)')
+			.attr('fill', gradiends[posName])
 			.attr('rx',4)
 			.attr('ry',4)
 			.attr('txt', function(d,i){ return d+'%';} )
@@ -73,8 +75,10 @@ function generate_grid_element(id, dataset, posName) {
 
 function generate_pie(id, value) {
 	
-	if(index_page_type == 'list'){ return; }
-	
+
+	if (typeof(list_type) == "undefined" || list_type == 'list'){ return; }
+	console.log(list_type);
+
 	var percent = value;
 	var dataset = [percent,(100-percent)];
 
@@ -190,7 +194,7 @@ function process_search(dom_obj, e){
 	e.preventDefault();
 	var key = e.keyCode ? e.keyCode : e.charCode
 	var obj = $('#search_inp');
-	var url = '/search/'+ obj.val();
+	var url = '/search/'+ obj.val()+'/';
 	
 	if (key == 40 || key == 38){ process_search_nav(key); return; }
 	if($(dom_obj).attr('type') == "submit"){ location.href = $('#search_inp').attr('href');  return; }
@@ -301,11 +305,58 @@ function open_graph(){
 	return false; // prevent href
 }
 
+function load_target_prices(){
+	 	if($(this).hasClass('active')){ return false; }
+	 		
+	 	var url = $(this).attr('href');
+	 	$('.inner_buttons a').removeClass('active');
+	 	$(this).addClass('active');
+
+	 	// load targets and stores Analysis html to temp html container
+	 	if(url.length){ 
+	 		$('#temp_container').html( $('.inner_content').html() );
+
+	        index_page_type = 'grid';
+		 	$('.inner_content').animate({'opacity': 0}, 50, function(){
+	            $(this).load(url, function(){
+	                $(this).animate({'opacity':1}, 100);
+	            });
+	        });
+        // sets Analysis html back from container
+	 	}else{
+	 		 $('.inner_content').animate({'opacity': 0}, 50, function(){
+            	$(this).html( $('#temp_container').html() ); $('#temp_container').html('');
+                $(this).animate({'opacity':1}, 100);
+	        });
+	 	}
+	 	return false;
+ }
+
+/*
+ * Remove content, change info and load again from html container
+ * Because need to rerun javascript for graphs
+ */ 
+function change_target_prices_list(){
+	$('.latest_target_prices').removeClass('grid').removeClass('list');
+	$('#temp_container').html( $('.title_container').html() );
+	$('#temp_container .latest_target_prices svg').remove();
+	$('.title_container').html(' ');
+
+	list_type = (list_type == 'list') ? 'grid' : 'list';
+	$('#temp_container .latest_target_prices').addClass(list_type);
+	$('.title_container').html( $('#temp_container').html() );
+	$('#temp_container').html(' ');
+
+	// new content, bind again
+	document_ready();
+}
+
+
 
 /* DOM ready */
-$(function(){
+$(document_ready)
 
-
+function document_ready(){
 	/* Tooltip (percent info box) */
 	 $('.chart .bar rect').hover(function(){
 	 	var obj = $(this);
@@ -336,7 +387,11 @@ $(function(){
 	 	function(){ $(this).find('.ln span').stop().css({'left': 0})}
 	 );
 
-})
+	 $('.inner_buttons a').click(load_target_prices);
+	 $('.latest_target_prices .toggle').click(change_target_prices_list);
+
+	 $('.title .entry').click(function(){ location.href = $(this).find('a').attr('href'); })
+}
 
 function in_graph_click(){
 	var obj = $(this);

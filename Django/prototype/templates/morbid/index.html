@@ -2,39 +2,12 @@
 
 
 {% block content %}
-<script type="text/javascript">
-var index_page_type = "{{ptype}}";
-</script>
 
-<svg xmlns="http://www.w3.org/2000/svg" width="300" height="12">
-    <defs>
-        <linearGradient id="first_grad" gradientUnits="userSpaceOnUse" x1="100%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#bdded3" stop-opacity="1"/>
-          <stop offset="7%" stop-color="#abd5c8" stop-opacity="1"/>
-          <stop offset="14%" stop-color="#9ecebf" stop-opacity="1"/>
-          <stop offset="21%" stop-color="#97caba" stop-opacity="1"/>
-          <stop offset="28%" stop-color="#94c9b8" stop-opacity="1" />
-          <stop offset="31%" stop-color="#90c7b5" stop-opacity="1" />
-          <stop offset="49%" stop-color="#8cc3b1" stop-opacity="1" />
-          <stop offset="56%" stop-color="#87bcab" stop-opacity="1" />
-          <stop offset="70%" stop-color="#82b6a5" stop-opacity="1" />
-          <stop offset="77%" stop-color="#85b5a6" stop-opacity="1" />
-          <stop offset="84%" stop-color="#8eb8aa" stop-opacity="1" />
-          <stop offset="91%" stop-color="#9aaca5" stop-opacity="1" />
-          <stop offset="100%" stop-color="#c3c3b4" stop-opacity="1" />
-        </linearGradient>
-    </defs>   
-	<rect x="0" y="0" width="0" height="0" fill="url(#first_grad)" />
-</svg>
-
+<div class="title_container">
 <div class="latest_target_prices title {{ptype}}">
 	
 	<div class="now">Nov. 17, 2013</div>
-	{% if ptype == 'grid' %}
-	<a class="toggle" href="?ptype=list">Compare</a>
-	{% else %}
-	<a class="toggle" href="/?ptype=grid">Compare</a>
-	{% endif %}
+	<a class="toggle">Compare</a>
 	
 	{% if latest_target_prices %}
 		<div class="pre_info">
@@ -51,7 +24,7 @@ var index_page_type = "{{ptype}}";
 						<span class="sn">({{ target.ticker.name }})</span>
 						<span class="goust">{{ target.ticker.long_name }} </span>
 					</a>
-					<a class="analytic" href="{{ target.analytic.get_absolute_url }}">{{ target.analytic }}</a>
+					<a class="analytic">{{ target.analytic }}</a>
 					<span class="price">{{ target.price }}</span>
 
 					<span id="{{ target.analytic.slug}}_{{ target.ticker.slug }}" class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
@@ -81,4 +54,7 @@ var index_page_type = "{{ptype}}";
 	{% endif %}
 	
 </div>
+</div>
 {% endblock %}
+
+

@@ -16,7 +16,6 @@
 
 
 {% block content %}
-
 	{% if ticker %}
 		
 	<ul class="corp_info">
@@ -36,12 +35,14 @@
 	</ul>
 	
 	<div class="inner_buttons">
-		<a href="" class="active ta">Target prices</a>
-		<a href="" class="an">Analysis</a>
+		<a href="/ticker/target_prices/{{ ticker.slug }}/" class=" ta">Target prices</a>
+		<a href="" class="active an">Analysis</a>
 		<br class="clear" />
 		<div class="line"></div>
 	</div>
-	
+
+
+	<div class="inner_content">
 	<div class="left">
 		<div class="analyse_menu">
 			{% for feature in features %}
@@ -53,7 +54,7 @@
 		</div>
 		
 		<div class="info_box">
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+			<strong>Lorem ipsum dolor</strong> sit amet, consectetur adipiscing elit. 
 			Suspendisse commodo scelerisque dolor, eget feugiat ligula commodo nec. 
 			Aliquam neque arcu, faucibus id consequat vel, egestas tempus turpis.
 			Morbi ac aliquet leo. Maecenas commodo est vel velit dictum at vestibulum tortor commodo. 
@@ -66,7 +67,7 @@
 		<ul class="bank">
 			{% for target in target_prices %}
 				<li>
-					<span class="corp">{{ target.analytic }}</span> 
+					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }}</a></span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
 					<span class="number">35.1<strong>No of target prices</strong> </span>
@@ -105,6 +106,8 @@
 	<div id="chart" class="graph"></div>
 
 	<br class="clear" />
+	</div>
+
 	{% endif %}
 {% endblock %}
 
