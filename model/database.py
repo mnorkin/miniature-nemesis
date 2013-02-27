@@ -148,6 +148,30 @@ def get_analytic(analytic=None):
 
   return item
 
+def get_ticker(ticker=None):
+  """
+  Returns the ticker information
+  """
+  con = connect_to_mysql()
+
+  number_of_tp = 0
+  """Number of target prices"""
+
+  query = "SELECT `date`, `analytic` FROM `entries` \
+    WHERE (`price1`!=0 OR `price0` != 0 ) AND `ticket`='%s' \
+    GROUP BY `ticket`, `date` \
+    ORDER BY `date` DESC" % (re.escape(ticker))
+
+  con.execute(query)
+
+  number_of_tp = con.fetchall().__len__()
+
+  item = {
+    "number_of_tp": number_of_tp
+  }
+
+  return item
+
 def get_tickers(analytic=None):
   """
   Method to get the tickers, which belongs to analytic
@@ -244,7 +268,7 @@ def get_targetprices(analytic=None, ticker=None):
     #   WHERE `date`=(SELECT MAX(`date`) FROM `entries`) AND (`price0`!=0 OR `price1` != 0)"
     query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
       FROM `entries` \
-      WHERE `date`=(SELECT MAX(`date`) FROM `entries`) AND (`price0` != 0 OR `price1` != 0) \
+      WHERE `date`=(SELECT MAX(`date`) FROM `entries` WHERE `date`<(SELECT MAX(`date`) FROM `entries`)) AND (`price0` != 0 OR `price1` != 0) \
       GROUP BY `analytic`, `date` \
       ORDER BY `date` DESC"
     """Query for the most recent dates"""
