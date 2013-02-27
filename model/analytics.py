@@ -43,7 +43,7 @@ class Analytics:
       analytic_stats = database.get_analytic(analytic)
       analytic_data = database.get_analytics(analytic)
       number_of_companies = analytic_stats['number_of_companies']
-      number_of_tp = analytic_stats['number_of_tp']
+      number_of_tp = 0
       last_target_price = analytic_stats['last_target_price']
       volatility_positive = analytic_stats['volatility_positive']
       volatility_negative = analytic_stats['volatility_negative']

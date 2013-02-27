@@ -35,7 +35,7 @@ class Tickers:
       name = ticker
       long_name = ticker_yahoo['long_name']
       last_stock_price = ticker_yahoo['last_stock_price']
-      number_of_analytics = database.get_analytics(ticker).__len__()
+      number_of_analytics = database.get_targetprices(ticker=ticker).__len__()
       number_of_tp = database.get_tickers(ticker).__len__()
       consensus_min = ticker_consensus['consensus_min']
       consensus_avg = ticker_consensus['consensus_avg']
