@@ -281,6 +281,7 @@ function process_search_nav(key){
 
 
 function open_graph(){
+	
 	obj = $(this);
 	var type = obj.attr('class');
 	type = type.toLowerCase();
@@ -296,9 +297,9 @@ function open_graph(){
 	}
 
 	// for testing, because of bulk data
-	if(type == 'max_profitability'){
-		eval('graphs.aggressiveness("'+url+'");');
-	}
+	// if(type == 'max_profitability'){
+	// 	eval('graphs.aggressiveness("'+url+'");');
+	// }
 
 	$('.analyse_menu a').removeClass('active');
 	obj.addClass('active');

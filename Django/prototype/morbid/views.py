@@ -145,7 +145,7 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
 				analytic=analytic, feature__display_in_frontpage=True).order_by('id')
 
 			for target_price in target_prices:
-				target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id)
+				target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
 				target_price_list.append(target_price)
 
 		except analytic.DoesNotExist:
@@ -161,7 +161,7 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
 				ticker=ticker, feature__display_in_frontpage=True).order_by('id')
 
 			for target_price in target_prices:
-				target_price.fap = feature_analytic_tickers.filter(ticker_id=target_price.ticker_id)
+				target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
 				target_price_list.append(target_price)
 
 		except ticker.DoesNotExist:
