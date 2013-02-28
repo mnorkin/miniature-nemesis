@@ -14,6 +14,7 @@ var graphs = (function() {
   var _slugs = new Array();
   var _urls = new Array();
   var host = "";
+  var active_topbar = "";
 
   var _number_of_graphs = 0
 
@@ -31,6 +32,7 @@ var graphs = (function() {
     },
 
     topbar_show: function(slug) {
+      active_topbar = slug;
       // d3.selectAll(".bank li[class='active']").style('class', 'passive')
       d3.select(".bank li[name='"+slug+"']").style('opacity', 0).transition().duration(400).style('opacity', 1).attr('class', 'active')
     },
@@ -194,6 +196,11 @@ var graphs = (function() {
       });
       return graphs
     },
+
+
+
+
+
 
     draw_proximity: function() {
       /**
@@ -366,7 +373,7 @@ var graphs = (function() {
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
       r = Math.min(w, h) / 30,
-      rhw = Math.min(w,h) / 75,
+      rhw = h / 110,
       color = d3.scale.category20c();
 
       translate_w = w/16;
@@ -382,7 +389,7 @@ var graphs = (function() {
       .append("svg:rect")
       .attr('fill', "#ece7e3")
       .attr('width', function() { return w-translate_w })
-      .attr('height', 1)
+      .attr('height', 0.5)
       .attr("x", function(d) { return 10} )
       .attr("y", function(d) { return d == 0 ? -10 : -d*rhw-10 } )
       .attr("transform", "translate(" + translate_w/3*2 + "," + h + ")");
@@ -423,22 +430,22 @@ var graphs = (function() {
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
-        var top = h+parseFloat(d3.select(this).attr('cy')) - 37
-        var left = translate_w+parseFloat(d3.select(this).attr('cx')) - d3.select(this).attr('txt').length*3/2
+        var top = h+parseFloat(d3.select(this).attr('cy')) - 35
+        var left = translate_w+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
-        $('.bank .corp').text(_slugs[i]);
+        if(active_topbar != _slugs[i]){
+          graphs.topbar_hide();
+          graphs.topbar_show(_slugs[i]);
+        }
       })
       .on("mouseout", function() {
         graphs.tooltip_hide()
         d3.select(this).style("fill", "#91bcc5");
       })
-      .attr("transform", "translate(" + translate_w + "," + h + ")")
-      .append('svg:title')
-      .text(function(d, i) { return _data[i] + ' %' })
+      .attr("transform", "translate(" + translate_w + "," + h + ")");
         
       return graphs
-
     },
 
     
@@ -663,7 +670,7 @@ var graphs = (function() {
       .append("svg:rect")
       .attr('fill', "#dec7b5")
       .attr('height', function(){ return graph_height -25; })
-      .attr('width', 1)
+      .attr('width', 0.5)
       .attr("x", function(d, i) { return d*rhw } )
       .attr("y", -graph_height )
       .attr("transform", "translate(" + translate_w/3*2 + "," + h + ")");
@@ -705,12 +712,14 @@ var graphs = (function() {
       .attr('txt', function(d,i) { return _data[i] + ' %' })
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
-        var top = h+parseFloat(d3.select(this).attr('cy')) - 61
-        var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 50
+        var top = h+parseFloat(d3.select(this).attr('cy')) - 37
+        var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
-        graphs.topbar_hide()
-        graphs.topbar_show(_slugs[i])
+        if(active_topbar != _slugs[i]){
+          graphs.topbar_hide()
+          graphs.topbar_show(_slugs[i])
+        }
         // text block
         $('.bank .corp').text(_slugs[i]);
       })

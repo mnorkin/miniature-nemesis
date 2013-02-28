@@ -845,6 +845,7 @@ li{ list-style: none; }
     position: absolute;
     width:177px;
     right: 0;
+    z-index: 1;
 }
 .in_graph button{
     background: url('../images/analyse_1.png') 16px 50% no-repeat #e95200;
@@ -926,29 +927,21 @@ li{ list-style: none; }
     height: 650px;
     margin-left: 230px;
     position: relative;
+    top:0px;
+    left:0px;
 }
 #chart svg{
     position: relative;
 }
 
 #chart.profitability{
-    height: 550px;
+    top:-26px;
+    left: -15px;
 }
 #chart.reach_time{
     height: 550px;
-}
-
-#chart.profitability svg{
-    top:-25px;
-    left:-15px;
-}
-#chart.accuracy svg{
-    top:0px;
-    left:0px;
-}
-#chart.reach_time svg{
-    top:-20px;
-    left:-28px;
+    top:-32px;
+    left:-27px;
 }
 
 #chart .bar_tooltip {

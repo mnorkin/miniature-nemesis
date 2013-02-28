@@ -1,63 +1,30 @@
-/* tested only with 3 entries (target prices) */
-
-// function run_grid() {
-// 	// var data = parse_float(get_inner(d3.selectAll(".ac-val").remove()[0]));
-// 	// var dataset = [[90, 23, 45], [70, 78, 55], [20, 73, 25]];
-
-// 	var dataset = join_array(parse_float(get_inner(d3.selectAll(".pr-val").remove()[0])), 
-// 		parse_float(get_inner(d3.selectAll(".ac-val").remove()[0])), 
-// 		parse_float(get_inner(d3.selectAll(".re-val").remove()[0])))
-
-// 	console.log(dataset)
-
-// 	// var count = dataset.length;
-
-// 	// var posName = ['ac', 'pr', 're'];
-
-// 	// var x = d3.scale.linear()
-// 	// .domain([0, 100])
-// 	// .range([0, 356]);
-
-// 	// var y = d3.scale.ordinal()
-// 	// .domain(dataset)
-// 	// .rangeBands([0, 36*count]);
-
-
-// 	// var chart = d3.selectAll('.grid .chart .bar').append('svg')
-// 	// .attr('width', 356)
-// 	// .attr('height', function(){ return (36*count); })
-// 	// .append("g");
-
-
-// 	// chart.selectAll('rect')
-// 	// .data(function(d,i){  return dataset[i]})
-// 	// .enter().append('rect')
-// 	// .attr('class', function(d,i){ return posName[i]; })
-// 	// .attr('height', 12)
-// 	// .attr('y', y)
-// 	// .attr('rx',4)
-// 	// .attr('ry',4)
-// 	// .attr('txt', function(d,i){ return d+'%';} )
-// 	// .transition().duration(500).attr('width', x)
-// 	// .text( String );
-// }
 
 var list_type;
-
 var page_number = Number();
 
 function generate_grid_element(id, dataset, posName) {
-
-	if (id != null && dataset != null) {
+	
+	if (id != null && dataset > 1) {
 		dataset = [dataset];
 		
 		var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
 		var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'}
 
+		switch(posName){
+			case 'accuracy':
+				var max_value = 100; break;
+			case 'reach_time':
+				var max_value = 250; break;
+			case 'profitability':
+				var max_value = 100; break;
+			default:
+				var max_value = 10;
+		}
+
 		var x = d3.scale.linear()
-		.domain([0, 300])
+		.domain([0, max_value])
 		.range([0, width]);
-		
+
 		var chart = d3.select("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
 		chart.selectAll('rect')
 			.data(dataset)
@@ -75,6 +42,7 @@ function generate_grid_element(id, dataset, posName) {
 		return;
 	}	
 }
+
 
 function generate_pie(id, value) {
 	
@@ -95,8 +63,6 @@ function generate_pie(id, value) {
 
 	var colors = [fill_color, 'transparent'];
 
-	
-
 	var pie = d3.layout.pie()
 	.sort(null);
 
@@ -116,77 +82,6 @@ function generate_pie(id, value) {
 	.attr("stroke", function(d, i) { return colors[i]; })
 	.attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
 	.attr("d", arc);
-}
-
-/* tested only with 3 entries (target prices) */
-function run_list_NENAUDOJAMA(){
-
-	var dataset = [[20, 93, 45], [60, 73, 45], [20, 73, 25]];
-	var count = 3;
-
-	var posName = ['ac', 'pr', 're'];
-
-	var width = d3.scale.linear()
-	.domain([0, 100])
-	.range([0, 143]);
-
-	var x = d3.scale.ordinal()
-	.domain(dataset)
-	.rangeBands([0, 167*count]);
-
-
-	var chart = d3.selectAll('.list .chart .bar').append('svg')
-	.attr('width', function(){ return (161*count); })
-	.attr('height', 18)
-	.append("g");
-
-
-	chart.selectAll('rect')
-	.data(function(d,i){  return dataset[i]} )
-	.enter().append('rect')
-	.attr('class', function(d,i){ return posName[i]; })
-	.attr('height', 12)
-	.attr('y', 0)
-	.attr('x', x)
-	.attr('rx',4)
-	.attr('ry',4)
-	.attr('txt', function(d,i){ return d+'%';} )
-	.transition().duration(500).attr('width', width)
-	.text( String );
-}
-
-function run_grid_pie_NENAUDOJAMA(){
-
-	var percent = 64;
-	var dataset = [percent,(100-percent)];
-
-	var width = 81,
-	height = 81,
-	radius = Math.min(width, height) / 2;
-
-	var colors = ['#da1e1e', 'transparent'];
-
-	var pie = d3.layout.pie()
-	.sort(null);
-
-	var arc = d3.svg.arc()
-	.innerRadius(35)
-	.outerRadius(35);
-
-	var svg = d3.selectAll(".grid .circle").append("svg")
-	.attr("width", width)
-	.attr("height", height)
-	.append("g")
-	.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-	var path = svg.selectAll("path")
-	.data(pie(dataset))
-	.enter().append("path")
-	.attr("stroke", function(d, i) { return colors[i]; })
-	.attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
-	.attr("d", arc);
-
-	/* Info http://bl.ocks.org/1346395  http://bl.ocks.org/3750941 */
 }
 
 
@@ -280,7 +175,9 @@ function process_search_nav(key){
 	}
 }
 
-
+/*
+ * Click on property in inner Analyse 
+ */
 function open_graph(){
 
 	obj = $(this);
@@ -304,6 +201,7 @@ function open_graph(){
 
 	$('.analyse_menu a').removeClass('active');
 	obj.addClass('active');
+	$('#bank li:first-child').addClass('active');
 	return false; // prevent href
 }
 
@@ -314,26 +212,31 @@ function load_target_prices(){
 	 	$('.inner_buttons a').removeClass('active');
 	 	$(this).addClass('active');
 
+
 	 	// load targets and stores Analysis html to temp html container
 	 	if(url.length){ 
-	 		$('#temp_container').html( $('.inner_content').html() );
-
 		 	$('.inner_content').animate({'opacity': 0}, 50, function(){
-	            $(this).load(url, function(){
+		 		$(this).addClass('hidden');
+	            
+	            $('.inner_target_prices').load(url, function(){
+	            	$(this).removeClass('hidden');
 	                $(this).animate({'opacity':1}, 100);
 	                binds_for_target_price_list();
 	            });
 	        });
         // sets Analysis html back from container
 	 	}else{
-	 		 $('.inner_content').animate({'opacity': 0}, 50, function(){
-            	$(this).html( $('#temp_container').html() ); $('#temp_container').html('');
-                $(this).animate({'opacity':1}, 100);
-	        });
+	 		 $('.inner_target_prices').animate({'opacity': 0}, 50, function(){
+		 		$(this).addClass('hidden').html('');
+
+            	$('.inner_content').removeClass('hidden').css('opacity',0);
+                $('.inner_content').animate({'opacity':1}, 100);
+	            });
 	 	}
 
 	 	return false;
  }
+
 
 /*
  * Remove content, add to another list 
@@ -476,7 +379,7 @@ $(window).scroll(function() {
 			url: _url,
 			context: $("#target-price-list")
 		}).done(function(data){
-			$("#target-price-list br").before(data)
+			$("#target-price-list br").before(data);
 			binds_for_target_price_list();
 		})
 	}
