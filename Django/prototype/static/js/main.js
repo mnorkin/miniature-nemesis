@@ -181,6 +181,7 @@ function process_search_nav(key){
 function open_graph(){
 
 	obj = $(this);
+	if(obj.hasClass('active')) { return false; }
 	var type = obj.attr('class');
 	type = type.toLowerCase();
 	type = type.replace(' ', '_');
@@ -201,7 +202,11 @@ function open_graph(){
 
 	$('.analyse_menu a').removeClass('active');
 	obj.addClass('active');
-	$('#bank li:first-child').addClass('active');
+	// show first target price
+	$('#bank li:first-child').removeClass('passive').addClass('active');
+	// info box content
+	$('.info_box').html( obj.siblings('div').html() );
+
 	return false; // prevent href
 }
 
@@ -311,6 +316,9 @@ $(function(){
 	 $('.inner_buttons a').click(load_target_prices);
 
 	 binds_for_target_price_list();
+
+	 // In analyse page, on document ready, load first property!
+	 $('.analyse_menu div:first-child a').trigger('click');
 });
 
 

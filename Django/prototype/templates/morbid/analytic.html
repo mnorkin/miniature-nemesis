@@ -14,7 +14,6 @@
 
 
 {% block content %}
-
 {% if analytic %}
 
 	<ul class="corp_info analytic">
@@ -23,28 +22,25 @@
 		<li class="thirteen"><strong>{{ analytic.number_of_tp }}</strong> Active target prices</li>
 	</ul>
 
-
 	<div class="inner_buttons">
-			<a href="" class=" ta">Target prices</a>
+			<a href="/analytic/target_prices/{{ analytic.slug }}/" class=" ta">Target prices</a>
 			<a href="" class="active an">Analysis</a>
 			<br class="clear" />
 			<div class="line"></div>
 	</div>
 
-	
+	<div class="inner_content">
 	<div class="left">
 		<div class="analyse_menu">
 			{% for feature in features %}
 			<div>
-				<a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a>
+				<a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" class="{{ feature.slug }}">{{ feature.name }}</a>
 				<span></span>
+				<div class="info_box_content">{% autoescape off %}{{feature.description}}{% endautoescape %}<img src="/static/images/mini_graphs/{{feature.slug}}.png"></div>
 			</div>
 			{% endfor %}
 		</div>
-		<div class="info_box">
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-			Suspendisse commodo scelerisque dolor, eget feugiat ligula commodo nec. 
-		</div>
+		<div class="info_box"></div>
 	</div>
 	
 	<div style="display: none;">
@@ -67,10 +63,10 @@
 	</div>
 	
 	<div class="analyser">
-		<ul class="bank">
+		<ul class="bank" id="bank">
 			{% for target in target_prices %}
-				<li>
-					<span class="corp">{{ target.analytic }}</span> 
+				<li name="{{ target.analytic.slug }}" class="passive">
+					<span class="corp"><a href="{{target.ticker.get_absolute_url}}">{{ target.ticker }}</a></span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
 					<span class="number">35.1<strong>No of target prices</strong> </span>
@@ -99,6 +95,9 @@
 		</div>
 		<br class="clear" />
 	</div>
+	<div id="chart" class="graph"></div>
+	</div>
+	<div class="inner_target_prices hidden"></div>
 	
 	<br class="clear" />
 

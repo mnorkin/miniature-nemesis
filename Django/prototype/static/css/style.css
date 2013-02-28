@@ -621,7 +621,6 @@ li{ list-style: none; }
 
 .corp_info .number{
     font-size: 22px;
-    letter-spacing:-2px;
     font-weight: bolder;    
     padding-top: 11px;
     padding: 11px 0px 0px 40px;
@@ -670,17 +669,27 @@ li{ list-style: none; }
     font-weight: bold;
     color:#444444;
 }
+.corp_info.analytic{
+    display: table;
+    width: 100%;
+}
 .corp_info.analytic > li{
     width: 300px;
+    display: table-cell;
+    vertical-align: middle;
+    margin: 0px;
+    padding: 0 0 0 20px;
+    height: 100%;
+    float: none;
 }
 .corp_info .thirteen{
     font-size: 14px;
     color:#b78f65;
-    padding: 17px 17px;
+    padding: 18px 17px;
     border-left: 1px solid #e7e0da;
 }
 .corp_info .thirteen strong{
-    font-size: 24px;
+    font-size: 20px;
     color:#444444;
 }
 
@@ -756,6 +765,9 @@ li{ list-style: none; }
     color:#fff;
     box-shadow: inset 0 0 10px #ac460f;
 }
+.analyse_menu div.info_box_content{
+    display: none;
+}
 
 .analyse_menu div:nth-child(2n) span{
     background: url('../images/merge_graph_1.png') 50% 50% no-repeat #fff;
@@ -772,7 +784,7 @@ li{ list-style: none; }
     display: inline-block;
     position: absolute;
     width: 22px;
-    height: 35px;
+    height: 22px;
     background-image: url('../images/property_icons_3.png');
     background-repeat: no-repeat;
     background-position: -26px 0px;
@@ -787,6 +799,10 @@ li{ list-style: none; }
 .analyse_menu a.profitability.active:before{ background-position: 0px -72px; }
 .analyse_menu a.reach_time:before{ background-position: -26px -142px; }
 .analyse_menu a.reach_time.active:before{ background-position: 0px -142px; }
+.analyse_menu a.impact_to_market:before{ background-position: -26px -177px; }
+.analyse_menu a.impact_to_market.active:before{ background-position: 0px -177px; }
+.analyse_menu a.difference:before{ background-position: -26px -104px; }
+.analyse_menu a.difference.active:before{ background-position: 0px -104px; }
 
 
 .analyser{
@@ -920,6 +936,11 @@ li{ list-style: none; }
 }
 .info_box strong{
     color: #b78f65;
+}
+.info_box img{
+    margin: 0 auto;
+    width: 135px;
+    display: block;
 }
 
 #chart{

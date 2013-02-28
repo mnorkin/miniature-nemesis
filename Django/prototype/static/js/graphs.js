@@ -720,8 +720,7 @@ var graphs = (function() {
           graphs.topbar_hide()
           graphs.topbar_show(_slugs[i])
         }
-        // text block
-        $('.bank .corp').text(_slugs[i]);
+        console.log(_slugs[i])
       })
       .on("mouseout", function() {
 

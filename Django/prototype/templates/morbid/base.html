@@ -12,67 +12,15 @@
 </head>
 <body>
     
-    <!-- SVG gradient -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="300" height="13">
-    <defs>
-        <linearGradient id="first_grad" gradientUnits="userSpaceOnUse" x1="100%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#bdded3" stop-opacity="1"/>
-          <stop offset="7%" stop-color="#abd5c8" stop-opacity="1"/>
-          <stop offset="14%" stop-color="#9ecebf" stop-opacity="1"/>
-          <stop offset="21%" stop-color="#97caba" stop-opacity="1"/>
-          <stop offset="28%" stop-color="#94c9b8" stop-opacity="1" />
-          <stop offset="31%" stop-color="#90c7b5" stop-opacity="1" />
-          <stop offset="49%" stop-color="#87bcab" stop-opacity="1" />
-          <stop offset="56%" stop-color="#82b6a5" stop-opacity="1" />
-          <stop offset="70%" stop-color="#77ac9c" stop-opacity="1" />
-          <stop offset="77%" stop-color="#80b3a2" stop-opacity="1" />
-          <stop offset="84%" stop-color="#7fb9a7" stop-opacity="1" />
-          <stop offset="90%" stop-color="#9bb8af" stop-opacity="1" />
-          <stop offset="96%" stop-color="#c3c3b4" stop-opacity="1" />
-          <stop offset="100%" stop-color="#ebebe6" stop-opacity="1" />
-        </linearGradient>   
-        <linearGradient id="second_grad" gradientUnits="userSpaceOnUse" x1="100%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#cfbdde" stop-opacity="1"/>
-          <stop offset="7%" stop-color="#c2abd5" stop-opacity="1"/>
-          <stop offset="14%" stop-color="#b397ca" stop-opacity="1"/>
-          <stop offset="21%" stop-color="#b397ca" stop-opacity="1"/>
-          <stop offset="28%" stop-color="#b094c9" stop-opacity="1" />
-          <stop offset="31%" stop-color="#ad90c7" stop-opacity="1" />
-          <stop offset="49%" stop-color="#a98cc3" stop-opacity="1" />
-          <stop offset="56%" stop-color="#a387bc" stop-opacity="1" />
-          <stop offset="70%" stop-color="#9678af" stop-opacity="1" />
-          <stop offset="77%" stop-color="#a085b5" stop-opacity="1" />
-          <stop offset="84%" stop-color="#a48eb8" stop-opacity="1" />
-          <stop offset="90%" stop-color="#ad9bbb" stop-opacity="1" />
-          <stop offset="96%" stop-color="#c3c3b4" stop-opacity="1" />
-          <stop offset="100%" stop-color="#ebebe6" stop-opacity="1" />
-        </linearGradient>   
-        <linearGradient id="third_grad" gradientUnits="userSpaceOnUse" x1="100%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#a4b9c9" stop-opacity="1"/>
-          <stop offset="7%" stop-color="#92a6ba" stop-opacity="1"/>
-          <stop offset="14%" stop-color="#8499af" stop-opacity="1"/>
-          <stop offset="21%" stop-color="#7c90a9" stop-opacity="1"/>
-          <stop offset="28%" stop-color="#788da7" stop-opacity="1" />
-          <stop offset="31%" stop-color="#7389a3" stop-opacity="1" />
-          <stop offset="49%" stop-color="#6f859f" stop-opacity="1" />
-          <stop offset="56%" stop-color="#6b809a" stop-opacity="1" />
-          <stop offset="70%" stop-color="#5b728e" stop-opacity="1" />
-          <stop offset="77%" stop-color="#6b8097" stop-opacity="1" />
-          <stop offset="84%" stop-color="#74899d" stop-opacity="1" />
-          <stop offset="90%" stop-color="#8297a7" stop-opacity="1" />
-          <stop offset="96%" stop-color="#c3c3b4" stop-opacity="1" />
-          <stop offset="100%" stop-color="#aaaaaa" stop-opacity="1" />
-        </linearGradient>   
-    </defs>   
-    </svg>
-
+    {% include "morbid/svg_gradient.html" %}
+    
     <div class="container">
         <div id="header">
         {% block sidebar %}
             <div class="title">
                 <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
-                <div class="main_intro">We are still in private beta. Now we are analyzing companies which are in S&P500 index. You can find all the companies <a href=''>here.</a></div>
-                <div class="search">
+                <div class="main_intro">We are still in private beta. Now we are analyzing companies which are in S&P500 index. You can find all the companies <a href=''><img src="/static/images/txt_here.png" alt="here" /></a></div>
+                <div class="search"> 
                     <form action="" method="get">
                         <input type="text" name="q" autocomplete="off" value="" class="inp-s" id="search_inp" onkeyup="process_search(this, event)" />
                         <input type="submit" value="Search" class="sub-s" onclick="process_search(this, event)" />

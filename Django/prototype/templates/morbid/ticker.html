@@ -2,7 +2,7 @@
 
 
 {% block sidebar %}
-  <div class="inner">
+	<div class="inner">
         <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
         <div class="search">
             <form action="" method="get">
@@ -49,18 +49,11 @@
 				<div>
 					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" class="{{ feature.slug }}">{{ feature.name }}</a>
 					<span></span>
+					<div class="info_box_content">{% autoescape off %}{{feature.description}}{% endautoescape %}<img src="/static/images/mini_graphs/{{feature.slug}}.png"></div>
 				</div>
 			{% endfor %}
 		</div>
-		
-		<div class="info_box">
-			<strong>Lorem ipsum dolor</strong> sit amet, consectetur adipiscing elit. 
-			Suspendisse commodo scelerisque dolor, eget feugiat ligula commodo nec. 
-			Aliquam neque arcu, faucibus id consequat vel, egestas tempus turpis.
-			Morbi ac aliquet leo. Maecenas commodo est vel velit dictum at vestibulum tortor commodo. 
-			Sed tempus justo a tortor dapibus vestibulum. Phasellus consequat mi aliquet tellus auctor
-		 	dapibus. Aenean eu tincidunt purus. Aenean sit amet ligula quis arcu condimentum porta.
-		</div>
+		<div class="info_box"></div>
 	</div>
 	
 	<div class="analyser">
@@ -104,7 +97,7 @@
 		</div>
 	</div>
 	<div id="chart" class="graph"></div>
-
+	
 	<br class="clear" />
 	</div>
 	<div class="inner_target_prices hidden"></div>
