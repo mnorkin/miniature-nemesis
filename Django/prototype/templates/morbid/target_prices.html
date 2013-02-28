@@ -1,10 +1,7 @@
 <div class="latest_target_prices title grid">
+  
   <div class="now">Nov. 17, 2013</div>
-  {% if ptype == 'grid' %}
-  <a class="toggle" href="?ptype=list">Compare</a>
-  {% else %}
-  <a class="toggle" href="/?ptype=grid">Compare</a>
-  {% endif %}
+  <a class="toggle">Compare</a>
   
   {% if target_prices %}
     <div class="pre_info">
@@ -13,41 +10,14 @@
       <span class="pr">Profitability<a href="?up"></a><a class="active" href="?down"></a> </span>
       <span class="re">Reach time<a href="?up"></a><a href="?down"></a> </span>
     </div>
-    <ul class="">
+    <ul class="" id="target-price-list">
       {% for target in target_prices  %}
-        <li class="entry chart">
-          <a class="ticket" href="{{ target.ticker.get_absolute_url }}">
-            <span class="ln"><span>{{ target.ticker.long_name }} </span></span>
-            <span class="sn">({{ target.ticker.name }})</span>
-            <span class="goust">{{ target.ticker.long_name }} </span>
-          </a>
-          <a class="analytic">{{ target.analytic }}</a>
-          <span class="price">{{ target.price }}</span>
-
-          <span id="{{ target.analytic.slug}}_{{ target.ticker.slug }}" class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
-            <strong>{{ target.change|floatformat:1|cut:"-" }}%</strong>
-          </span>
-
-          <script type="text/javascript">
-            generate_pie( "{{ target.analytic.slug}}_{{ target.ticker.slug }}", "{{ target.change }}" )
-          </script>
-
-          <ul class="bar">
-            {% for fap in target.fap %}
-              <li id="{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}" class="feature"><span>{{fap.feature.name}}</span></li>
-              <script type="text/javascript">
-                generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value }}", "{{fap.feature.name}}" )
-              </script>
-            {% endfor %}
-          </ul>
-          <div class="bar_tooltip"></div>
-        </li>
-
+        {% include "morbid/target_price_card.html" %}
       {% endfor %}
       <br class="clear"/>
     </ul>
   {% else %}
     <p>Error, no target prices</p>
   {% endif %}
-  
 </div>
+<div class="latest_target_prices title list hidden"></div>

@@ -47,15 +47,15 @@ var list_type;
 var page_number = Number();
 
 function generate_grid_element(id, dataset, posName) {
-	console.log('grid el', id)
+
 	if (id != null && dataset != null) {
 		dataset = [dataset];
 		
 		var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
-		var gradiends = {'accuracy': 'url(#first_grad)', 'closeness': 'url(#second_grad)', 'difference': 'url(#third_grad)'}
+		var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'}
 
 		var x = d3.scale.linear()
-		.domain([0, 500])
+		.domain([0, 300])
 		.range([0, width]);
 		
 		var chart = d3.select("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
@@ -318,10 +318,10 @@ function load_target_prices(){
 	 	if(url.length){ 
 	 		$('#temp_container').html( $('.inner_content').html() );
 
-	        index_page_type = 'grid';
 		 	$('.inner_content').animate({'opacity': 0}, 50, function(){
 	            $(this).load(url, function(){
 	                $(this).animate({'opacity':1}, 100);
+	                binds_for_target_price_list();
 	            });
 	        });
         // sets Analysis html back from container
@@ -331,6 +331,7 @@ function load_target_prices(){
                 $(this).animate({'opacity':1}, 100);
 	        });
 	 	}
+
 	 	return false;
  }
 
@@ -476,6 +477,7 @@ $(window).scroll(function() {
 			context: $("#target-price-list")
 		}).done(function(data){
 			$("#target-price-list br").before(data)
+			binds_for_target_price_list();
 		})
 	}
 })
