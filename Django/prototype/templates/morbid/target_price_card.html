@@ -20,7 +20,7 @@
     
     <li id="{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}" class="feature"><span>{{fap.feature.name}}</span></li>
     <script type="text/javascript">
-    generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value }}", "{{fap.feature.name}}" )
+    generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value }}", "{{fap.feature.slug}}" )
     </script>
     {% endfor %}
   </ul>

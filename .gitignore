@@ -5,3 +5,4 @@ local_settings.py
 
 .project
 .pydevproject
+Django\prototype\prototype\settings.py
