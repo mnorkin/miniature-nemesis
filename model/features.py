@@ -40,8 +40,8 @@ class Features:
       {'id': 3, 'name': 'Difference', 'display_in_frontpage': 0, 'unit_id': 1},
     'profitability': 
       {'id': 4, 'name': 'Profitability', 'display_in_frontpage': 1, 'unit_id': 1},
-    'max_profitability': 
-      {'id': 5, 'name': 'Max profitability', 'display_in_frontpage': 0, 'unit_id': 1},
+    # 'max_profitability': 
+      # {'id': 5, 'name': 'Max profitability', 'display_in_frontpage': 0, 'unit_id': 1},
     'impact_to_market': 
       {'id': 6, 'name': 'Impact to market', 'display_in_frontpage': 0, 'unit_id': 1},
     'reach_time': 
@@ -80,7 +80,10 @@ class Features:
     if calculate:
       self.calculated_feature_data = []
       for method, bound in inspect.getmembers(self, predicate=inspect.ismethod):
-        if method != '__init__' and method != 'values':
+        if method != '__init__' and method != 'values' and method != 'max_profitability':
+          """
+          Get rid of `max_profitability` at this stage
+          """
           if utils.DEBUG:
             print method
           item = {'feature_slug': method,'value': bound()}

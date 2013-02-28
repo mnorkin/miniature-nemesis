@@ -103,8 +103,11 @@ def get_beta(ticker):
         position = row.find('Beta:')
         if position != -1:
           r = PATTERN.split(row[position:])[1::2]
-          beta = float(r[1])
-          database.write_beta(ticker, beta)
-          """Write beta to database"""
-
+          try:
+            beta = float(r[1])
+            """Write beta to database"""
+            database.write_beta(ticker, beta)
+          except ValueError:
+            beta = None
+          
   return beta

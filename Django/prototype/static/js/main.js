@@ -95,8 +95,6 @@ function generate_pie(id, value) {
 
 	var colors = [fill_color, 'transparent'];
 
-	
-
 	var pie = d3.layout.pie()
 	.sort(null);
 
@@ -467,7 +465,7 @@ function join_array( array0, array1, array2 ) {
   * Scroll
   */
 $(window).scroll(function() {
-	if ( $(window).scrollTop() + $(window).height() == $(document).height() ) {
+	if ( $(window).scrollTop() + $(window).height() == $(document).height() || $(window).height() == $(document).height() ) {
 		page_number +=1
 		/* Make a query */
 		_url = "/page/" + page_number + "/"
