@@ -78,9 +78,6 @@ var graphs = (function() {
           _urls[i] = json[i].url
         };
 
-        _data.push(80);
-        _data.push(40);
-        _data.push(15);
         
         console.log("single graph", _slugs, _data)
 
