@@ -794,16 +794,17 @@ li{ list-style: none; }
 }
 .analyse_menu a.accuracy:before{ background-position: -26px 0px; }
 .analyse_menu a.accuracy.active:before{ background-position: 0px 0px; }
-.analyse_menu a.closeness:before{ background-position: -26px -38px; }
-.analyse_menu a.closeness.active:before{ background-position: 0px -38px; }
+.analyse_menu a.proximity:before{ background-position: -26px -38px; }
+.analyse_menu a.proximity.active:before{ background-position: 0px -38px; }
 .analyse_menu a.profitability:before{ background-position: -26px -72px; }
 .analyse_menu a.profitability.active:before{ background-position: 0px -72px; }
+
 .analyse_menu a.reach_time:before{ background-position: -26px -142px; }
 .analyse_menu a.reach_time.active:before{ background-position: 0px -142px; }
 .analyse_menu a.impact_to_market:before{ background-position: -26px -177px; }
 .analyse_menu a.impact_to_market.active:before{ background-position: 0px -177px; }
-.analyse_menu a.difference:before{ background-position: -26px -104px; }
-.analyse_menu a.difference.active:before{ background-position: 0px -104px; }
+.analyse_menu a.aggressiveness:before{ background-position: -26px -104px; }
+.analyse_menu a.aggressiveness.active:before{ background-position: 0px -104px; }
 
 
 .analyser{
@@ -942,6 +943,7 @@ li{ list-style: none; }
     margin: 0 auto;
     width: 135px;
     display: block;
+    padding-top: 15px;
 }
 
 #chart{
@@ -967,6 +969,12 @@ li{ list-style: none; }
 #chart.accuracy{
     height: 425px;
     top:-10px;
+}
+#chart.aggressiveness{
+    top:25px;
+}
+#chart.proximity{
+    top:25px;
 }
 
 #chart .bar_tooltip {
