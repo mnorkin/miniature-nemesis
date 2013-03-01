@@ -63,7 +63,7 @@
 		<ul class="bank" id="bank">
 			{% for target in target_prices %}
 				<li name="{{ target.analytic.slug }}" class="passive">
-					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }}</a></span> 
+					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }} </a></span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
 					<span class="number">{{ target.analytic.number_of_tp }}<strong>No of target prices</strong> </span>

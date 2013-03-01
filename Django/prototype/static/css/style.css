@@ -167,14 +167,14 @@ li{ list-style: none; }
     position: relative;
     text-align: left;
     overflow: hidden;
-    height: 14px;
+    height: 16px;
 }
 .title .entry .ticket .ln span{
     display: inline-block;
     position: relative;
     top:0;
     left: 0px;
-    height: 14px;
+    height: 16px;
     width: 500px;
 }
 .title .entry .ticket .sn{
@@ -189,10 +189,11 @@ li{ list-style: none; }
 .title.list .entry .ticket .sn{
     position: absolute;
     top:1px;
-    right: 0px;
+    right: 4px;
     left: auto;
     width: 40px;
     padding-left: 23px;
+    text-align: center;
 }
 .title .entry  .goust{
     visibility: hidden;
@@ -399,7 +400,7 @@ li{ list-style: none; }
     color:#444444;
     margin: 8px 0 0px 12px;
     height:32px;
-    width:168px;
+    width:172px;
     display: block;
     float:left;
     font-weight: bold;
@@ -418,7 +419,7 @@ li{ list-style: none; }
     margin: 8px 0 0px 0px;
     padding-top:5px;
     height:26px;
-    width:76px;
+    width:72px;
     display: block;
     float:left;
     border-right: 1px solid #f4eee8;
@@ -592,7 +593,7 @@ li{ list-style: none; }
     margin: 21px 5px 21px 20px;
     overflow-x:hidden;
     white-space: nowrap;
-    width: 225px;
+    width: 240px;
 }
 
 .corp_info .price{
@@ -769,9 +770,11 @@ li{ list-style: none; }
     display: none;
 }
 
-.analyse_menu div:nth-child(2n) span{
+.analyse_menu div.can_compare span{
     background: url('../images/merge_graph_1.png') 50% 50% no-repeat #fff;
     border:1px solid #f4eee8;
+    border-left:0;
+    box-shadow: 7px 0px 25px -11px #dcd9d8 inset;
     width: 36px;
     height: 34px;
     position: absolute;
@@ -785,7 +788,7 @@ li{ list-style: none; }
     display: inline-block;
     position: absolute;
     width: 22px;
-    height: 22px;
+    height: 24px;
     background-image: url('../images/property_icons_3.png');
     background-repeat: no-repeat;
     background-position: -26px 0px;
@@ -801,10 +804,10 @@ li{ list-style: none; }
 
 .analyse_menu a.reach_time:before{ background-position: -26px -142px; }
 .analyse_menu a.reach_time.active:before{ background-position: 0px -142px; }
-.analyse_menu a.impact_to_market:before{ background-position: -26px -177px; }
-.analyse_menu a.impact_to_market.active:before{ background-position: 0px -177px; }
-.analyse_menu a.aggressiveness:before{ background-position: -26px -104px; }
-.analyse_menu a.aggressiveness.active:before{ background-position: 0px -104px; }
+.analyse_menu a.impact_to_market:before{ background-position: -26px -176px; }
+.analyse_menu a.impact_to_market.active:before{ background-position: 0px -176px; }
+.analyse_menu a.aggressiveness:before{ background-position: -26px -105px; top:8px }
+.analyse_menu a.aggressiveness.active:before{ background-position: 0px -105px; top:8px }
 
 
 .analyser{
@@ -937,11 +940,10 @@ li{ list-style: none; }
     line-height: 18px;
 }
 .info_box strong{
-    color: #b78f65;
+    color: rgb(194, 166, 137);
 }
 .info_box img{
     margin: 0 auto;
-    width: 135px;
     display: block;
     padding-top: 15px;
 }
@@ -972,6 +974,7 @@ li{ list-style: none; }
 }
 #chart.aggressiveness{
     top:25px;
+    height: 620px;
 }
 #chart.proximity{
     top:25px;

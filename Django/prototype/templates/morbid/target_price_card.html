@@ -5,9 +5,9 @@
     <span class="goust">{{ target.ticker.long_name }} </span>
   </a>
   <a class="analytic">{{ target.analytic }}</a>
-  <span class="price">{{ target.price }}</span>
+  <span class="price">{{ target.price|cut:".0" }}</span>
 
-  <span id="{{ target.analytic.slug}}_{{ target.ticker.slug }}" class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
+  <span id="{{ target.analytic.slug}}_{{ target.ticker.slug }}" class="circle {% if target.change < 0 %}down{% elif target.change >= 0 %}up{% endif %}">
     <strong>{{ target.change|floatformat:1|cut:"-" }}%</strong>
   </span>
 
@@ -20,7 +20,7 @@
     
     <li id="{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}" class="feature"><span>{{fap.feature.name}}</span></li>
     <script type="text/javascript">
-    generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value }}", "{{fap.feature.slug}}" )
+    generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value|cut:'.0' }}", "{{fap.feature.slug}}" )
     </script>
     {% endfor %}
   </ul>

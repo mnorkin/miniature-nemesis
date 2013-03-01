@@ -50,7 +50,7 @@
 	<div class="analyser">
 		<ul class="bank" id="bank">
 			{% for target in target_prices %}
-				<li name="{{ target.analytic.slug }}" class="passive">
+				<li name="{{ target.ticker.slug }}" class="passive">
 					<span class="corp"><a href="{{target.ticker.get_absolute_url}}">{{ target.ticker }}</a></span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>

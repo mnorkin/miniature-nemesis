@@ -33,24 +33,25 @@ var graphs = (function() {
 
     topbar_show: function(slug) {
       active_topbar = slug;
-      // d3.selectAll(".bank li[class='active']").style('class', 'passive')
-      d3.select(".bank li[name='"+slug+"']").style('opacity', 0).transition().duration(400).style('opacity', 1).attr('class', 'active')
+      d3.select(".bank li[name='"+slug+"']").style('background', '#FAFAFA').transition().duration(300).style('background', '#fff').attr('class', 'active')
     },
 
     topbar_hide: function() {
-      d3.selectAll(".bank li[class='active']").transition().duration(400).attr('class', 'passive')
+      d3.selectAll(".bank li[class='active']").attr('class', 'passive')
     },
 
     tooltip_show: function(top, left, text) {
       /**
         * Show tooltip method
         */
+      d3.selectAll("#chart div").remove()
       d3.select("#chart")
         .append('div')
         .attr('class', 'bar_tooltip')
         .text( text )
         .style("left", left + "px") 
         .style("top", top + "px" )
+        .style('font-size', function(){ return (text.length >= 5) ? '11px' : '12px' })
         .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
     },
 
@@ -58,7 +59,7 @@ var graphs = (function() {
       /**
         * Hide tooltip method
         */
-      d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+      //d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
     },
 
     populate: function(json) {
@@ -74,7 +75,7 @@ var graphs = (function() {
 
         for (var i = json.length - 1; i >= 0; i--) {
           _data[i] = json[i].value
-          _slugs[i] = json[i].analytic__slug
+          _slugs[i] = (typeof(json[i].analytic__slug) !== "undefined") ? json[i].analytic__slug : json[i].ticker__slug
           _urls[i] = json[i].url
         };
 
@@ -137,7 +138,7 @@ var graphs = (function() {
       d3.json(host + url, function(error, json) {
         if ( !error ) {
           graphs.populate(json)
-          _data.sort(function(a,b){return b-a});
+          _data.sort(function(a,b){return a-b});
           graphs.draw_accuracy(phase);
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -215,16 +216,20 @@ var graphs = (function() {
       var w = $("#" + _element_id).width() - 20,
       h = $("#" + _element_id).height() - 40,
       r = Math.min(w, h) / 20,
-      rhw = Math.min(w,h) /2,
+      rhw = Math.min(w,h) /2.2,
       color = d3.scale.category20c();
 
       var sun = d3.select("#"+_element_id).append("svg:svg")
       .attr("width", w)
       .attr("height", h);
-
       pi = Math.PI;
 
-      angle_scale = d3.scale.linear().domain([0, _data.length]).range([0, 2*pi])
+      // fill with bulk data to have lost of lines, circle r=0 for false value
+      var data_proximity = [];
+      for(i=0 ; i< _data.length ; i++){ data_proximity.push(_data[i]); }
+      while(data_proximity.length < 50){ data_proximity.push(false); }
+
+      angle_scale = d3.scale.linear().domain([0, data_proximity.length]).range([0, 2*pi])
 
       angle_arc = d3.svg.arc()
       .innerRadius(r)
@@ -233,18 +238,18 @@ var graphs = (function() {
       .endAngle(function(d, i) { return angle_scale(i)+pi/2 });
 
       sun.selectAll('.stripes')
-      .data(_data).enter()
+      .data(data_proximity).enter()
       .append('svg:path')
       .attr("d", function(d, i) {
         return angle_arc(d, i)
       })
-      .attr('stroke-width', 0.3)
+      .attr('stroke-width', 0.1)
       .attr('fill', 'none')
       .attr("stroke", "grey")
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
 
       sun.selectAll('.stripes')
-      .data(_data).enter()
+      .data(data_proximity).enter()
       .append('svg:circle')
       .attr('cx', function(d, i) {
         return (d/100*rhw+r)*Math.cos(angle_scale(i))
@@ -253,11 +258,15 @@ var graphs = (function() {
         return (d/100*rhw+r)*Math.sin(angle_scale(i))
       })
       .attr('r', function(d, i) {
-        return 6;
+        if(d === false){
+          return 0
+        }else{
+          return 6;
+        }
       })
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
       .attr('fill', '#c0be81')
-      .attr('txt', function(d,i) { return _data[i] + ' %' })
+      .attr('txt', function(d,i) { return data_proximity[i] + ' %' })
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
         var top = h/2+parseFloat(d3.select(this).attr('cy')) - 37
@@ -384,7 +393,7 @@ var graphs = (function() {
 
       linear.selectAll("#" + _element_id).data(linear_data).enter()
       .append("svg:rect")
-      .attr('fill', "#eeeae7")
+      .attr('fill', "#e7e2de")
       .attr('width', function() { return w-translate_w })
       .attr('height', 0.5)
       .attr("x", 10)
@@ -452,8 +461,8 @@ var graphs = (function() {
 
       var w = $("#" + _element_id).width() - 20,
         h = $("#" + _element_id).height(),
-        r = Math.min(w, h) / 15,
-        rhw = Math.min(w,h) / 1.3,
+        r = Math.min(w, h) / 5,
+        rhw = Math.min(w,h) / 1.56,
         color = d3.scale.category20c();
 
       number_of_data_for_full_graph = 40
@@ -722,7 +731,7 @@ var graphs = (function() {
       .append('svg:circle')
       .attr('cx', function(d, i) {  return d*rhw  })
       .attr('cy', function(d, i) {  return -graph_height/(_data.length+1)*(i+1) })
-      .attr('r', 7)
+      .attr('r', 6)
       .attr('fill', '#91bcc5')
       .attr('txt', function(d,i) { return _data[i] + ' %' })
 

@@ -34,7 +34,7 @@ function generate_grid_element(id, dataset, posName) {
 			.attr('fill', gradiends[posName])
 			.attr('rx',4)
 			.attr('ry',4)
-			.attr('txt', function(d,i){ return d+'%';} )
+			.attr('txt', function(d,i){ return (posName == 'reach_time') ? d+' days':  d+'%';} )
 		.transition().duration(500).attr('width', x)
 			.text( String );
 
@@ -273,6 +273,7 @@ function change_target_prices_list(){
 
 	// new content, bind again
 	binds_for_target_price_list();
+	load_more_target_prices();
 }
 
 
@@ -301,7 +302,20 @@ function binds_for_target_price_list(){
 	 	function(){ $(this).find('.ln span').stop().css({'left': 0})}
 	 );
 	 $('.title .entry').click(function(){ location.href = $(this).find('a').attr('href'); })
-	 $('.latest_target_prices .toggle').click(change_target_prices_list);
+	 $('.latest_target_prices .toggle').unbind('click').click(change_target_prices_list);
+}
+
+function calculate_minavgmax_block(){
+	obj = $('.corp_info .avg');
+	if(obj.length == 0) { return; }
+
+	var min = obj.find('.mn i').text();
+	var avg = obj.find('.av i').text();
+	var max = obj.find('.mx i').text();
+	
+	// avg element style is from 55 to 255px left
+	var percent = 200/(max-min)*(avg-min)+55;
+	obj.find('.av').css('left',percent);
 }
 
 
@@ -317,10 +331,12 @@ $(function(){
 	
 	 $('.inner_buttons a').click(load_target_prices);
 
-	 binds_for_target_price_list();
-
 	 // In analyse page, on document ready, load first property!
 	 $('.analyse_menu div:first-child a').trigger('click');
+	 
+	 binds_for_target_price_list();
+	 calculate_minavgmax_block();
+	 load_more_target_prices();
 });
 
 
@@ -377,14 +393,12 @@ function join_array( array0, array1, array2 ) {
 	}
 }
 
-/**
-  * Scroll
-  */
-$(window).scroll(function() {
-	if ( $(window).scrollTop() + $(window).height() == $(document).height() ) {
 
-		// don't use in inner, analyse page
-		if($('.inner_target_prices').length) { return false; }
+function load_more_target_prices(){
+	// don't use in inner, analyse page
+	if($('.inner_target_prices').length) { return false; }
+	
+	if ( $(window).scrollTop() + $(window).height() >= $(document).height() ) {
 
 		page_number +=1
 		/* Make a query */
@@ -397,4 +411,11 @@ $(window).scroll(function() {
 			binds_for_target_price_list();
 		})
 	}
+}
+
+/**
+  * Scroll
+  */
+$(window).scroll(function() {
+	load_more_target_prices();
 })
