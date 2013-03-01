@@ -66,10 +66,8 @@
 				<input type="text" name="sear" placeholder="Search" />
 				<ul>
 					{% for target in target_prices %}
-					<li name="{{target.analytic.slug}}">{{target.analytic.name}}</li>
+					<li name="{{target.ticker.slug}}">{{target.ticker.long_name}}</li>
 					{% endfor %}
-					<li>Lorem imsum </li>
-					<li>Lorem dipsum</li>
 				</ul>
 			</div>
 		</div>

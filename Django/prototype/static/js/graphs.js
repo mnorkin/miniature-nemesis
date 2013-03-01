@@ -105,6 +105,7 @@ var graphs = (function() {
           graphs.populate(json)
           _data.sort(function(a,b){return a-b});
           graphs.draw_aggressiveness();
+          in_graph_select_active_elements();
 
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -123,6 +124,7 @@ var graphs = (function() {
           graphs.populate(json)
           _data.sort(function(a,b){return b-a});
           graphs.draw_profitability();
+          in_graph_select_active_elements();
 
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -140,6 +142,7 @@ var graphs = (function() {
           graphs.populate(json)
           _data.sort(function(a,b){return a-b});
           graphs.draw_accuracy(phase);
+          in_graph_select_active_elements();
         } else {
           console.log("Error on fetch data: ", error.status)
         }
@@ -157,6 +160,7 @@ var graphs = (function() {
           graphs.populate(json)
           _data.sort(function(a,b){return b-a});
           graphs.draw_reach_time();
+          in_graph_select_active_elements();
 
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -195,6 +199,7 @@ var graphs = (function() {
           _data.sort(function(a,b){return a-b});
           /* Draw the graph */
           graphs.draw_proximity();
+          in_graph_select_active_elements();
         } else {
           console.log("Error on fetch data: ", error.status)
         }
@@ -267,6 +272,7 @@ var graphs = (function() {
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
       .attr('fill', '#c0be81')
       .attr('txt', function(d,i) { return data_proximity[i] + ' %' })
+      .attr('name', function(d,i) {return _slugs[i]} )
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
         var top = h/2+parseFloat(d3.select(this).attr('cy')) - 37
@@ -279,7 +285,9 @@ var graphs = (function() {
         }
       })
       .on("mouseout", function() {
-        d3.select(this).style("fill", "#c0be81");
+        if(d3.select(this).attr('origin_fill') == null){
+          d3.select(this).attr("fill", "#c0be81");
+        }
         graphs.tooltip_hide()
       });
 
@@ -354,6 +362,7 @@ var graphs = (function() {
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
       .attr('fill', '#71859e')
       .attr('txt', function(d,i) { return _data[i] + ' %' })
+      .attr('name', function(d,i) {return _slugs[i]} )
       .on('mouseover', function(d, i) {
         d3.select(this).style("fill", "#e95201")
         var top = h/2+parseFloat(d3.select(this).attr('cy')) - 34
@@ -367,7 +376,9 @@ var graphs = (function() {
       })
       .on("mouseout", function() {
         graphs.tooltip_hide()
-        d3.select(this).style("fill", "#71859e");
+        if(d3.select(this).attr('origin_fill') == null){
+          d3.select(this).style("fill", "#71859e");
+        }
       });
 
       return graphs
@@ -428,9 +439,10 @@ var graphs = (function() {
       .attr('r', 6)
       .attr('fill', '#ac8dc6')
       .attr('txt', function(d,i) { return _data[i] + ' %' })
+      .attr('name', function(d,i) {return _slugs[i]} )
 
       .on('mouseover', function(d, i) {
-        d3.select(this).style("fill", "#e95201")
+        d3.select(this).attr("fill", "#e95201")
         var top = h+parseFloat(d3.select(this).attr('cy')) - 37
         var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
@@ -442,7 +454,9 @@ var graphs = (function() {
       })
       .on("mouseout", function() {
         graphs.tooltip_hide()
-        d3.select(this).style("fill", "#91bcc5");
+        if(d3.select(this).attr('origin_fill') == null){
+          d3.select(this).attr("fill", "#ac8dc6");
+        }
       })
       .attr("transform", translate);
         
@@ -623,6 +637,7 @@ var graphs = (function() {
         .attr('stroke-width', 1)
         .attr("stroke", "#fff")
         .attr('fill', '#8dc6b3')
+        .attr('name', function(d,i) {return _slugs[i]} )
         .on("mouseover", function(d, i) {
           d3.select(this).attr("fill", "#e95201")
           var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator')))+angle_scale(parseFloat(d3.select(this).attr('enumerator'))+1))/2-pi
@@ -637,7 +652,9 @@ var graphs = (function() {
           }
         })
         .on("mouseout", function() {
-          d3.select(this).attr("fill", "#8dc6b3")
+          if(d3.select(this).attr('origin_fill') == null){
+            d3.select(this).attr("fill", "#8dc6b3")
+          }
           graphs.tooltip_hide()
         })
         .attr('txt', function(d) { return d+"%" })
@@ -734,9 +751,9 @@ var graphs = (function() {
       .attr('r', 6)
       .attr('fill', '#91bcc5')
       .attr('txt', function(d,i) { return _data[i] + ' %' })
-
+      .attr('name', function(d,i) {return _slugs[i]} )
       .on('mouseover', function(d, i) {
-        d3.select(this).style("fill", "#e95201")
+        d3.select(this).attr("fill", "#e95201")
         var top = h+parseFloat(d3.select(this).attr('cy')) - 37
         var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
@@ -747,7 +764,9 @@ var graphs = (function() {
         }
       })
       .on("mouseout", function() {
-        d3.select(this).style("fill", "#91bcc5");
+        if(d3.select(this).attr('origin_fill') == null){
+          d3.select(this).attr("fill", "#91bcc5");
+        }
         graphs.tooltip_hide()
       })
       .attr("transform", translate);

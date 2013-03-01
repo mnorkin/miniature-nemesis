@@ -313,8 +313,8 @@ function calculate_minavgmax_block(){
 	var avg = obj.find('.av i').text();
 	var max = obj.find('.mx i').text();
 	
-	// avg element style is from 55 to 255px left
-	var percent = 200/(max-min)*(avg-min)+55;
+	// avg element style is from 55 to 250px left
+	var percent = 195/(max-min)*(avg-min)+55;
 	obj.find('.av').css('left',percent);
 }
 
@@ -357,8 +357,39 @@ function in_graph_click(){
 }
 
 function in_graph_entry_click(){
-	$(this).toggleClass('active');
+	var obj = $(this);
+	var name = obj.attr('name');
+	var svg_element = $('#chart svg [name='+name+']');
+
+	if(obj.hasClass('active')){
+
+		obj.removeClass('active');
+		svg_element.attr('fill', svg_element.attr('origin_fill') );
+		svg_element.removeAttr('origin_fill')
+	}else{
+
+		obj.addClass('active');
+		svg_element.attr('origin_fill', svg_element.attr('fill'));
+		svg_element.attr('fill', '#e95201');
+	}
 }
+
+function in_graph_select_active_elements(){
+	var list = $('.in_graph .sear li');
+	var obj, name, svg_element;
+
+	list.each(function(){
+		obj = $(this);
+		name = obj.attr('name');
+		svg_element = $('#chart svg [name='+name+']');
+
+		if(obj.hasClass('active')){
+			svg_element.attr('origin_fill', svg_element.attr('fill'));
+			svg_element.attr('fill', '#e95201');
+		}
+	})
+}
+
 
 function get_inner( object ) {
 	var i, n = object.length;
