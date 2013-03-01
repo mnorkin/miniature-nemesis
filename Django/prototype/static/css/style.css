@@ -775,6 +775,7 @@ li{ list-style: none; }
     width: 36px;
     height: 34px;
     position: absolute;
+    z-index: 2;
     right: -38px;
     top:0;
     cursor:pointer;
@@ -945,7 +946,7 @@ li{ list-style: none; }
 
 #chart{
     width: 750px;
-    height: 650px;
+    height: 550px;
     margin-left: 230px;
     position: relative;
     top:0px;
@@ -956,13 +957,16 @@ li{ list-style: none; }
 }
 
 #chart.profitability{
-    top:-26px;
-    left: -15px;
+    height: 550px;
+    left: -13px;
 }
 #chart.reach_time{
+    left:-28px;
     height: 550px;
-    top:-32px;
-    left:-27px;
+}
+#chart.accuracy{
+    height: 425px;
+    top:-10px;
 }
 
 #chart .bar_tooltip {

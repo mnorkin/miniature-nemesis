@@ -43,25 +43,6 @@
 		<div class="info_box"></div>
 	</div>
 	
-	<div style="display: none;">
-		Valid target prices
-		{# List of all valid target prices #}
-		{% if target_prices %}
-			<ul>
-				{% for target in target_prices %}
-					<li>{{ target.ticker }} on {{ target.date }} {{ target.price }}$</li>
-					{% if target.fap %}
-						<ul>
-							{% for feature in target.fap %}
-								<li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li>
-							{% endfor %}
-						</ul>
-					{% endif %}
-				{% endfor %}
-			</ul>
-		{% endif %}
-	</div>
-	
 	<div class="analyser">
 		<ul class="bank" id="bank">
 			{% for target in target_prices %}
@@ -81,15 +62,10 @@
 				<input type="text" name="sear" placeholder="Search" />
 				<ul>
 					{% for target in target_prices %}
-						<li><a href="{{ target.ticker.get_absolute_url }}" name="{{target.ticker.long_name}}">{{ target.ticker.long_name }}</a></li>
+					<li name="{{target.analytic.slug}}">{{target.analytic.name}}</li>
 					{% endfor %}
-					<li>Lom imsum 9</li>
-					<li class="active">Lorem sum 4</li>
-					<li class="active">Lorem imsum 1</li>
-					<li>Lorem imsum 41</li>
 					<li>Lorem imsum </li>
-					<li>Loresrghum 1</li>
-					<li>Lorem imsum 8</li>
+					<li>Lorem dipsum</li>
 				</ul>
 			</div>
 		</div>

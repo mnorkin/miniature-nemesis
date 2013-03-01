@@ -380,6 +380,10 @@ function join_array( array0, array1, array2 ) {
   */
 $(window).scroll(function() {
 	if ( $(window).scrollTop() + $(window).height() == $(document).height() ) {
+
+		// don't use in inner, analyse page
+		if($('.inner_target_prices').length) { return false; }
+
 		page_number +=1
 		/* Make a query */
 		_url = "/page/" + page_number + "/"
