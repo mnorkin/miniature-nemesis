@@ -203,7 +203,9 @@ function open_graph(){
 	$('.analyse_menu a').removeClass('active');
 	obj.addClass('active');
 	// show first target price
-	$('#bank li:first-child').removeClass('passive').addClass('active');
+	if($('#bank li.active').length == 0){
+		$('#bank li:first-child').addClass('active').removeClass('passive');
+	}	
 	// info box content
 	$('.info_box').html( obj.siblings('div').html() );
 
