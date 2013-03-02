@@ -33,7 +33,7 @@ var graphs = (function() {
 
     topbar_show: function(slug) {
       active_topbar = slug;
-      d3.select(".bank li[name='"+slug+"']").style('background', '#FAFAFA').transition().duration(300).style('background', '#fff').attr('class', 'active')
+      d3.select(".bank li[name='"+slug+"']").attr('class', 'active').style('background-color', '#FAFAFA').transition().duration(300).style('background-color', '#fff')
     },
 
     topbar_hide: function() {
@@ -274,7 +274,7 @@ var graphs = (function() {
       .attr('txt', function(d,i) { return data_proximity[i] + ' %' })
       .attr('name', function(d,i) {return _slugs[i]} )
       .on('mouseover', function(d, i) {
-        d3.select(this).style("fill", "#e95201")
+        d3.select(this).attr("fill", "#e95201")
         var top = h/2+parseFloat(d3.select(this).attr('cy')) - 37
         var left = w/2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')

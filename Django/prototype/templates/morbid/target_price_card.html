@@ -7,8 +7,8 @@
   <a class="analytic">{{ target.analytic }}</a>
   <span class="price">{{ target.price|cut:".0" }}</span>
 
-  <span id="{{ target.analytic.slug}}_{{ target.ticker.slug }}" class="circle {% if target.change < 0 %}down{% elif target.change >= 0 %}up{% endif %}">
-    <strong>{{ target.change|floatformat:1|cut:"-" }}%</strong>
+  <span id="{{ target.analytic.slug}}_{{ target.ticker.slug }}" class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
+    <strong>{{ target.change|floatformat:1|cut:"-"|cut:".0" }}%</strong>
   </span>
 
   <script type="text/javascript">

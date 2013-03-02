@@ -1,10 +1,12 @@
-from django.db import models
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.contrib.auth import models as auth_models
-from django.contrib.auth.models import User
-from django.contrib.auth.management import create_superuser
-from django.db.models import signals
+from django.db import models # Model description
+from django.core.urlresolvers import reverse # Anchor formation
+from django.conf import settings # Settings
+from django.contrib.auth import models as auth_models # Authentication
+from django.contrib.auth.models import User # User manager
+from django.contrib.auth.management import create_superuser # Superuser manager
+from django.db.models import signals # Signal handling
+import hashlib # For generation of unique string
+import time # For random generation of string
 
 signals.post_syncdb.disconnect(
 	create_superuser,
@@ -170,6 +172,9 @@ class FeatureAnalyticTicker(models.Model):
 	ticker = models.ForeignKey(Ticker)
 	"""The Ticker on which the feature was calculated
 	   @type: L{Ticker}"""
+
+	def hash(self):
+		return hashlib.sha224( self.feature.slug + self.analytic.slug + self.ticker.slug + str(time.time()) ).hexdigest()
 
 	def __unicode__(self):
 		"""

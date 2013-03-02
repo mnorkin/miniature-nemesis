@@ -228,7 +228,12 @@ function load_target_prices(){
 	            $('.inner_target_prices').load(url, function(){
 	            	$(this).removeClass('hidden');
 	                $(this).animate({'opacity':1}, 100);
-	                binds_for_target_price_list();
+	                // loaded fresh content, might need to change type to list
+	                if(list_type == 'list'){
+	                	list_type = 'grid';	change_target_prices_list();
+	                }else{
+	                	binds_for_target_price_list();
+	                }
 	            });
 	        });
         // sets Analysis html back from container
@@ -274,6 +279,7 @@ function change_target_prices_list(){
 	// new content, bind again
 	binds_for_target_price_list();
 	load_more_target_prices();
+	scroll_style_elements();
 }
 
 
@@ -283,12 +289,16 @@ function binds_for_target_price_list(){
 	 	var obj = $(this);
 	 	var chart = obj.closest('.chart');
 	 	var tooltip = chart.children('.bar_tooltip');
-	 	
+	 	tooltip.text(obj.attr('txt'));
+
+	 	var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
+
  		var top = obj.offset().top - chart.offset().top - 3;
- 		var left = obj.offset().left -chart.offset().left + parseInt(obj.attr('width')) -4; 
+ 		var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - tooltip.width(), 
+ 							obj.offset().left - chart.offset().left + parseInt(obj.attr('width')) -4); 
 
 	 	tooltip.fadeIn(100);
-	 	tooltip.text(obj.attr('txt')).css({top:top,left:left});
+	 	tooltip.css({top:top,left:left});
 	 }, function(){});
 
 	 $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); });
@@ -337,6 +347,7 @@ $(function(){
 	 binds_for_target_price_list();
 	 calculate_minavgmax_block();
 	 load_more_target_prices();
+	 scroll_style_elements();
 });
 
 
@@ -427,6 +438,15 @@ function join_array( array0, array1, array2 ) {
 /**
   * Scroll
   */
+function scroll_style_elements(){
+	// compare and date buttons
+	var target_prices = $('#target-price-list');
+	if(target_prices.length){
+		var btn_top = Math.max(32, $(window).scrollTop() - target_prices.offset().top + 32);
+		$('.latest_target_prices .toggle, .latest_target_prices .now').css({'top':btn_top})
+	}
+
+}
 
 function load_more_target_prices(){
 	// don't use in inner, analyse page
@@ -452,4 +472,9 @@ function load_more_target_prices(){
   */
 $(window).scroll(function() {
 	load_more_target_prices();
+	scroll_style_elements();
 })
+
+
+/** Internet Explorer save console.log() */
+if(typeof(console)=="undefined"){var console={log:function(){}};}

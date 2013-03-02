@@ -390,6 +390,7 @@ li{ list-style: none; }
     height: 48px;
     position: relative;
     cursor: pointer;
+    border: 1px solid transparent;
 }
 .title.list .entry:nth-child(odd){
     background: #fff;
@@ -427,7 +428,6 @@ li{ list-style: none; }
 }
 
 .title.list .circle{
-    color:#e42020;
     font-size: 16px;
     font-weight: bold;
     margin: 8px 0 0px 0px;
@@ -439,6 +439,7 @@ li{ list-style: none; }
     border-right: 1px solid #f4eee8;
     text-align: center;
     position: relative;
+    color:#c2d859;
 }
 .title.list .circle strong{
     margin-left: 8px;
@@ -446,8 +447,8 @@ li{ list-style: none; }
     display: inline-block;
     text-align: center;
 }
-.title.list .circle.up{
-    color:#c2d859;
+.title.list .circle.down{
+    color:#e42020;
 }
 
 .title.list .circle.down strong:before{

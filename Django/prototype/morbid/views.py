@@ -46,10 +46,7 @@ def index(request, page=0):
 		
 	t = loader.get_template('morbid/index.html')
 
-	if 'ptype' in request.GET:
-		ptype = request.GET['ptype']
-	else:
-		ptype = 'grid'
+	date = datetime.today();
 
 	if page == 0:
 		extends_template = 'morbid/base.html'
@@ -59,7 +56,7 @@ def index(request, page=0):
 	c = Context({
 		'latest_target_prices' : target_price_list,
 		'extends_template': extends_template,
-		'ptype' : ptype
+		'date' : date
 	})
 
 	return HttpResponse(t.render(c))
@@ -186,11 +183,14 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
 	else:
 		raise Http404
 
+	date = datetime.today();
+
 
 	t = loader.get_template('morbid/target_prices.html')
 
 	c = Context({
 		'target_prices' : target_price_list,
+		'date' : date
 	})
 
 	return HttpResponse(t.render(c))
