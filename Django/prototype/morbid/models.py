@@ -1,22 +1,21 @@
-from django.db import models # Model description
-from django.core.urlresolvers import reverse # Anchor formation
-from django.conf import settings # Settings
-from django.contrib.auth import models as auth_models # Authentication
-from django.contrib.auth.models import User # User manager
-from django.contrib.auth.management import create_superuser # Superuser manager
-from django.db.models import signals # Signal handling
-import hashlib # For generation of unique string
-import time # For random generation of string
+from django.db import models  # Model description
+from django.conf import settings  # Settings
+from django.contrib.auth import models as auth_models  # Authentication
+from django.contrib.auth.models import User  # User manager
+from django.contrib.auth.management import create_superuser  # Superuser manager
+from django.db.models import signals  # Signal handling
+import time  # For random generation of string
+import string  # String lib for alphabet
 
 signals.post_syncdb.disconnect(
 	create_superuser,
 	sender=auth_models,
 	dispatch_uid='django.contrib.auth.management.create_superuser')
 
+
+
 class Unit(models.Model):
-	"""
-	The units of the feature
-	"""
+	""" The units of the feature """
 
 	name = models.CharField(max_length=200)
 	"""Name of the unit of measure
@@ -174,7 +173,9 @@ class FeatureAnalyticTicker(models.Model):
 	   @type: L{Ticker}"""
 
 	def hash(self):
-		return hashlib.sha224( self.feature.slug + self.analytic.slug + self.ticker.slug + str(time.time()) ).hexdigest()
+		all_letters = string.lowercase
+		time_hash = "".join([all_letters[int(letter)] for letter in str(time.time()).replace('.', '')])
+		return self.feature.slug + self.analytic.slug + self.ticker.slug + time_hash
 
 	def __unicode__(self):
 		"""
