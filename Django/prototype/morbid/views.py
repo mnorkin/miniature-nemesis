@@ -71,6 +71,8 @@ def ticker(request, slug):
 	@return: Http Response. If the Ticker was not found -- rises the 404 error
 	"""
 
+	ticker = Ticker()
+
 	try:
 		ticker = Ticker.objects.get(slug=slug)
 	except ticker.DoesNotExist:

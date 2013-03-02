@@ -2,94 +2,89 @@ import database
 import rest
 import utils
 
+
 class Analytics:
-  """
-  Analytic object
-  """
-
-  def fetch(self,analytic=None):
     """
-    Fetching analytics data to the server
-
-    If analytic is defined -- sending the data of specific analytic
+    Analytic object
     """
 
-    if not analytic:
-      for analytic in database.get_analytics():
-        analytic_data = self.collect(analytic)
-        if analytic_data and not self.send(analytic_data):
-          return False
-          """If there was error at any step -- return"""
-      return True
-      """If everything was ok -- return true"""
-    else:
-      """
-      Get specific analytic data and parse it to the front-end
-      """
-      analytic_data = self.collect(analytic)
-      if analytic_data and self.send(analytic_data):
-        return True
-        """If everything was okay -- return true"""
-      else:
-        return False
-        """If something went wrong -- return false"""
+    def fetch(self, analytic=None):
+        """
+        Fetching analytics data to the server
 
-      
-  def collect(self,analytic=None):
-    """
-    Method to collect analytic data
-    """
-    if analytic:
-      analytic_stats = database.get_analytic(analytic)
-      analytic_data = database.get_analytics(analytic)
-      number_of_companies = analytic_stats['number_of_companies']
-      number_of_tp = 0
-      last_target_price = analytic_stats['last_target_price']
-      volatility_positive = analytic_stats['volatility_positive']
-      volatility_negative = analytic_stats['volatility_negative']
-      slug = utils.slugify(str(analytic))
-      for ticker in database.get_tickers(analytic):
-        # Get all the tickers
-        number_of_companies = number_of_companies + 1
-        for targetprice in database.get_targetprices(analytic, ticker):
-          number_of_tp = number_of_tp + 1
+        If analytic is defined -- sending the data of specific analytic
+        """
 
-          if last_target_price == 0:
-            last_target_price = targetprice['price']
-
-      data = {'name': analytic.replace('"',''),
-        'number_of_companies': number_of_companies, 
-        'number_of_tp': number_of_tp,
-        'last_target_price': last_target_price,
-        'volatility_positive': volatility_positive,
-        'volatility_negative': volatility_negative,
-        'slug': slug}
-
-      return data
-    else:
-      return None
-
-  def send(self,data=None):
-    """
-    Method to send analytic data
-    """
-
-    if data:
-      if rest.send("POST","/api/analytics/", data):
-        """Trying to send POST"""
-        if utils.DEBUG:
-          print "Analytic data create"
-        return True
-      else:
-        if rest.send("PUT","/api/analytics/", data):
-          """Trying to send PUT"""
-          if utils.DEBUG:
-            print "Analytic data update"
-          return True
+        if not analytic:
+            for analytic in database.get_analytics():
+                analytic_data = self.collect(analytic)
+                if analytic_data and not self.send(analytic_data):
+                    return False
+                """If there was error at any step -- return"""
+            return True
+            """If everything was ok -- return true"""
         else:
-          # Literally, something should be wrong on front-end side, if this does not work
-          if utils.DEBUG:
-            print "Analytic data update fail, nothing else to try"
-          return False
-    else:
-      return False
+            """
+            Get specific analytic data and parse it to the front-end
+            """
+            analytic_data = self.collect(analytic)
+            if analytic_data and self.send(analytic_data):
+                return True
+                """If everything was okay -- return true"""
+            else:
+                return False
+                """If something went wrong -- return false"""
+
+    def collect(self, analytic=None):
+        """
+        Method to collect analytic data
+        """
+        if analytic:
+            analytic_stats = database.get_analytic(analytic)
+            analytic_data = database.get_analytics(analytic)
+            number_of_companies = analytic_stats['number_of_companies']
+            number_of_tp = analytic_data['number_of_tp']
+            last_target_price = analytic_stats['last_target_price']
+            volatility_positive = analytic_stats['volatility_positive']
+            volatility_negative = analytic_stats['volatility_negative']
+            slug = utils.slugify(str(analytic))
+
+            for ticker in database.get_tickers(analytic):
+                # Get all the tickers
+                number_of_companies = number_of_companies + 1
+                for targetprice in database.get_targetprices(analytic, ticker):
+                    number_of_tp = number_of_tp + 1
+
+                    if last_target_price == 0:
+                        last_target_price = targetprice['price']
+
+            data = {
+                'name': analytic.replace('"', ''),
+                'number_of_companies': number_of_companies,
+                'number_of_tp': number_of_tp,
+                'last_target_price': last_target_price,
+                'volatility_positive': volatility_positive,
+                'volatility_negative': volatility_negative,
+                'slug': slug
+            }
+
+            return data
+        else:
+            return None
+
+    def send(self, data=None):
+        """
+        Method to send analytic data
+        """
+
+        if data:
+            if rest.send("POST", "/api/analytics/", data):
+                return True
+            else:
+                if rest.send("PUT", "/api/analytics/", data):
+                    return True
+                else:
+                    # Literally, something should be wrong on front-end side, if this does not work
+                    return False
+        else:
+            return False
