@@ -167,14 +167,14 @@ li{ list-style: none; }
     position: relative;
     text-align: left;
     overflow: hidden;
-    height: 16px;
+    height: 18px;
 }
 .title .entry .ticket .ln span{
     display: inline-block;
     position: relative;
     top:0;
     left: 0px;
-    height: 16px;
+    height: 18px;
     width: 500px;
 }
 .title .entry .ticket .sn{
