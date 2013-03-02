@@ -18,9 +18,9 @@
   <ul class="bar">
     {% for fap in target.fap %}
     
-    <li id="{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}" class="feature"><span>{{fap.feature.name}}</span></li>
+    <li id="{{ fap.hash }}" class="feature"><span>{{fap.feature.name}}</span></li>
     <script type="text/javascript">
-    generate_grid_element( "{{ fap.feature.slug }}_{{ fap.analytic.slug }}_{{ fap.ticker.slug }}", "{{ fap.value|cut:'.0' }}", "{{fap.feature.slug}}" )
+    generate_grid_element( "{{ fap.hash }}", "{{ fap.value|cut:'.0' }}", "{{fap.feature.slug}}" )
     </script>
     {% endfor %}
   </ul>
