@@ -1,15 +1,6 @@
 #!/usr/bin/python2
 """
-App logic
-
-Then the new target price comes by, filter all the old ones and calculate all the features by standart technique.
-
-TODO:
-* Make a trigger for the app to fetch the target price data (this thing needs all the data available from the database on specific stock)
-* Pass all the data from the trigger to this app (done)
-* Get the stock data from the yahoo (done)
-* Calculate what is needed (done)
-* Pass the arguments with the feature identification to the main database (done)
+Main application
 """
 
 import datetime

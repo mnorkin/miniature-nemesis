@@ -17,16 +17,17 @@ feature_handler = Resource(FeatureHandler)
 unit_handler = Resource(UnitHandler)
 apikey_handler = Resource(ApiKeyHandler)
 
-urlpatterns = patterns('',
-  url(r'^feature_analytic_tickers/$', feature_analytic_ticker_handler),
-  url(r'^analytics/$', analytic_handler),
-  url(r'^analytics/(?P<analytic_slug>[^/]+)/$', analytic_handler),
-  url(r'^tickers/$', ticker_handler),
-  url(r'^tickers/(?P<ticker_slug>[^/]+)/$', ticker_handler),
-  url(r'^target_prices/$', target_price_handler),
-  url(r'^target_prices/(?P<target_price_id>\d+)/$', target_price_handler),
-  url(r'^features/$', feature_handler),
-  url(r'^features/(?P<feature_id>\d+)/$', feature_handler),
-  url(r'^units/$', unit_handler),
-  url(r'^apikeys/', apikey_handler)
+urlpatterns = patterns(
+    '',
+    url(r'^feature_analytic_tickers/$', feature_analytic_ticker_handler),
+    url(r'^analytics/$', analytic_handler),
+    url(r'^analytics/(?P<analytic_slug>[^/]+)/$', analytic_handler),
+    url(r'^tickers/$', ticker_handler),
+    url(r'^tickers/(?P<ticker_slug>[^/]+)/$', ticker_handler),
+    url(r'^target_prices/$', target_price_handler),
+    url(r'^target_prices/(?P<target_price_id>\d+)/$', target_price_handler),
+    url(r'^features/$', feature_handler),
+    url(r'^features/(?P<feature_id>\d+)/$', feature_handler),
+    url(r'^units/$', unit_handler),
+    url(r'^apikeys/', apikey_handler)
 )
