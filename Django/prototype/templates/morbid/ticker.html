@@ -2,11 +2,11 @@
 
 
 {% block sidebar %}
-  <div class="inner">
+	<div class="inner">
         <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
         <div class="search">
             <form action="" method="get">
-                <input type="text" name="q" value="" class="inp-s" id="search_inp" onkeyup="process_search(this, event)"  />
+                <input type="text" name="q" value="" autocomplete="off" class="inp-s" id="search_inp" onkeyup="process_search(this, event)"  />
                 <input type="submit" value="Search" class="sub-s" onclick="process_search(this, event)"  />
                 <ul class="search_res"></ul>
             </form>
@@ -35,7 +35,7 @@
 	</ul>
 	
 	<div class="inner_buttons">
-		<a href="/ticker/target_prices/{{ ticker.slug }}/" class=" ta">Target prices</a>
+		<a href="/ticker/target_prices/{{ ticker.slug }}/" class="ta">Target prices</a>
 		<a href="" class="active an">Analysis</a>
 		<br class="clear" />
 		<div class="line"></div>
@@ -49,25 +49,21 @@
 				<div>
 					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" class="{{ feature.slug }}">{{ feature.name }}</a>
 					<span></span>
+					<div class="info_box_content">
+						{% autoescape off %}{{feature.description}}{% endautoescape %}
+						{% if feature.slug != 'profitability' %}<img src="/static/images/mini_graphs/{{feature.slug}}.png">{% endif %}
+					</div>
 				</div>
 			{% endfor %}
 		</div>
-		
-		<div class="info_box">
-			<strong>Lorem ipsum dolor</strong> sit amet, consectetur adipiscing elit. 
-			Suspendisse commodo scelerisque dolor, eget feugiat ligula commodo nec. 
-			Aliquam neque arcu, faucibus id consequat vel, egestas tempus turpis.
-			Morbi ac aliquet leo. Maecenas commodo est vel velit dictum at vestibulum tortor commodo. 
-			Sed tempus justo a tortor dapibus vestibulum. Phasellus consequat mi aliquet tellus auctor
-		 	dapibus. Aenean eu tincidunt purus. Aenean sit amet ligula quis arcu condimentum porta.
-		</div>
+		<div class="info_box"></div>
 	</div>
 	
 	<div class="analyser">
 		<ul class="bank" id="bank">
 			{% for target in target_prices %}
 				<li name="{{ target.analytic.slug }}" class="passive">
-					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }}</a></span> 
+					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }} </a></span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
 					<span class="number">{{ target.analytic.number_of_tp }}<strong>No of target prices</strong> </span>
@@ -88,25 +84,18 @@
 			<div class="sear">
 				<input type="text" name="sear" placeholder="Search" />
 				<ul>
-					<li>Lorem imsum </li>
-					<li>Lorem imsum 8</li>
-					<li>Lom imsum 9</li>
-					<li class="active">Lorem sum 4</li>
-					<li class="active">Lorem imsum 1</li>
-					<li>Lorem imsum 41</li>
-					<li>Lorem ims 3</li>
-					<li>Lorem imsrghum 1</li>
-					<li>Lorem imsum </li>
-					<li>Loresrghum 1</li>
-					<li>Lorem imsum 8</li>
+					{% for target in target_prices %}
+					<li name="{{target.analytic.slug}}">{{target.analytic.name}}</li>
+					{% endfor %}
 				</ul>
 			</div>
 		</div>
 	</div>
 	<div id="chart" class="graph"></div>
-
+	
 	<br class="clear" />
 	</div>
+	<div class="inner_target_prices hidden"></div>
 
 	{% endif %}
 {% endblock %}

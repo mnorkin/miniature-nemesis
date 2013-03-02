@@ -5,8 +5,9 @@
         <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
         <div class="search">
             <form action="" method="get">
-                <input type="text" name="q" value="" class="inp-s" />
-                <input type="submit" value="Search" class="sub-s"/>
+                <input type="text" name="q" value="" autocomplete="off" class="inp-s" id="search_inp" onkeyup="process_search(this, event)"  />
+                <input type="submit" value="Search" class="sub-s" onclick="process_search(this, event)"  />
+                <ul class="search_res"></ul>
             </form>
         </div>
     </div>
@@ -14,7 +15,6 @@
 
 
 {% block content %}
-
 {% if analytic %}
 
 	<ul class="corp_info analytic">
@@ -23,54 +23,35 @@
 		<li class="thirteen"><strong>{{ analytic.number_of_tp }}</strong> Active target prices</li>
 	</ul>
 
-
 	<div class="inner_buttons">
-			<a href="" class=" ta">Target prices</a>
+			<a href="/analytic/target_prices/{{ analytic.slug }}/" class=" ta">Target prices</a>
 			<a href="" class="active an">Analysis</a>
 			<br class="clear" />
 			<div class="line"></div>
 	</div>
 
-	
+	<div class="inner_content">
 	<div class="left">
 		<div class="analyse_menu">
 			{% for feature in features %}
 			<div>
-				<a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" name="{{ feature.name }}">{{ feature.name }}</a>
+				<a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" class="{{ feature.slug }}">{{ feature.name }}</a>
 				<span></span>
+				<div class="info_box_content">
+					{% autoescape off %}{{feature.description}}{% endautoescape %}
+					{% if feature.slug != 'profitability' %}<img src="/static/images/mini_graphs/{{feature.slug}}.png">{% endif %}
+				</div>
 			</div>
 			{% endfor %}
 		</div>
-		<div class="info_box">
-			Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-			Suspendisse commodo scelerisque dolor, eget feugiat ligula commodo nec. 
-		</div>
-	</div>
-	
-	<div style="display: none;">
-		Valid target prices
-		{# List of all valid target prices #}
-		{% if target_prices %}
-			<ul>
-				{% for target in target_prices %}
-					<li>{{ target.ticker }} on {{ target.date }} {{ target.price }}$</li>
-					{% if target.fap %}
-						<ul>
-							{% for feature in target.fap %}
-								<li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li>
-							{% endfor %}
-						</ul>
-					{% endif %}
-				{% endfor %}
-			</ul>
-		{% endif %}
+		<div class="info_box"></div>
 	</div>
 	
 	<div class="analyser">
-		<ul class="bank">
+		<ul class="bank" id="bank">
 			{% for target in target_prices %}
-				<li>
-					<span class="corp">{{ target.analytic }}</span> 
+				<li name="{{ target.ticker.slug }}" class="passive">
+					<span class="corp"><a href="{{target.ticker.get_absolute_url}}">{{ target.ticker }}</a></span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
 					<span class="number">35.1<strong>No of target prices</strong> </span>
@@ -85,20 +66,16 @@
 				<input type="text" name="sear" placeholder="Search" />
 				<ul>
 					{% for target in target_prices %}
-						<li><a href="{{ target.ticker.get_absolute_url }}" name="{{target.ticker.long_name}}">{{ target.ticker.long_name }}</a></li>
+					<li name="{{target.ticker.slug}}">{{target.ticker.long_name}}</li>
 					{% endfor %}
-					<li>Lom imsum 9</li>
-					<li class="active">Lorem sum 4</li>
-					<li class="active">Lorem imsum 1</li>
-					<li>Lorem imsum 41</li>
-					<li>Lorem imsum </li>
-					<li>Loresrghum 1</li>
-					<li>Lorem imsum 8</li>
 				</ul>
 			</div>
 		</div>
 		<br class="clear" />
 	</div>
+	<div id="chart" class="graph"></div>
+	</div>
+	<div class="inner_target_prices hidden"></div>
 	
 	<br class="clear" />
 

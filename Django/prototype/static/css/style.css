@@ -167,14 +167,14 @@ li{ list-style: none; }
     position: relative;
     text-align: left;
     overflow: hidden;
-    height: 14px;
+    height: 16px;
 }
 .title .entry .ticket .ln span{
     display: inline-block;
     position: relative;
     top:0;
     left: 0px;
-    height: 14px;
+    height: 16px;
     width: 500px;
 }
 .title .entry .ticket .sn{
@@ -189,10 +189,11 @@ li{ list-style: none; }
 .title.list .entry .ticket .sn{
     position: absolute;
     top:1px;
-    right: 0px;
+    right: 4px;
     left: auto;
     width: 40px;
     padding-left: 23px;
+    text-align: center;
 }
 .title .entry  .goust{
     visibility: hidden;
@@ -399,7 +400,7 @@ li{ list-style: none; }
     color:#444444;
     margin: 8px 0 0px 12px;
     height:32px;
-    width:168px;
+    width:172px;
     display: block;
     float:left;
     font-weight: bold;
@@ -418,7 +419,7 @@ li{ list-style: none; }
     margin: 8px 0 0px 0px;
     padding-top:5px;
     height:26px;
-    width:76px;
+    width:72px;
     display: block;
     float:left;
     border-right: 1px solid #f4eee8;
@@ -592,7 +593,7 @@ li{ list-style: none; }
     margin: 21px 5px 21px 20px;
     overflow-x:hidden;
     white-space: nowrap;
-    width: 225px;
+    width: 240px;
 }
 
 .corp_info .price{
@@ -621,7 +622,6 @@ li{ list-style: none; }
 
 .corp_info .number{
     font-size: 22px;
-    letter-spacing:-2px;
     font-weight: bolder;    
     padding-top: 11px;
     padding: 11px 0px 0px 40px;
@@ -670,17 +670,27 @@ li{ list-style: none; }
     font-weight: bold;
     color:#444444;
 }
+.corp_info.analytic{
+    display: table;
+    width: 100%;
+}
 .corp_info.analytic > li{
     width: 300px;
+    display: table-cell;
+    vertical-align: middle;
+    margin: 0px;
+    padding: 0 0 0 20px;
+    height: 100%;
+    float: none;
 }
 .corp_info .thirteen{
     font-size: 14px;
     color:#b78f65;
-    padding: 17px 17px;
+    padding: 18px 17px;
     border-left: 1px solid #e7e0da;
 }
 .corp_info .thirteen strong{
-    font-size: 24px;
+    font-size: 20px;
     color:#444444;
 }
 
@@ -756,13 +766,19 @@ li{ list-style: none; }
     color:#fff;
     box-shadow: inset 0 0 10px #ac460f;
 }
+.analyse_menu div.info_box_content{
+    display: none;
+}
 
-.analyse_menu div:nth-child(2n) span{
+.analyse_menu div.can_compare span{
     background: url('../images/merge_graph_1.png') 50% 50% no-repeat #fff;
     border:1px solid #f4eee8;
+    border-left:0;
+    box-shadow: 7px 0px 25px -11px #dcd9d8 inset;
     width: 36px;
     height: 34px;
     position: absolute;
+    z-index: 2;
     right: -38px;
     top:0;
     cursor:pointer;
@@ -772,7 +788,7 @@ li{ list-style: none; }
     display: inline-block;
     position: absolute;
     width: 22px;
-    height: 35px;
+    height: 24px;
     background-image: url('../images/property_icons_3.png');
     background-repeat: no-repeat;
     background-position: -26px 0px;
@@ -781,12 +797,17 @@ li{ list-style: none; }
 }
 .analyse_menu a.accuracy:before{ background-position: -26px 0px; }
 .analyse_menu a.accuracy.active:before{ background-position: 0px 0px; }
-.analyse_menu a.closeness:before{ background-position: -26px -38px; }
-.analyse_menu a.closeness.active:before{ background-position: 0px -38px; }
+.analyse_menu a.proximity:before{ background-position: -26px -38px; }
+.analyse_menu a.proximity.active:before{ background-position: 0px -38px; }
 .analyse_menu a.profitability:before{ background-position: -26px -72px; }
 .analyse_menu a.profitability.active:before{ background-position: 0px -72px; }
+
 .analyse_menu a.reach_time:before{ background-position: -26px -142px; }
 .analyse_menu a.reach_time.active:before{ background-position: 0px -142px; }
+.analyse_menu a.impact_to_market:before{ background-position: -26px -176px; }
+.analyse_menu a.impact_to_market.active:before{ background-position: 0px -176px; }
+.analyse_menu a.aggressiveness:before{ background-position: -26px -105px; top:8px }
+.analyse_menu a.aggressiveness.active:before{ background-position: 0px -105px; top:8px }
 
 
 .analyser{
@@ -845,6 +866,7 @@ li{ list-style: none; }
     position: absolute;
     width:177px;
     right: 0;
+    z-index: 1;
 }
 .in_graph button{
     background: url('../images/analyse_1.png') 16px 50% no-repeat #e95200;
@@ -918,14 +940,21 @@ li{ list-style: none; }
     line-height: 18px;
 }
 .info_box strong{
-    color: #b78f65;
+    color: rgb(194, 166, 137);
+}
+.info_box img{
+    margin: 0 auto;
+    display: block;
+    padding-top: 15px;
 }
 
 #chart{
     width: 750px;
-    height: 650px;
+    height: 550px;
     margin-left: 230px;
     position: relative;
+    top:0px;
+    left:0px;
 }
 #chart svg{
     position: relative;
@@ -933,22 +962,22 @@ li{ list-style: none; }
 
 #chart.profitability{
     height: 550px;
+    left: -13px;
 }
 #chart.reach_time{
+    left:-28px;
     height: 550px;
 }
-
-#chart.profitability svg{
-    top:-25px;
-    left:-15px;
+#chart.accuracy{
+    height: 425px;
+    top:-10px;
 }
-#chart.accuracy svg{
-    top:0px;
-    left:0px;
+#chart.aggressiveness{
+    top:25px;
+    height: 620px;
 }
-#chart.reach_time svg{
-    top:-20px;
-    left:-28px;
+#chart.proximity{
+    top:25px;
 }
 
 #chart .bar_tooltip {
