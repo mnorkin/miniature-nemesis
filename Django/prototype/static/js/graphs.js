@@ -33,7 +33,7 @@ var graphs = (function() {
 
     topbar_show: function(slug) {
       active_topbar = slug;
-      d3.select(".bank li[name='"+slug+"']").style('background', '#FAFAFA').transition().duration(300).style('background', '#fff').attr('class', 'active')
+      d3.select(".bank li[name='"+slug+"']").style('background-color', '#FAFAFA').transition().duration(300).style('background-color', '#fff').attr('class', 'active')
     },
 
     topbar_hide: function() {
