@@ -424,6 +424,13 @@ function join_array( array0, array1, array2 ) {
 	}
 }
 
+function scroll_style_elements(){
+	// compare and date buttons
+	var target_prices_offset = $('#target-price-list').offset().top;
+	var btn_top = Math.max(32, $(window).scrollTop() - target_prices_offset + 32);
+	$('.latest_target_prices .toggle, .latest_target_prices .now').css({'top':btn_top})
+
+}
 
 function load_more_target_prices(){
 	// don't use in inner, analyse page
@@ -449,4 +456,5 @@ function load_more_target_prices(){
   */
 $(window).scroll(function() {
 	load_more_target_prices();
+	scroll_style_elements();
 })

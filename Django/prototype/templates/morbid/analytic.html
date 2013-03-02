@@ -38,7 +38,7 @@
 				<a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}" class="{{ feature.slug }}">{{ feature.name }}</a>
 				<span></span>
 				<div class="info_box_content">
-					{% autoescape off %}{{feature.description}}{% endautoescape %}
+					{{feature.description|safe}}
 					{% if feature.slug != 'profitability' %}<img src="/static/images/mini_graphs/{{feature.slug}}.png">{% endif %}
 				</div>
 			</div>

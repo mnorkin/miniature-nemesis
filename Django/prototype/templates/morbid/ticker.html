@@ -27,7 +27,6 @@
 		<li class='avg'>
 		<ul>
 			<li class='mn'><i>{{ ticker.consensus_min }}</i> min </li>
-			<!-- calculate avg value. left style is from min 45px to max 260px -->
 			<li class='av' style="left:113px;"><i>{{ ticker.consensus_avg }}</i>avg </li>
 			<li class='mx'><i>{{ ticker.consensus_max }}</i> max </li>
 		</ul>
@@ -50,7 +49,7 @@
 					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" class="{{ feature.slug }}">{{ feature.name }}</a>
 					<span></span>
 					<div class="info_box_content">
-						{% autoescape off %}{{feature.description}}{% endautoescape %}
+						{{feature.description|safe}}
 						{% if feature.slug != 'profitability' %}<img src="/static/images/mini_graphs/{{feature.slug}}.png">{% endif %}
 					</div>
 				</div>
@@ -65,7 +64,7 @@
 				<li name="{{ target.analytic.slug }}" class="passive">
 					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }} </a></span> 
 					<span class="date">{{ target.date }}</span>
-					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
+					<span class="number">{{ target.price|cut:'.0' }} <strong>Last target price</strong> </span>
 					<span class="number">{{ target.analytic.number_of_tp }}<strong>No of target prices</strong> </span>
 					<span class="number">{{ target.analytic.volatility_positive }}/{{ target.analytic.volatility_negative }}<strong>Volatility</strong> </span>
 				</li>
