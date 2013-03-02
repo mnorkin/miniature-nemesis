@@ -174,8 +174,8 @@ class FeatureAnalyticTicker(models.Model):
 
 	def hash(self):
 		all_letters = string.lowercase
-		time_hash = "".join([all_letters[int(letter)] for letter in str(time.time()).replace('.', '')])
-		return self.feature.slug + self.analytic.slug + self.ticker.slug + time_hash
+		id_hash = "".join([all_letters[int(letter)] for letter in str(self.id)])
+		return self.feature.slug + self.analytic.slug + self.ticker.slug + id_hash
 
 	def __unicode__(self):
 		"""
