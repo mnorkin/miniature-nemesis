@@ -5,7 +5,7 @@ from api.handlers import FeatureAnalyticTickerHandler
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 auth = HttpBasicAuthentication(realm='morbid_realm')
-ad = { 'authentication' : auth }
+ad = {'authentication': auth}
 
 feature_analytic_ticker_resource = Resource(handler=FeatureAnalyticTickerHandler, **ad)
 
@@ -13,9 +13,8 @@ feature_analytic_ticker_resource = Resource(handler=FeatureAnalyticTickerHandler
 from django.contrib import admin
 admin.autodiscover()
 
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'prototype.views.home', name='home'),
+urlpatterns = patterns(
+    '',
     url(r'^page/(?P<page>\d+)/$', 'morbid.views.index'),
     url(r'^$', 'morbid.views.index'),
     url(r'^analytic/target_prices/(?P<analytic_slug>[^/]+)/$', 'morbid.views.target_prices'),
@@ -25,9 +24,9 @@ urlpatterns = patterns('',
     url(r'^graph_03/$', 'morbid.views.graph_03'),
     url(r'^graph_01/$', 'morbid.views.graph_01'),
 
-    url(r'^feature_by_ticker/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_ticker'), # JSON only
-    url(r'^feature_by_analytic/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_analytic'), # JSON only
-    url(r'^search/(?P<search_me>[^/]+)/$', 'morbid.views.search'), # JSON only
+    url(r'^feature_by_ticker/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_ticker'),  # JSON only
+    url(r'^feature_by_analytic/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_analytic'),  # JSON only
+    url(r'^search/(?P<search_me>[^/]+)/$', 'morbid.views.search'),  # JSON only
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -36,7 +35,10 @@ urlpatterns = patterns('',
 
     # API
     # url(r'^api/feature_analytic_ticker/(?P<analytic_slug>[^/]+)/(?P<ticker_slug>[^/]+)/(?P<feature_id>\d+)/(?P<value>[^/]+)/$', feature_analytic_ticker_resource)
-    url(r'^api/', include('api.urls'))
+    url(r'^api/', include('api.urls')),
+
+    # Screen page
+    url(r'^screen/$', 'morbid.views.screen')
 )
 
 # Statics (need for gunicorn)

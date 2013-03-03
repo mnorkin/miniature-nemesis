@@ -316,3 +316,12 @@ def graph_03(request):
     c = Context()
 
     return HttpResponse(t.render(c))
+
+
+def screen(request):
+
+    t = loader.get_template("screen.html")
+
+    c = Context()
+
+    return HttpResponse(t.render(c))
