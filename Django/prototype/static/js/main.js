@@ -7,186 +7,186 @@ var bottom_of_page = false;
 
 function generate_grid_element(id, dataset, posName) {
 
-	if (id !== null && dataset > 1) {
-		dataset = [dataset];
+    if (id !== null && dataset > 1) {
+        dataset = [dataset];
 
-		var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
-		var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'};
+        var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
+        var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'};
 
-		var max_value = null;
+        var max_value = null;
 
-		switch(posName){
-			case 'accuracy':
-			max_value = 100; break;
-			case 'reach_time':
-			max_value = 250; break;
-			case 'profitability':
-			max_value = 100; break;
-			default:
-			max_value = 10;
-		}
+        switch(posName){
+            case 'accuracy':
+            max_value = 100; break;
+            case 'reach_time':
+            max_value = 250; break;
+            case 'profitability':
+            max_value = 100; break;
+            default:
+            max_value = 10;
+        }
 
-		var x = d3.scale.linear()
-		.domain([0, max_value])
-		.range([0, width]);
+        var x = d3.scale.linear()
+        .domain([0, max_value])
+        .range([0, width]);
 
-		var chart = d3.select("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
-		chart.selectAll('rect')
-		.data(dataset)
-		.enter().append('rect')
-		.attr('height', 13)
-		.attr('y', 0)
-		.attr('fill', gradiends[posName])
-		.attr('rx',4)
-		.attr('ry',4)
-		.attr('txt', function(d,i){ return (posName == 'reach_time') ? d+' days':  d+'%';} )
-		.transition().duration(500).attr('width', x)
-		.text( String );
+        var chart = d3.select("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
+        chart.selectAll('rect')
+        .data(dataset)
+        .enter().append('rect')
+        .attr('height', 13)
+        .attr('y', 0)
+        .attr('fill', gradiends[posName])
+        .attr('rx',4)
+        .attr('ry',4)
+        .attr('txt', function(d,i){ return (posName == 'reach_time') ? d+' days':  d+'%';} )
+        .transition().duration(500).attr('width', x)
+        .text( String );
 
-	} else {
-		return;
-	}
+    } else {
+        return;
+    }
 }
 
 
 function generate_pie(id, value) {
 
-	if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
+    if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
 
-	var percent = value;
-	var dataset = [percent,(100-percent)];
+    var percent = value;
+    var dataset = [percent,(100-percent)];
 
-	var width = 81,
-	height = 81,
-	radius = Math.min(width, height) / 2;
+    var width = 81,
+    height = 81,
+    radius = Math.min(width, height) / 2;
 
-	var fill_color = "#b7cd44";
+    var fill_color = "#b7cd44";
 
-	if (value < 0) {
-		fill_color = "#da1e1e";
-	}
+    if (value < 0) {
+        fill_color = "#da1e1e";
+    }
 
-	var colors = [fill_color, 'transparent'];
+    var colors = [fill_color, 'transparent'];
 
-	var pie = d3.layout.pie()
-	.sort(null);
+    var pie = d3.layout.pie()
+    .sort(null);
 
-	var arc = d3.svg.arc()
-	.innerRadius(35)
-	.outerRadius(35);
+    var arc = d3.svg.arc()
+    .innerRadius(35)
+    .outerRadius(35);
 
-	var svg = d3.selectAll("#" + id).append("svg")
-	.attr("width", width)
-	.attr("height", height)
-	.append("g")
-	.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    var svg = d3.selectAll("#" + id).append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-	var path = svg.selectAll("path")
-	.data(pie(dataset))
-	.enter().append("path")
-	.attr("stroke", function(d, i) { return colors[i]; })
-	.attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
-	.attr("d", arc);
+    var path = svg.selectAll("path")
+    .data(pie(dataset))
+    .enter().append("path")
+    .attr("stroke", function(d, i) { return colors[i]; })
+    .attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
+    .attr("d", arc);
 }
 
 
 function process_search(dom_obj, e){
-	e.preventDefault();
-	var key = e.keyCode ? e.keyCode : e.charCode;
-	var obj = $('#search_inp');
-	var url = '/search/'+ obj.val()+'/';
+    e.preventDefault();
+    var key = e.keyCode ? e.keyCode : e.charCode;
+    var obj = $('#search_inp');
+    var url = '/search/'+ obj.val()+'/';
 
-	if (key == 40 || key == 38){ process_search_nav(key); return; }
-	if($(dom_obj).attr('type') == "submit"){ location.href = $('#search_inp').attr('href');  return; }
+    if (key == 40 || key == 38){ process_search_nav(key); return; }
+    if($(dom_obj).attr('type') == "submit"){ location.href = $('#search_inp').attr('href');  return; }
 
-	if(obj.val().length < 1) {
-		$('.search_res').html('');
-		return;
-	}
+    if(obj.val().length < 1) {
+        $('.search_res').html('');
+        return;
+    }
 
-	$.ajax({
-		url: url,
-		dataType: "json"
-	}).done(function(resp) {
-		var resp_html = '';
+    $.ajax({
+        url: url,
+        dataType: "json"
+    }).done(function(resp) {
+        var resp_html = '';
 
-		if(resp.tickers.length){
-			resp_html += '<li class="inf">Companies</li>';
-			for(i=0; i < resp.tickers.length ; i++){
-				resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+'</a></li>';
-			}
-		}
+        if(resp.tickers.length){
+            resp_html += '<li class="inf">Companies</li>';
+            for(i=0; i < resp.tickers.length ; i++){
+                resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+'</a></li>';
+            }
+        }
 
-		if(resp.analytics.length) {
-			resp_html += '<li class="inf">Analytics</li>';
-			for(i=0; i < resp.analytics.length ; i++){
-				resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
-			}
-		}
+        if(resp.analytics.length) {
+            resp_html += '<li class="inf">Analytics</li>';
+            for(i=0; i < resp.analytics.length ; i++){
+                resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
+            }
+        }
 
-		$('.search_res').html(resp_html);
-	});
+        $('.search_res').html(resp_html);
+    });
 }
 
 function process_search_nav(key){
 
-	var list = null;
-	var first_time = null;
-	var i = 0;
+    var list = null;
+    var first_time = null;
+    var i = 0;
 
-	function _set_active(li_obj){
-		if(li_obj.length){
-			$('.search_res li').removeClass('active');
-			li_obj.addClass('active');
-			$('#search_inp').val('').val(li_obj.text()).attr('href', li_obj.find('a').attr('href'));
-		}
-	}
+    function _set_active(li_obj){
+        if(li_obj.length){
+            $('.search_res li').removeClass('active');
+            li_obj.addClass('active');
+            $('#search_inp').val('').val(li_obj.text()).attr('href', li_obj.find('a').attr('href'));
+        }
+    }
 
-	if(key == 40){ // nav button down
+    // nav button down
+    if(key == 40){
 
-		list = $('.search_res li');
-		first_time = ($('.search_res li.active').length === 0);
+        list = $('.search_res li');
+        first_time = ($('.search_res li.active').length === 0);
 
-		for(i=1 ; i <= list.length ; i++){
+        for(i=1 ; i <= list.length ; i++){
 
-			// fist time, no active elements
-			if(first_time){
-				_set_active( $('.search_res li:nth-child(2)') );
-				break;
-			}
+            // fist time, no active elements
+            if(first_time){
+                _set_active( $('.search_res li:nth-child(2)') );
+                break;
+            }
 
-			// li nth(i) active and next not have inf class		
-			if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === false){
-				_set_active ( $('.search_res li:nth-child('+(i+1)+')') );
-				break;
-			// li nth(i) active and next have inf class		
-		}else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === true){
-			_set_active ( $('.search_res li:nth-child('+(i+2)+')') );
-			break;
-		}
-	}
+            if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === false){
+                // li nth(i) active and next not have inf class
+                _set_active ( $('.search_res li:nth-child('+(i+1)+')') );
+                break;
+            } else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === true){
+                // li nth(i) active and next have inf class     
+                _set_active ( $('.search_res li:nth-child('+(i+2)+')') );
+                break;
+            }
+        }
 
-}else if(key == 38){
+    } else if(key == 38) {
 
-	list = $('.search_res li'), first_time = ($('.search_res li.active').length === 0);
-	for(i=1;i <= list.length ; i++){
-
-			// going to input element
-			if(i == 2 && $('.search_res li:nth-child('+i+')').hasClass('active')){
-				$('.search_res li').removeClass('active');
-				// cursor to end
-				var tmp_val = $('#search_inp').val(); $('#search_inp').val(tmp_val);
-			// li nth(i) active and prev not have inf class	
-		}else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === false){
-			_set_active ( $('.search_res li:nth-child('+(i-1)+')') );
-			break;
-			// li nth(i) active and prev have inf class		
-		}else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === true){
-			_set_active ( $('.search_res li:nth-child('+(i-2)+')') );
-			break;
-		}
-	}
-}
+        list = $('.search_res li'), first_time = ($('.search_res li.active').length === 0);
+        for(i=1;i <= list.length ; i++){
+            // going to input element
+            if(i == 2 && $('.search_res li:nth-child('+i+')').hasClass('active')){
+                $('.search_res li').removeClass('active');
+                // cursor to end
+                var tmp_val = $('#search_inp').val(); $('#search_inp').val(tmp_val);
+            } else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === false){
+                // li nth(i) active and prev not have inf class 
+                _set_active ( $('.search_res li:nth-child('+(i-1)+')') );
+                break;
+            } else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === true){
+                // li nth(i) active and prev have inf class
+                _set_active ( $('.search_res li:nth-child('+(i-2)+')') );
+                break;
+            }
+        }
+    }
 }
 
 /**
@@ -194,72 +194,72 @@ function process_search_nav(key){
 ***/
 function open_graph(){
 
-	obj = $(this);
-	if(obj.hasClass('active')) { return false; }
-	var type = obj.attr('class');
-	type = type.toLowerCase();
-	type = type.replace(' ', '_');
-	var url = obj.attr('href');
-	$('#chart').html('').attr('class', type);
-	var graph_fx = eval('graphs.'+type);
+    obj = $(this);
+    if(obj.hasClass('active')) { return false; }
+    var type = obj.attr('class');
+    type = type.toLowerCase();
+    type = type.replace(' ', '_');
+    var url = obj.attr('href');
+    $('#chart').html('').attr('class', type);
+    var graph_fx = eval('graphs.'+type);
 
-	if(typeof(graph_fx) === 'function') {
-		graph_fx(url);
-	} else {
-		console.log('Graph not ready yet. ' + type);
-	}
+    if(typeof(graph_fx) === 'function') {
+        graph_fx(url);
+    } else {
+        console.log('Graph not ready yet. ' + type);
+    }
 
-	// for testing, because of bulk data
-	// if(type == 'max_profitability'){
-	// eval('graphs.aggressiveness("'+url+'");');
-	// }
+    // for testing, because of bulk data
+    // if(type == 'max_profitability'){
+    // eval('graphs.aggressiveness("'+url+'");');
+    // }
 
-	$('.analyse_menu a').removeClass('active');
-	obj.addClass('active');
-	// show first target price
-	if($('#bank li.active').length === 0) {
-		$('#bank li:first-child').addClass('active').removeClass('passive');
-	}
-	// info box content
-	$('.info_box').html( obj.siblings('div').html() );
+    $('.analyse_menu a').removeClass('active');
+    obj.addClass('active');
+    // show first target price
+    if($('#bank li.active').length === 0) {
+        $('#bank li:first-child').addClass('active').removeClass('passive');
+    }
+    // info box content
+    $('.info_box').html( obj.siblings('div').html() );
 
-	return false; // prevent href
+    return false; // prevent href
 }
 
 function load_target_prices(){
 
-	if($(this).hasClass('active')){ return false; }
+    if($(this).hasClass('active')){ return false; }
 
-	var url = $(this).attr('href');
-	$('.inner_buttons a').removeClass('active');
-	$(this).addClass('active');
+    var url = $(this).attr('href');
+    $('.inner_buttons a').removeClass('active');
+    $(this).addClass('active');
 
-	// load targets and stores Analysis html to temp html container
-	if ( url.length ){
-		$('.inner_content').animate({'opacity': 0}, 50, function(){
-			$(this).addClass('hidden');
+    // load targets and stores Analysis html to temp html container
+    if ( url.length ){
+        $('.inner_content').animate({'opacity': 0}, 50, function(){
+            $(this).addClass('hidden');
 
-			$('.inner_target_prices').load(url, function(){
-				$(this).removeClass('hidden');
-				$(this).animate({'opacity':1}, 100);
-				// loaded fresh content, might need to change type to list
-				if (list_type == 'list') {
-					list_type = 'grid';	change_target_prices_list();
-				} else {
-					binds_for_target_price_list();
-				}
-			});
-		});
-		// sets Analysis html back from container
-	} else {
-		$('.inner_target_prices').animate({'opacity': 0}, 50, function(){
-			$(this).addClass('hidden').html('');
+            $('.inner_target_prices').load(url, function(){
+                $(this).removeClass('hidden');
+                $(this).animate({'opacity':1}, 100);
+                // loaded fresh content, might need to change type to list
+                if (list_type == 'list') {
+                    list_type = 'grid';    change_target_prices_list();
+                } else {
+                    binds_for_target_price_list();
+                }
+            });
+        });
+        // sets Analysis html back from container
+    } else {
+        $('.inner_target_prices').animate({'opacity': 0}, 50, function(){
+            $(this).addClass('hidden').html('');
 
-			$('.inner_content').removeClass('hidden').css('opacity',0);
-			$('.inner_content').animate({'opacity':1}, 100);
-		});
-	}
-	return false;
+            $('.inner_content').removeClass('hidden').css('opacity',0);
+            $('.inner_content').animate({'opacity':1}, 100);
+        });
+    }
+    return false;
 }
 
 /**
@@ -268,54 +268,54 @@ function load_target_prices(){
 ***/
 function change_target_prices_list(){
 
-	var content = null;
+    var content = null;
 
-	list_type = (list_type == 'list') ? 'grid' : 'list';
-	$('.latest_target_prices svg').remove();
+    list_type = (list_type == 'list') ? 'grid' : 'list';
+    $('.latest_target_prices svg').remove();
 
-	// set list page
-	if($('.latest_target_prices.hidden').hasClass('list')){
+    // set list page
+    if($('.latest_target_prices.hidden').hasClass('list')){
 
-		$('.latest_target_prices.list').removeClass('hidden');
-		$('.latest_target_prices.grid').addClass('hidden');
-		content = $('.latest_target_prices.grid').html();
-		$('.latest_target_prices.grid').html('');
-		$('.latest_target_prices.list').html(content);
-		// set grid page
-	}else{
-		$('.latest_target_prices.grid').removeClass('hidden');
-		$('.latest_target_prices.list').addClass('hidden');
-		content = $('.latest_target_prices.list').html();
-		$('.latest_target_prices.list').html('');
-		$('.latest_target_prices.grid').html(content);
-	}
+        $('.latest_target_prices.list').removeClass('hidden');
+        $('.latest_target_prices.grid').addClass('hidden');
+        content = $('.latest_target_prices.grid').html();
+        $('.latest_target_prices.grid').html('');
+        $('.latest_target_prices.list').html(content);
+        // set grid page
+    }else{
+        $('.latest_target_prices.grid').removeClass('hidden');
+        $('.latest_target_prices.list').addClass('hidden');
+        content = $('.latest_target_prices.list').html();
+        $('.latest_target_prices.list').html('');
+        $('.latest_target_prices.grid').html(content);
+    }
 
-	// new content, bind again
-	binds_for_target_price_list();
-	load_more_target_prices();
-	scroll_style_elements();
+    // new content, bind again
+    binds_for_target_price_list();
+    load_more_target_prices();
+    scroll_style_elements();
 }
 
 
 function binds_for_target_price_list(){
-	/* Tooltip (percent info box) */
-	$('.chart .bar rect').hover(function(){
-		var obj = $(this);
-		var chart = obj.closest('.chart');
-		var tooltip = chart.children('.bar_tooltip');
-		tooltip.text(obj.attr('txt'));
+    /* Tooltip (percent info box) */
+    $('.chart .bar rect').hover(function(){
+        var obj = $(this);
+        var chart = obj.closest('.chart');
+        var tooltip = chart.children('.bar_tooltip');
+        tooltip.text(obj.attr('txt'));
 
-		var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
+        var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
 
-		var top = obj.offset().top - chart.offset().top - 3;
-		var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - tooltip.width(),
-			obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -4);
+        var top = obj.offset().top - chart.offset().top - 3;
+        var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - tooltip.width(),
+            obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -4);
 
-		tooltip.fadeIn(100);
-		tooltip.css({top:top,left:left});
-	}, function(){});
+        tooltip.fadeIn(100);
+        tooltip.css({top:top,left:left});
+    }, function(){});
 
-	$('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); });
+    $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); });
 
     // long company names moving
     $('.title .entry').hover(
@@ -337,84 +337,86 @@ function calculate_minavgmax_block(){
  var avg = obj.find('.av i').text();
  var max = obj.find('.mx i').text();
 
-	// avg element style is from 55 to 250px left
-	var percent = 195/(max-min)*(avg-min)+55;
-	obj.find('.av').css('left',percent);
+    // avg element style is from 55 to 250px left
+    var percent = 195/(max-min)*(avg-min)+55;
+    obj.find('.av').css('left',percent);
 }
 
 
 /* DOM ready */
 $(function(){
 
-	$('body').click(in_graph_click);
-	$('.in_graph').click(in_graph_click);
-	$('.in_graph .sear li').click(in_graph_entry_click);
-	// to clear search proposals
-	$('body').click(function () { $('.search_res').html(''); });
-	$('.analyse_menu a').click(open_graph);
+    $('body').click(in_graph_click);
+    $('.in_graph').click(in_graph_click);
+    $('.in_graph .sear li').click(in_graph_entry_click);
+    // to clear search proposals
+    $('body').click(function () { $('.search_res').html(''); });
+    $('.analyse_menu a').click(open_graph);
 
-	$('.inner_buttons a').click(load_target_prices);
+    $('.inner_buttons a').click(load_target_prices);
 
-	// In analyse page, on document ready, load first property!
-	$('.analyse_menu div:first-child a').trigger('click');
+    // In analyse page, on document ready, load first property!
+    $('.analyse_menu div:first-child a').trigger('click');
 
-	binds_for_target_price_list();
-	calculate_minavgmax_block();
-	load_more_target_prices();
-	scroll_style_elements();
+    binds_for_target_price_list();
+    calculate_minavgmax_block();
+    load_more_target_prices();
+    scroll_style_elements();
 
-    horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
+    if ($('.horizontal_slider').length !== 0) {
+        horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
+    }
 });
 
 
 function in_graph_click(){
-	var obj = $(this);
+    var obj = $(this);
 
-	if($('.in_graph').hasClass('tmp') ){
-		$('.in_graph').removeClass('tmp');
-		return;
-	}
+    if($('.in_graph').hasClass('tmp') ){
+        $('.in_graph').removeClass('tmp');
+        return;
+    }
 
-	if(obj.parents().length > 2){
-		obj.addClass('tmp');
-		obj.addClass('active');
-	}else{
-		$('.in_graph').removeClass('active');
-	}
+    if(obj.parents().length > 2){
+        obj.addClass('tmp');
+        obj.addClass('active');
+    }else{
+        $('.in_graph').removeClass('active');
+    }
 }
 
 function in_graph_entry_click(){
-	var obj = $(this);
-	var name = obj.attr('name');
-	var svg_element = $('#chart svg [name='+name+']');
+    var obj = $(this);
+    var name = obj.attr('name');
+    var svg_element = $('#chart svg [name='+name+']');
 
-	if(obj.hasClass('active')){
+    if(obj.hasClass('active')){
 
-		obj.removeClass('active');
-		svg_element.attr('fill', svg_element.attr('origin_fill') );
-		svg_element.removeAttr('origin_fill');
-	}else{
+        obj.removeClass('active');
+        svg_element.attr('fill', svg_element.attr('origin_fill') );
+        svg_element.removeAttr('origin_fill');
+    }else{
 
-		obj.addClass('active');
-		svg_element.attr('origin_fill', svg_element.attr('fill'));
-		svg_element.attr('fill', '#e95201');
-	}
+        obj.addClass('active');
+        svg_element.attr('origin_fill', svg_element.attr('fill'));
+        svg_element.attr('fill', '#e95201');
+    }
 }
 
 function in_graph_select_active_elements(){
-	var list = $('.in_graph .sear li');
-	var obj, name, svg_element;
+    var list = $('.in_graph .sear li');
+    var obj, name, svg_element;
 
-	list.each(function(){
-		obj = $(this);
-		name = obj.attr('name');
-		svg_element = $('#chart svg [name='+name+']');
+    list.each(function(){
+        obj = $(this);
+        name = obj.attr('name');
+        svg_element = $('#chart svg [name='+name+']');
 
-		if(obj.hasClass('active')){
-			svg_element.attr('origin_fill', svg_element.attr('fill'));
-			svg_element.attr('fill', '#e95201');
-		}
-	});
+        if(obj.hasClass('active')){
+            svg_element.attr('origin_fill', svg_element.attr('fill'));
+            svg_element.attr('fill', '#e95201');
+        }
+    });
 }
 
 /**
@@ -460,20 +462,20 @@ function scroll_style_elements() {
 }
 
 function load_more_target_prices(){
-	// don't use in inner, analyse page
-	if($('.inner_target_prices').length) { return false; }
+    // don't use in inner, analyse page
+    if($('.inner_target_prices').length) { return false; }
 
     /* Give it a bigger offset, for better experience */
 
-	if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && bottom_of_page === false){ 
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && bottom_of_page === false){ 
         page_number +=1;
         /* Make a query */
-		_url = "/page/" + page_number + "/";
-		$.ajax({
-			url: _url,
-			context: $("#target-price-list")
-		}).done(function(data){
-			// $("#target-price-list br").before(data);
+        _url = "/page/" + page_number + "/";
+        $.ajax({
+           url: _url,
+           context: $("#target-price-list")
+       }).done(function(data){
+            // $("#target-price-list br").before(data);
             /* Take an empty card slot, for the new card to start from the left, not right (better discriminating with dates) */
             // $(".target-price-list").after(data);
             $('.latest_target_prices').append(data);
@@ -481,7 +483,7 @@ function load_more_target_prices(){
         }).error(function() {
             bottom_of_page = true;
         });
-	}
+    }
 }
 
 /**
@@ -496,3 +498,16 @@ $(window).scroll(function() {
 
 /** Internet Explorer save console.log() */
 if(typeof(console)=="undefined"){var console={log:function(){}};}
+
+function update_ticker_stock( ticker ) {
+
+    if ($(".price_detail") !== undefined) {
+        var format_text = '';
+        $.getJSON('/get_ticker_data/' + ticker + '/', function(data) {
+            /* data.change_direction apraso i kuria puse reikia sukti arrow */
+            $('.price').text( data.last_stock_price );
+            format_text = data.change + " ( " + data.change_percent + "%)";
+            $('.price_detail').text( format_text );
+        });
+    }
+}

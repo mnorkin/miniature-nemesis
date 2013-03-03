@@ -2,7 +2,6 @@
 The Stock_Quete
 """
 import urllib as u
-import string
 import datetime
 import time
 import utils

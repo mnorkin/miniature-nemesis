@@ -21,6 +21,7 @@ urlpatterns = patterns(
     url(r'^ticker/target_prices/(?P<ticker_slug>[^/]+)/$', 'morbid.views.target_prices'),
     url(r'^analytic/(?P<slug>[^/]+)/$', 'morbid.views.analytic'),
     url(r'^ticker/(?P<slug>[^/]+)/$', 'morbid.views.ticker'),
+    url(r'^get_ticker_data/(?P<ticker>[^/]+)/$', 'morbid.views.ticker_data'),
     url(r'^graph_03/$', 'morbid.views.graph_03'),
     url(r'^graph_01/$', 'morbid.views.graph_01'),
 

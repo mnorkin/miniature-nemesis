@@ -2,9 +2,10 @@ from django.http import HttpResponse, Http404
 from django.template import Context, loader
 from morbid.models import TargetPrice, Analytic, FeatureAnalyticTicker, Feature, Ticker
 from django.db.models import Q
-from datetime import datetime
+import re
 import json
 from prototype.decorators import logged_in_or_basicauth
+import urllib as u
 
 
 @logged_in_or_basicauth(realm="Limited access")
@@ -101,6 +102,48 @@ def ticker(request, slug):
     return HttpResponse(t.render(c))
 
 
+def ticker_data(request, ticker):
+    PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
+    url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b3c6&e=.csv' % (ticker)
+    f = u.urlopen(url, proxies={})
+    rows = f.readlines()
+    r = rows[0]
+    # return HttpResponse(r)
+    """Get the first entry"""
+    r = PATTERN.split(r[:-2])[1::2]
+    """Remove the `\r\n` and split by comma"""
+
+    r[1].replace('"', '')
+    change = r[1]
+    last_stock_price = float(r[0])
+    change_percent = 0
+    change_direction = 'up'
+
+    if (change[1] == '+'):
+        """Positive change"""
+        change = change[2:-1]
+        """Drop the sign"""
+        change_direction = 'up'
+    else:
+        """Negative change"""
+        change = change[2:-1]
+        """Drop the sign"""
+        change_direction = 'down'
+
+    change = float(change)
+
+    change_percent = round(change / (last_stock_price - change) * 100, 2)
+
+    item = {
+        "last_stock_price": last_stock_price,
+        "change": change,
+        "change_percent": change_percent,
+        "change_direction": change_direction
+    }
+
+    return HttpResponse(json.dumps(item))
+
+
 def analytic(request, slug):
     """
     Analytic page
@@ -184,7 +227,7 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
     else:
         raise Http404
 
-    date = datetime.today()
+    date = target_price_list[0].date
 
     t = loader.get_template('morbid/target_prices.html')
 
