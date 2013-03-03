@@ -1,3 +1,6 @@
-{% for target in latest_target_prices  %}
-  {% include "morbid/target_price_card.html" %}
-{% endfor %}
+<ul name="{{date|date:'M. d, Y'}}" class="target_price_list">
+    {% for target in latest_target_prices  %}
+    {% include "morbid/target_price_card.html" %}
+    {% endfor %}
+    <br class="clear"/>
+</ul>

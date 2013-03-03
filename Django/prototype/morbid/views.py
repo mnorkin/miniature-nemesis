@@ -26,7 +26,8 @@ def index(request, page=0):
 
     page = int(page)
 
-    if page > dates.__len__() or page >= 7:
+    # if page > dates.__len__() or page >= 7:
+    if page > dates.__len__():
         raise Http404
 
     latest_target_prices = TargetPrice.objects.filter(date=dates[page]).order_by('id').reverse()
@@ -41,7 +42,7 @@ def index(request, page=0):
 
     t = loader.get_template('morbid/index.html')
 
-    date = datetime.today()
+    date = dates[page]
 
     if page == 0:
         extends_template = 'morbid/base.html'

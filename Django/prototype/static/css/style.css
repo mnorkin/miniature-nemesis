@@ -1037,3 +1037,8 @@ li{ list-style: none; }
 #bank .active {
     display: block;
 }
+
+.target_price_list {
+    /*border-bottom: 10px solid #333;*/
+    /*margin-bottom: 10px;*/
+}

@@ -17,7 +17,7 @@
          <span class="pr">Profitability<a href="?up"></a><a class="active" href="?down"></a> </span>
          <span class="re">Reach time<a href="?up"></a><a href="?down"></a> </span>
      </div>
-     <ul class="" id="target-price-list">
+     <ul class="target_price_list" id="target-price-list" name="{{date|date:'M. d, Y'}}">
          {% for target in latest_target_prices  %}
          {% include "morbid/target_price_card.html" %}
          {% endfor %}
