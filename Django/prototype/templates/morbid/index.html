@@ -3,29 +3,33 @@
 {% block content %}
 
 <div class="title_container">
-<div class="latest_target_prices title grid">
-	
-	<div class="now">{{date|date:"M. d, Y"}}</div>
-	<a class="toggle">Compare</a>
-	
-	{% if latest_target_prices %}
-		<div class="pre_info">
-			<span class="cr"><a href="?up"></a><a href="?down"></a></span>
-			<span class="ac">Accuracy<a href="?up"></a><a href="?down"></a></span>
-			<span class="pr">Profitability<a href="?up"></a><a class="active" href="?down"></a> </span>
-			<span class="re">Reach time<a href="?up"></a><a href="?down"></a> </span>
-		</div>
-		<ul class="" id="target-price-list">
-			{% for target in latest_target_prices  %}
-				{% include "morbid/target_price_card.html" %}
-			{% endfor %}
-			<br class="clear"/>
-		</ul>
-	{% else %}
-		<p>Error, no target prices</p>
-	{% endif %}
-</div>
-<div class="latest_target_prices title list hidden"></div>
+
+    <div class="latest_target_prices title grid">
+        <div class="horizontal_slider absolute">
+            <div class="now">{{date|date:"M. d, Y"}}</div>
+            <a class="toggle">Compare</a>
+        </div>
+
+       {% if latest_target_prices %}
+       <div class="pre_info">
+         <span class="cr"><a href="?up"></a><a href="?down"></a></span>
+         <span class="ac">Accuracy<a href="?up"></a><a href="?down"></a></span>
+         <span class="pr">Profitability<a href="?up"></a><a class="active" href="?down"></a> </span>
+         <span class="re">Reach time<a href="?up"></a><a href="?down"></a> </span>
+     </div>
+     <ul class="" id="target-price-list">
+         {% for target in latest_target_prices  %}
+         {% include "morbid/target_price_card.html" %}
+         {% endfor %}
+         <br class="clear"/>
+     </ul>
+     {% else %}
+     <p>Error, no target prices</p>
+     {% endif %}
+ </div>
+
+ <div class="latest_target_prices title list hidden"></div>
+
 </div>
 
 {% endblock %}

@@ -16,8 +16,7 @@
   </script>
 
   <ul class="bar">
-    {% for fap in target.fap %}
-    
+    {% for fap in target.fap %}    
     <li id="{{ fap.hash }}" class="feature"><span>{{fap.feature.name}}</span></li>
     <script type="text/javascript">
     generate_grid_element( "{{ fap.hash }}", "{{ fap.value|cut:'.0' }}", "{{fap.feature.slug}}" )

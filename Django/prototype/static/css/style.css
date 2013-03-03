@@ -211,22 +211,36 @@ li{ list-style: none; }
     font-weight: bold;
     margin-top: 7px;
 }
+
+.fixed {
+    position: fixed;
+}
+.absolute {
+    position: absolute;
+}
+
 .title.grid .entry .price{
     color:#e95200;
     font-size: 22px;
     width: 85px;
     text-align: right;
     font-weight: bold;
-    position:absolute;
+    position: absolute;
     top:39px;
     left:200px;
 }
 
-.title .now{
+/* A little bit of fixing part */
+.horizontal_slider {
+    top: 5px;
+}
+
+.title .now {
     color:#fff;
     background: #d1c1b0;
     display:inline-block;
-    position:absolute;
+    /*position:absolute;*/
+    position: relative;
     top:13px;
     left:-130px;
     padding-top:6px;
@@ -235,6 +249,7 @@ li{ list-style: none; }
     font-size:12px;
     text-align: center;
 }
+
 .title .now::after{
     border-top: 13px solid transparent;
     border-left: 14px solid #d1c1b0;
@@ -244,14 +259,17 @@ li{ list-style: none; }
     right:-14px;
     top:0;
 }
+
 .title .toggle{
     height: 20px;
     color:#fff;
     background: #e95200;
     display:inline-block;
-    position:absolute;
+    /*position:absolute;*/
+    position: relative;
     top:13px;
-    right:-131px;
+    /*right:-131px;*/
+    right: -708px;
     padding-top:6px;
     text-align: center;
     width:110px;

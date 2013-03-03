@@ -2,6 +2,8 @@
 var list_type;
 var page_number = Number();
 
+var horizontal_slider_top_offset = 0;
+
 function generate_grid_element(id, dataset, posName) {
 
 	if (id !== null && dataset > 1) {
@@ -358,6 +360,8 @@ $(function(){
 	calculate_minavgmax_block();
 	load_more_target_prices();
 	scroll_style_elements();
+
+    horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
 });
 
 
@@ -449,12 +453,36 @@ function join_array( array0, array1, array2 ) {
   * Scroll
   */
   function scroll_style_elements(){
+    $('.latest_target_prices .toggle').addClass('absolute');
 	// compare and date buttons
 	var target_prices = $('#target-price-list');
-	if(target_prices.length){
-		var btn_top = Math.max(32, $(window).scrollTop() - target_prices.offset().top + 32);
-		$('.latest_target_prices .toggle, .latest_target_prices .now').css({'top':btn_top});
-	}
+    var top_position = $('.horizontal_slider').offset().top - $(window).scrollTop();
+    var window_scroll = $(window).scrollTop();
+    console.log("Window scroll top: ", $(window).scrollTop());
+    console.log("Horizontal slider offset:", $('.horizontal_slider').offset().top);
+    console.log("Top position: ", top_position);
+
+    if ( window_scroll > horizontal_slider_top_offset ) {
+
+        if ($('.horizontal_slider').hasClass('absolute')) {
+            $('.horizontal_slider').removeClass('absolute');
+        }
+        if (!$('.horizontal_slider').hasClass('fixed')) {
+            $('.horizontal_slider').addClass('fixed');
+        }
+
+    } else {
+        if ( $('.horizontal_slider').hasClass('absolute')) {
+            $('.horizontal_slider').removeClass('fixed');
+        }
+        if (!$('.horizontal_slider').hasClass('absolute')) {
+            $('.horizontal_slider').addClass('absolute');
+        }
+    }
+	// if(target_prices.length){
+	//	var btn_top = Math.max(32, $(window).scrollTop() - target_prices.offset().top + 32);
+	//	$('.latest_target_prices .toggle, .latest_target_prices .now').css({'top':btn_top});
+	// }
 
 }
 

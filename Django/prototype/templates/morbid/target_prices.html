@@ -1,23 +1,26 @@
 <div class="latest_target_prices title grid">
-  
-  <div class="now">{{date|date:"M. d, Y"}}</div>
-  <a class="toggle">Compare</a>
-  
-  {% if target_prices %}
+
+    <!-- <div class="slider_part"> -->
+        <div class="now">{{date|date:"M. d, Y"}}</div>
+        <a class="toggle">Compare</a>
+    <!-- </div> -->
+
+    {% if target_prices %}
     <div class="pre_info">
-      <span class="cr"><a href="?up"></a><a href="?down"></a></span>
-      <span class="ac">Accuracy<a href="?up"></a><a href="?down"></a></span>
-      <span class="pr">Profitability<a href="?up"></a><a class="active" href="?down"></a> </span>
-      <span class="re">Reach time<a href="?up"></a><a href="?down"></a> </span>
+        <span class="cr"><a href="?up"></a><a href="?down"></a></span>
+        <span class="ac">Accuracy<a href="?up"></a><a href="?down"></a></span>
+        <span class="pr">Profitability<a href="?up"></a><a class="active" href="?down"></a> </span>
+        <span class="re">Reach time<a href="?up"></a><a href="?down"></a> </span>
     </div>
     <ul class="" id="target-price-list">
-      {% for target in target_prices  %}
+        {% for target in target_prices  %}
         {% include "morbid/target_price_card.html" %}
-      {% endfor %}
-      <br class="clear"/>
+        {% endfor %}
+        <br class="clear"/>
     </ul>
-  {% else %}
+    {% else %}
     <p>Error, no target prices</p>
-  {% endif %}
+    {% endif %}
 </div>
+
 <div class="latest_target_prices title list hidden"></div>
