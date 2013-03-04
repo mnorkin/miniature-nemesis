@@ -199,7 +199,7 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
         analytic = Analytic
         try:
             analytic = Analytic.objects.get(slug=analytic_slug)
-            target_prices = TargetPrice.objects.filter(analytic=analytic).distinct('ticker')  # TODO: reikia normalaus sprendimo
+            target_prices = TargetPrice.objects.filter(analytic=analytic)
             feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
                 analytic=analytic, feature__display_in_frontpage=True)
 
@@ -215,7 +215,7 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
         ticker = Ticker
         try:
             ticker = Ticker.objects.get(slug=ticker_slug)
-            target_prices = TargetPrice.objects.filter(ticker=ticker).distinct('analytic')  # TODO: reikia normalaus sprendimo
+            target_prices = TargetPrice.objects.filter(ticker=ticker)
             feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
                 ticker=ticker, feature__display_in_frontpage=True)
 
