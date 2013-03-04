@@ -8,7 +8,7 @@ from prototype.decorators import logged_in_or_basicauth
 import urllib as u
 
 
-@logged_in_or_basicauth(realm="Limited access")
+# @logged_in_or_basicauth(realm="Limited access")
 def index(request, page=0):
     """
     Index page
@@ -40,9 +40,9 @@ def index(request, page=0):
     target_price_list = []
 
     for target_price in latest_target_prices:
-        target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
-        print target_price.fap
-        target_price_list.append(target_price)
+        target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker)
+        if sum(target_price.fap.values_list('value', flat=True)) != 0:
+            target_price_list.append(target_price)
 
     t = loader.get_template('morbid/index.html')
 

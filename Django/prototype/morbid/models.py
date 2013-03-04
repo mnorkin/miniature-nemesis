@@ -198,8 +198,7 @@ class TargetPriceManager(models.Manager):
         cursor.execute("SELECT ticker_id FROM morbid_targetprice GROUP BY ticker_id HAVING COUNT(ticker_id) > 1")
         results_list = []
         for row in cursor.fetchall():
-            p = row[0]
-            results_list.append(p)
+            results_list.append(row[0])
 
         return self.filter(ticker_id__in=results_list)
 
