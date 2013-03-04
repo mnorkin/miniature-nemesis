@@ -30,7 +30,7 @@ function generate_grid_element(id, dataset, posName) {
         .domain([0, max_value])
         .range([0, width]);
 
-        var chart = d3.select("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
+        var chart = d3.selectAll("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
         chart.selectAll('rect')
         .data(dataset)
         .enter().append('rect')
@@ -467,7 +467,7 @@ function load_more_target_prices(){
 
     /* Give it a bigger offset, for better experience */
 
-    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && bottom_of_page === false){ 
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() && bottom_of_page === false){ 
         page_number +=1;
         /* Make a query */
         _url = "/page/" + page_number + "/";

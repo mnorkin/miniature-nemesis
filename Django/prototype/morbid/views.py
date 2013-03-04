@@ -16,22 +16,14 @@ def index(request, page=0):
     @return: Http Response
     """
 
-    # if not settings.DEBUG:
-        # Return week long entries
-        # latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
-    # else:
-        # latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-1)).order_by('date').reverse()
-    # latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
-
     dates = [tp['date'] for tp in TargetPrice.objects.with_count().order_by('-date').distinct('date').values()]
 
     page = int(page)
 
-    # if page > dates.__len__() or page >= 7:
-    if page > dates.__len__():
+    if page > dates.__len__() or page >= 12:
         raise Http404
 
-    latest_target_prices = TargetPrice.objects.with_count().filter(date=dates[page]).order_by('id').reverse()
+    latest_target_prices = TargetPrice.objects.with_count().filter(date=dates[page]).order_by('-id')
 
     feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
         analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct,
@@ -40,8 +32,9 @@ def index(request, page=0):
     target_price_list = []
 
     for target_price in latest_target_prices:
-        target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker).distinct('feature')
-        if sum(target_price.fap.values_list('value', flat=True)) != 0:
+        target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker).order_by('-feature').distinct('feature')
+        if sum(target_price.fap.values_list('value', flat=True)) > 0:
+            target_price.sum = sum(target_price.fap.values_list('value', flat=True))
             target_price_list.append(target_price)
 
     t = loader.get_template('morbid/index.html')
