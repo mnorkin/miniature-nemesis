@@ -8,7 +8,7 @@ from prototype.decorators import logged_in_or_basicauth
 import urllib as u
 
 
-# @logged_in_or_basicauth(realm="Limited access")
+@logged_in_or_basicauth(realm="Limited access")
 def index(request, page=0):
     """
     Index page
@@ -40,7 +40,7 @@ def index(request, page=0):
     target_price_list = []
 
     for target_price in latest_target_prices:
-        target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker)
+        target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker).distinct('feature')
         if sum(target_price.fap.values_list('value', flat=True)) != 0:
             target_price_list.append(target_price)
 
@@ -206,12 +206,12 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
         analytic = Analytic
         try:
             analytic = Analytic.objects.get(slug=analytic_slug)
-            target_prices = TargetPrice.objects.filter(analytic=analytic)
+            target_prices = TargetPrice.objects.filter(analytic=analytic).distinct('ticker')  # TODO: reikia normalaus sprendimo
             feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-                analytic=analytic, feature__display_in_frontpage=True).order_by('id')
+                analytic=analytic, feature__display_in_frontpage=True)
 
             for target_price in target_prices:
-                target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
+                target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker)
                 target_price_list.append(target_price)
 
         except analytic.DoesNotExist:
@@ -222,12 +222,12 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
         ticker = Ticker
         try:
             ticker = Ticker.objects.get(slug=ticker_slug)
-            target_prices = TargetPrice.objects.filter(ticker=ticker)
+            target_prices = TargetPrice.objects.filter(ticker=ticker).distinct('analytic')  # TODO: reikia normalaus sprendimo
             feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-                ticker=ticker, feature__display_in_frontpage=True).order_by('id')
+                ticker=ticker, feature__display_in_frontpage=True)
 
             for target_price in target_prices:
-                target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
+                target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker)
                 target_price_list.append(target_price)
 
         except ticker.DoesNotExist:

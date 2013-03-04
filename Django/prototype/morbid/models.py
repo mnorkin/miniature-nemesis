@@ -226,8 +226,11 @@ class TargetPrice(models.Model):
 
     objects = TargetPriceManager()
 
-    def filter_via_number(self):
-        return self.objects.all().values_list('analytic', flat=True)
+    def hash(self):
+        all_letters = string.lowercase
+        id_hash = "".join([all_letters[int(letter)] for letter in str(self.date).replace("-", "")])
+        price_hash = "".join([all_letters[int(letter)] for letter in str(self.price).replace(".", "")])
+        return price_hash + self.analytic.slug + self.ticker.slug + id_hash
 
     def __unicode__(self):
         """

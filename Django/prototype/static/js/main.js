@@ -75,7 +75,7 @@ function generate_pie(id, value) {
     .innerRadius(35)
     .outerRadius(35);
 
-    var svg = d3.selectAll("#" + id).append("svg")
+    var svg = d3.select("#" + id).append("svg")
     .attr("width", width)
     .attr("height", height)
     .append("g")
