@@ -4,11 +4,11 @@ from morbid.models import TargetPrice, Analytic, FeatureAnalyticTicker, Feature,
 from django.db.models import Q
 import re
 import json
-from prototype.decorators import logged_in_or_basicauth
+# from prototype.decorators import logged_in_or_basicauth
 import urllib as u
 
 
-@logged_in_or_basicauth(realm="Limited access")
+# @logged_in_or_basicauth(realm="Limited access")
 def index(request, page=0):
     """
     Index page
