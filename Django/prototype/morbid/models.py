@@ -188,6 +188,22 @@ class FeatureAnalyticTicker(models.Model):
         return str(self.value) + " " + str(self.feature) + " " + str(self.analytic)
 
 
+class TargetPriceManager(models.Manager):
+    def with_count(self):
+        """
+        Return the target prices with more than repeatable number defined
+        """
+        from django.db import connection
+        cursor = connection.cursor()
+        cursor.execute("SELECT ticker_id FROM morbid_targetprice GROUP BY ticker_id HAVING COUNT(ticker_id) > 1")
+        results_list = []
+        for row in cursor.fetchall():
+            p = row[0]
+            results_list.append(p)
+
+        return self.filter(ticker_id__in=results_list)
+
+
 class TargetPrice(models.Model):
     """
     The list of all the target prices to show to people
@@ -208,6 +224,11 @@ class TargetPrice(models.Model):
     analytic = models.ForeignKey(Analytic)
     """The analytic, which published the target price
          @type: L{Analytic}"""
+
+    objects = TargetPriceManager()
+
+    def filter_via_number(self):
+        return self.objects.all().values_list('analytic', flat=True)
 
     def __unicode__(self):
         """

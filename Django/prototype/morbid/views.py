@@ -23,7 +23,7 @@ def index(request, page=0):
         # latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-1)).order_by('date').reverse()
     # latest_target_prices = TargetPrice.objects.filter(date__lt=datetime(datetime.now().year, datetime.now().month, datetime.now().day) - timedelta(days=-7)).order_by('date').reverse()
 
-    dates = [tp['date'] for tp in TargetPrice.objects.order_by('-date').distinct('date').values()]
+    dates = [tp['date'] for tp in TargetPrice.objects.with_count().order_by('-date').distinct('date').values()]
 
     page = int(page)
 
@@ -31,14 +31,17 @@ def index(request, page=0):
     if page > dates.__len__():
         raise Http404
 
-    latest_target_prices = TargetPrice.objects.filter(date=dates[page]).order_by('id').reverse()
+    latest_target_prices = TargetPrice.objects.with_count().filter(date=dates[page]).order_by('id').reverse()
 
-    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct, feature__display_in_frontpage=True)
+    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+        analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct,
+        ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct,
+        feature__display_in_frontpage=True)
     target_price_list = []
 
     for target_price in latest_target_prices:
-
         target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id, ticker_id=target_price.ticker_id)
+        print target_price.fap
         target_price_list.append(target_price)
 
     t = loader.get_template('morbid/index.html')
@@ -104,7 +107,7 @@ def ticker(request, slug):
 
 def ticker_data(request, ticker):
     PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
-    url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b3c6&e=.csv' % (ticker)
+    url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b3c6p&e=.csv' % (ticker.upper())
     f = u.urlopen(url, proxies={})
     rows = f.readlines()
     r = rows[0]
@@ -132,7 +135,13 @@ def ticker_data(request, ticker):
 
     change = float(change)
 
-    change_percent = round(change / (last_stock_price - change) * 100, 2)
+    if change == 0:
+        last_stock_price = r[2]
+
+    if change != 0:
+        change_percent = round(change / (last_stock_price - change) * 100, 2)
+    else:
+        change_percent = 0
 
     item = {
         "last_stock_price": last_stock_price,
