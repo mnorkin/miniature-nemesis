@@ -178,6 +178,7 @@ var graphs = (function() {
 
           graphs.populate(json)
           graphs.draw_impact_to_stock();
+          in_graph_select_active_elements();
 
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -782,12 +783,12 @@ var graphs = (function() {
 
       phase = 0
 
-      var sun_data = [0, 40, 100];
+      var sun_data = [0, 0, 100];
 
       var w = $("#" + _element_id).width() - 20,
-        h = $("#" + _element_id).height(),
-        r = Math.min(w,h) / 4,
-        rhw = Math.min(w,h) / 3,
+        h = $("#" + _element_id).height() -120,
+        r = Math.min(w,h) / 2.3,
+        rhw = Math.min(w,h) / 2.4,
         color = d3.scale.category20c();
       
       number_of_data_for_full_graph = 4
@@ -966,7 +967,8 @@ var graphs = (function() {
         .attr('stroke-width', 1)
         .attr("stroke", "#fff")
         .attr('fill', '#8dc6b3')
-        .on("mouseover", function() {
+        .attr('name', function(d,i) {return _slugs[i]} )
+        .on("mouseover", function(d, i) {
           var angle = (calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) + calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) ) /2+pi
           var radius = sun_data[2]/100*rhw+r
           d3.select(this).attr("fill", "#e95201")
@@ -975,9 +977,17 @@ var graphs = (function() {
           var left = w/2-Math.sin(angle)*radius
           var text = d3.select(this).attr('txt')
           graphs.tooltip_show(top, left, text)
+
+          if(active_topbar != _slugs[i]){
+            graphs.topbar_hide();
+            graphs.topbar_show(_slugs[i]);
+          }
+
         })
         .on("mouseout", function() {
-          d3.select(this).attr("fill", "#8dc6b3")
+          if(d3.select(this).attr('origin_fill') == null){
+            d3.select(this).attr("fill", "#8dc6b3")
+          }
           graphs.tooltip_hide()
         })
         .attr('txt', function(d) { return d +"%" })

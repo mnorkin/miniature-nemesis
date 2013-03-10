@@ -46,7 +46,7 @@
 		<div class="analyse_menu">
 			{% for feature in features %}
 				<div>
-					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}" class="{{ feature.slug }}">{{ feature.name }}</a>
+					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}/" class="{{ feature.slug }}">{{ feature.name }}</a>
 					<span></span>
 					<div class="info_box_content">
 						{{feature.description|safe}}
