@@ -95,6 +95,8 @@ function generate_pie(id, value) {
  * Draw target price block (call d3js)
  */
 function process_target_prices_blocks(){
+    console.log(target_prices_list, 'process target blocks')
+    for(i = 0 ; i< target_prices_list.length ; i++) console.log(target_prices_list[i].name)
     for(i = 0 ; i < target_prices_list.length ; i++){
         if(target_prices_list[i].processed) { continue; }
         target_prices_list[i].processed = true;
@@ -225,11 +227,6 @@ function open_graph(){
         console.log('Graph not ready yet. ' + type);
     }
 
-    // for testing, because of bulk data
-    // if(type == 'max_profitability'){
-    // eval('graphs.aggressiveness("'+url+'");');
-    // }
-
     $('.analyse_menu a').removeClass('active');
     obj.addClass('active');
     // show first target price
@@ -254,7 +251,8 @@ function load_target_prices(){
     if ( url.length ){
         $('.inner_content').animate({'opacity': 0}, 50, function(){
             $(this).addClass('hidden');
-
+            // clear target_prices list
+            target_prices_list = [];
             $('.inner_target_prices').load(url, function(){
                 $(this).removeClass('hidden');
                 $(this).animate({'opacity':1}, 100);
@@ -289,7 +287,7 @@ function change_target_prices_list(){
 
     list_type = (list_type == 'list') ? 'grid' : 'list';
     $('.latest_target_prices svg').remove();
-
+    target_prices_list = []; // target prices content will be realoded.
     // set list page
     if($('.latest_target_prices.hidden').hasClass('list')){
 
@@ -349,12 +347,12 @@ function binds_for_target_price_list(){
 }
 
 function calculate_minavgmax_block(){
- obj = $('.corp_info .avg');
- if(obj.length === 0) { return; }
+    obj = $('.corp_info .avg');
+    if(obj.length === 0) { return; }
 
- var min = obj.find('.mn i').text();
- var avg = obj.find('.av i').text();
- var max = obj.find('.mx i').text();
+    var min = obj.find('.mn i').text();
+    var avg = obj.find('.av i').text();
+    var max = obj.find('.mx i').text();
 
     // avg element style is from 55 to 250px left
     var percent = 195/(max-min)*(avg-min)+55;
@@ -441,15 +439,12 @@ function in_graph_entry_click(){
     var svg_element = $('#chart svg [name='+name+']');
 
     if(obj.hasClass('active')){
-
         obj.removeClass('active');
-        svg_element.attr('fill', svg_element.attr('origin_fill') );
-        svg_element.removeAttr('origin_fill');
-    }else{
+        svg_element.attr('fill', svg_element.attr('origin_fill') ).attr('selectd', 0);
 
+    }else{
         obj.addClass('active');
-        svg_element.attr('origin_fill', svg_element.attr('fill'));
-        svg_element.attr('fill', '#e95201');
+        svg_element.attr('fill', '#e95201').attr('selectd', 1);
     }
 }
 
@@ -463,8 +458,7 @@ function in_graph_select_active_elements(){
         svg_element = $('#chart svg [name='+name+']');
 
         if(obj.hasClass('active')){
-            svg_element.attr('origin_fill', svg_element.attr('fill'));
-            svg_element.attr('fill', '#e95201');
+            svg_element.attr('fill', '#e95201').attr('selectd', 1);
         }
     });
 }

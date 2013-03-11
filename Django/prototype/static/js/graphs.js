@@ -11,8 +11,7 @@ var graphs = (function() {
   var _url = '';
   var _element_id = "chart"
   var _data = new Array();
-  var _slugs = new Array();
-  var _urls = new Array();
+  var full_data = new Array(); // refactor, real, full data variable.
   var host = "";
   var active_topbar = "";
 
@@ -32,7 +31,10 @@ var graphs = (function() {
     },
 
     topbar_show: function(slug) {
+      if(active_topbar == slug){ return; }
+
       active_topbar = slug;
+      graphs.topbar_hide();
       d3.select(".bank li[name='"+slug+"']").attr('class', 'active').style('background-color', '#FAFAFA').transition().duration(300).style('background-color', '#fff')
     },
 
@@ -41,9 +43,6 @@ var graphs = (function() {
     },
 
     tooltip_show: function(top, left, text) {
-      /**
-        * Show tooltip method
-        */
       d3.selectAll("#chart div").remove()
       d3.select("#chart")
         .append('div')
@@ -55,55 +54,68 @@ var graphs = (function() {
         .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1)
     },
 
-    tooltip_hide: function() {
-      /**
-        * Hide tooltip method
-        */
-      //d3.selectAll("#chart div").transition().duration(400).style("opacity", 0).remove()
+    on_mouseout: function() {
+      if(d3.select(this).attr('selectd') == 0){
+        d3.select(this).attr("fill", d3.select(this).attr('origin_fill'));
+      }
     },
 
     populate: function(json) {
+      full_data = new Array();
+      var tmp_obj;
 
-      if ( _number_of_graphs >= 1 ) {
+      for (i = 0;  i < json.length ; i++) {
+        tmp_obj = {};
+        tmp_obj.value = Math.max(0, json[i].value); // TODO: why values come negatyve?
 
-        console.log("dual graph")
+        // analytics (banks) in graph
+        if (json[i].ticker__slug == undefined){
+          tmp_obj.name = json[i].analytic__name;
+          tmp_obj.slug = json[i].analytic__slug;
+          tmp_obj.type = 'analytic';
 
-      } else {
+        // ticker (company) in graph
+        }else{
+          tmp_obj.name = json[i].ticker__name;
+          tmp_obj.slug = json[i].ticker__slug;
+          tmp_obj.type = 'ticker';
+        }
 
-
-        d3.selectAll("#" + _element_id + " svg").remove()
-
-        for (var i = json.length - 1; i >= 0; i--) {
-          _data[i] = json[i].value
-          _slugs[i] = (typeof(json[i].analytic__slug) !== "undefined") ? json[i].analytic__slug : json[i].ticker__slug
-          _urls[i] = json[i].url
-        };
-
-        console.log("single graph", _slugs, _data)
-
-        /* Foo data */
-        // _data = [ 11, 22, 33, 44, 55, 66, 77, 88, 99,11, 22, 33, 44, 55, 66, 77, 88, 99, 11, 22, 33, 44, 55, 66, 77, 88, 99]
-        // _data = [99, 99, 99, 99, 1]
-        // _data.sort()
-        // _slugs = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
-        // _urls = ['foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo', 'foo']
+        full_data.push(tmp_obj);
       }
-      
-      _number_of_graphs += 1
 
-      return this
+      console.log(full_data, 'populate');
+
+
+      /*
+      if ( _number_of_graphs >= 1 ) {
+        console.log("dual graph")
+      } else {
+        console.log("single graph")
+      }
+      _number_of_graphs += 1
+      */
+      return this;
+    },
+
+    get__data: function(d){
+      var new_d = new Array();
+      for (i = 0;  i < d.length ; i++) {
+        new_d.push(d[i].value);
+      }
+      return new_d;
     },
 
     aggressiveness: function(url) {
       /**
         * Aggressiveness request
         */
-
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
           graphs.populate(json)
-          _data.sort(function(a,b){return a-b});
+          full_data.sort(function(a,b){return a.value-b.value});
+          _data = graphs.get__data(full_data);
           graphs.draw_aggressiveness();
           in_graph_select_active_elements();
 
@@ -122,7 +134,8 @@ var graphs = (function() {
         if ( !error ) {
 
           graphs.populate(json)
-          _data.sort(function(a,b){return b-a});
+          full_data.sort(function(a,b){return b.value-a.value});
+          _data = graphs.get__data(full_data);
           graphs.draw_profitability();
           in_graph_select_active_elements();
 
@@ -139,9 +152,10 @@ var graphs = (function() {
         */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
-          graphs.populate(json)
-          _data.sort(function(a,b){return a-b});
-          graphs.draw_accuracy(phase);
+          graphs.populate(json);
+          full_data.sort(function(a,b){return b.value-a.value});
+          _data = graphs.get__data(full_data);
+          graphs.draw_accuracy();
           in_graph_select_active_elements();
         } else {
           console.log("Error on fetch data: ", error.status)
@@ -156,9 +170,9 @@ var graphs = (function() {
         */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
-
           graphs.populate(json)
-          _data.sort(function(a,b){return b-a});
+          full_data.sort(function(a,b){return b.value-a.value});
+          _data = graphs.get__data(full_data);
           graphs.draw_reach_time();
           in_graph_select_active_elements();
 
@@ -177,6 +191,8 @@ var graphs = (function() {
         if ( !error ) {
 
           graphs.populate(json)
+          full_data.sort(function(a,b){return a.value-b.value});
+          _data = graphs.get__data(full_data);
           graphs.draw_impact_to_stock();
           in_graph_select_active_elements();
 
@@ -191,14 +207,13 @@ var graphs = (function() {
       /**
         * Proximity graph request
         */
-
       d3.json(host + url, function(error, json) {
         /* XHR check */
         if ( !error ) {
           /* Populate the data */
           graphs.populate(json)
-          _data.sort(function(a,b){return a-b});
-          /* Draw the graph */
+          full_data.sort(function(a,b){return a.value-b.value});
+          _data = graphs.get__data(full_data);
           graphs.draw_proximity();
           in_graph_select_active_elements();
         } else {
@@ -207,8 +222,6 @@ var graphs = (function() {
       });
       return graphs
     },
-
-
 
 
 
@@ -231,8 +244,7 @@ var graphs = (function() {
       pi = Math.PI;
 
       // fill with bulk data to have lost of lines, circle r=0 for false value
-      var data_proximity = [];
-      for(i=0 ; i< _data.length ; i++){ data_proximity.push(_data[i]); }
+      var data_proximity = $.extend([], _data);
       while(data_proximity.length < 50){ data_proximity.push(false); }
 
       angle_scale = d3.scale.linear().domain([0, data_proximity.length]).range([0, 2*pi])
@@ -272,25 +284,19 @@ var graphs = (function() {
       })
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
       .attr('fill', '#c0be81')
+      .attr('origin_fill', '#c0be81')
+      .attr('selectd', 0)
       .attr('txt', function(d,i) { return data_proximity[i] + ' %' })
-      .attr('name', function(d,i) {return _slugs[i]} )
+      .attr('name', function(d,i) { return (i < full_data.length) ? full_data[i].slug : '' } )
       .on('mouseover', function(d, i) {
         d3.select(this).attr("fill", "#e95201")
         var top = h/2+parseFloat(d3.select(this).attr('cy')) - 37
         var left = w/2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
-        if(active_topbar != _slugs[i]){
-          graphs.topbar_hide();
-          graphs.topbar_show(_slugs[i]);
-        }
+        graphs.topbar_show(full_data[i].slug);
       })
-      .on("mouseout", function() {
-        if(d3.select(this).attr('origin_fill') == null){
-          d3.select(this).attr("fill", "#c0be81");
-        }
-        graphs.tooltip_hide()
-      });
+      .on("mouseout", graphs.on_mouseout);
 
       sun.append('circle')
       .style('stroke', 'grey')
@@ -309,11 +315,8 @@ var graphs = (function() {
        */
 
       var sun_data = [0, 20, 40, 60, 80, 100];
-
       pi = Math.PI;
-
       rect_w = 20;
-
       angle_scale = d3.scale.linear().domain([0, _data.length]).range([0, 2*pi])
 
       var w = $("#" + _element_id).width() - 20,
@@ -362,32 +365,24 @@ var graphs = (function() {
       .attr('r',  6)
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")")
       .attr('fill', '#71859e')
+      .attr('origin_fill', '#71859e')
+      .attr('selectd', 0)
       .attr('txt', function(d,i) { return _data[i] + ' %' })
-      .attr('name', function(d,i) {return _slugs[i]} )
+      .attr('name', function(d,i) {return full_data[i].slug } )
       .on('mouseover', function(d, i) {
-        d3.select(this).style("fill", "#e95201")
+        d3.select(this).attr("fill", "#e95201")
         var top = h/2+parseFloat(d3.select(this).attr('cy')) - 34
         var left = w/2+parseFloat(d3.select(this).attr('cx')) - 22.5
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
-        if(active_topbar != _slugs[i]){
-          graphs.topbar_hide();
-          graphs.topbar_show(_slugs[i]);
-        }
+        graphs.topbar_show(full_data[i].slug);
       })
-      .on("mouseout", function() {
-        graphs.tooltip_hide()
-        if(d3.select(this).attr('origin_fill') == null){
-          d3.select(this).style("fill", "#71859e");
-        }
-      });
-
+      .on("mouseout", graphs.on_mouseout);
       return graphs
     },
 
     draw_profitability: function() {
       /*
-       * All done!
        * Draw profitability graph
        */
 
@@ -439,8 +434,10 @@ var graphs = (function() {
       .attr('cy', function(d, i) { return -d*rhw-10   })
       .attr('r', 6)
       .attr('fill', '#ac8dc6')
+      .attr('origin_fill', '#ac8dc6')
+      .attr('selectd', 0)
       .attr('txt', function(d,i) { return _data[i] + ' %' })
-      .attr('name', function(d,i) {return _slugs[i]} )
+      .attr('name', function(d,i) {return full_data[i].slug} )
 
       .on('mouseover', function(d, i) {
         d3.select(this).attr("fill", "#e95201")
@@ -448,17 +445,9 @@ var graphs = (function() {
         var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
-        if(active_topbar != _slugs[i]){
-          graphs.topbar_hide();
-          graphs.topbar_show(_slugs[i]);
-        }
+        graphs.topbar_show(full_data[i].slug);
       })
-      .on("mouseout", function() {
-        graphs.tooltip_hide()
-        if(d3.select(this).attr('origin_fill') == null){
-          d3.select(this).attr("fill", "#ac8dc6");
-        }
-      })
+      .on("mouseout", graphs.on_mouseout)
       .attr("transform", translate);
         
       return graphs
@@ -631,14 +620,16 @@ var graphs = (function() {
         .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
 
       sun.selectAll("#" + _element_id)
-        .data(_data.reverse()).enter()
+        .data(_data).enter()
         .append('svg:path')
         .attr('class', 'data')
         .attr("d", data_arc)
         .attr('stroke-width', 1)
         .attr("stroke", "#fff")
         .attr('fill', '#8dc6b3')
-        .attr('name', function(d,i) {return _slugs[i]} )
+        .attr('origin_fill', '#8dc6b3')
+        .attr('selectd', 0)
+        .attr('name', function(d,i) {return full_data[i].slug} )
         .on("mouseover", function(d, i) {
           d3.select(this).attr("fill", "#e95201")
           var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator')))+angle_scale(parseFloat(d3.select(this).attr('enumerator'))+1))/2-pi
@@ -647,17 +638,9 @@ var graphs = (function() {
           var left = w/2-Math.sin(angle)*(radius*rhw/110+r)
           var text = d3.select(this).attr('txt')
           graphs.tooltip_show(top, left, text)
-          if(active_topbar != _slugs[i]){
-            graphs.topbar_hide();
-            graphs.topbar_show(_slugs[i]);
-          }
+          graphs.topbar_show(full_data[i].slug);
         })
-        .on("mouseout", function() {
-          if(d3.select(this).attr('origin_fill') == null){
-            d3.select(this).attr("fill", "#8dc6b3")
-          }
-          graphs.tooltip_hide()
-        })
+        .on("mouseout", graphs.on_mouseout)
         .attr('txt', function(d) { return d+"%" })
         .attr('enumerator', function(d, i) { return i })
         .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")") 
@@ -697,10 +680,8 @@ var graphs = (function() {
 
     draw_reach_time: function() {
     /**
-      * All done!
       * Method to draw reach time
       */
-
       var linear_data = [0, 20, 40, 60, 80, 100];
 
       var w = $("#" + _element_id).width() ,
@@ -751,25 +732,19 @@ var graphs = (function() {
       .attr('cy', function(d, i) {  return -graph_height/(_data.length+1)*(i+1) })
       .attr('r', 6)
       .attr('fill', '#91bcc5')
+      .attr('origin_fill', '#91bcc5')
+      .attr('selectd', 0)
       .attr('txt', function(d,i) { return _data[i] + ' %' })
-      .attr('name', function(d,i) {return _slugs[i]} )
+      .attr('name', function(d,i) {return full_data[i].slug} )
       .on('mouseover', function(d, i) {
         d3.select(this).attr("fill", "#e95201")
         var top = h+parseFloat(d3.select(this).attr('cy')) - 37
         var left = translate_w/3*2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
-        if(active_topbar != _slugs[i]){
-          graphs.topbar_hide()
-          graphs.topbar_show(_slugs[i])
-        }
+        graphs.topbar_show(full_data[i].slug)
       })
-      .on("mouseout", function() {
-        if(d3.select(this).attr('origin_fill') == null){
-          d3.select(this).attr("fill", "#91bcc5");
-        }
-        graphs.tooltip_hide()
-      })
+      .on("mouseout", graphs.on_mouseout)
       .attr("transform", translate);
 
       return graphs
@@ -780,11 +755,8 @@ var graphs = (function() {
       * Method to draw impact to market
       */
       pi = Math.PI;
-
       phase = 0
-
       var sun_data = [0, 0, 100];
-
       var w = $("#" + _element_id).width() - 20,
         h = $("#" + _element_id).height() -120,
         r = Math.min(w,h) / 2.3,
@@ -792,6 +764,7 @@ var graphs = (function() {
         color = d3.scale.category20c();
       
       number_of_data_for_full_graph = 4
+      //console.log(full_data, _data)
 
       line_width = w/7
       rect_w = 20;
@@ -960,41 +933,31 @@ var graphs = (function() {
         .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
 
       sun.selectAll("#" + _element_id)
-        .data(_data.reverse()).enter()
+        .data(_data).enter()
         .append('svg:path')
         .attr('class', 'data')
         .attr("d", data_arc)
         .attr('stroke-width', 1)
         .attr("stroke", "#fff")
         .attr('fill', '#8dc6b3')
-        .attr('name', function(d,i) {return _slugs[i]} )
+        .attr('origin_fill', '#8dc6b3')
+        .attr('selectd', 0)
+        .attr('name', function(d,i) { return full_data[i].slug} )
         .on("mouseover", function(d, i) {
           var angle = (calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) + calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) ) /2+pi
           var radius = sun_data[2]/100*rhw+r
           d3.select(this).attr("fill", "#e95201")
-
           var top = (h-h/8)+Math.cos(angle)*radius
           var left = w/2-Math.sin(angle)*radius
           var text = d3.select(this).attr('txt')
           graphs.tooltip_show(top, left, text)
-
-          if(active_topbar != _slugs[i]){
-            graphs.topbar_hide();
-            graphs.topbar_show(_slugs[i]);
-          }
-
+          graphs.topbar_show(full_data[i].slug);
         })
-        .on("mouseout", function() {
-          if(d3.select(this).attr('origin_fill') == null){
-            d3.select(this).attr("fill", "#8dc6b3")
-          }
-          graphs.tooltip_hide()
-        })
+        .on("mouseout", graphs.on_mouseout)
         .attr('txt', function(d) { return d +"%" })
         .attr('enumerator', function(d, i) { return i })
         .attr('data_sum', function(d, i) { return d3.sum(_data) })
         .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")")
-
       return graphs
     }
   };
