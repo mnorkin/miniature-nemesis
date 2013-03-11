@@ -1,4 +1,6 @@
-
+var target_prices_list = []
+var tmp_target_price = {}
+var target_price_sort_info = {}
 var list_type;
 var page_number = Number();
 
@@ -30,7 +32,7 @@ function generate_grid_element(id, dataset, posName) {
         .domain([0, max_value])
         .range([0, width]);
 
-        var chart = d3.selectAll("#" + id).append('svg').attr('width', width).attr('height', '20').append('g');
+        var chart = d3.selectAll("#" + id + ' .'+posName).append('svg').attr('width', width).attr('height', '20').append('g');
         chart.selectAll('rect')
         .data(dataset)
         .enter().append('rect')
@@ -75,7 +77,7 @@ function generate_pie(id, value) {
     .innerRadius(35)
     .outerRadius(35);
 
-    var svg = d3.select("#" + id).append("svg")
+    var svg = d3.select("#" + id + ' .circle').append("svg")
     .attr("width", width)
     .attr("height", height)
     .append("g")
@@ -87,6 +89,20 @@ function generate_pie(id, value) {
     .attr("stroke", function(d, i) { return colors[i]; })
     .attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
     .attr("d", arc);
+}
+
+/*
+ * Draw target price block (call d3js)
+ */
+function process_target_prices_blocks(){
+    for(i = 0 ; i < target_prices_list.length ; i++){
+        if(target_prices_list[i].processed) { continue; }
+        target_prices_list[i].processed = true;
+        generate_pie(target_prices_list[i].hash, target_prices_list[i].change);
+        generate_grid_element(target_prices_list[i].hash, target_prices_list[i].accuracy, 'accuracy');
+        generate_grid_element(target_prices_list[i].hash, target_prices_list[i].profitability, 'profitability');
+        generate_grid_element(target_prices_list[i].hash, target_prices_list[i].reach_time, 'reach_time');
+    }
 }
 
 
@@ -246,6 +262,7 @@ function load_target_prices(){
                 if (list_type == 'list') {
                     list_type = 'grid';    change_target_prices_list();
                 } else {
+                    process_target_prices_blocks();
                     binds_for_target_price_list();
                 }
             });
@@ -291,6 +308,7 @@ function change_target_prices_list(){
     }
 
     // new content, bind again
+    process_target_prices_blocks();
     binds_for_target_price_list();
     load_more_target_prices();
     scroll_style_elements();
@@ -327,6 +345,7 @@ function binds_for_target_price_list(){
        );
     $('.title .entry').click(function(){ location.href = $(this).find('a').attr('href');});
     $('.latest_target_prices .toggle').unbind('click').click(change_target_prices_list);
+    $('.title.list .pre_info span a').unbind('click').click(sort_target_prices);
 }
 
 function calculate_minavgmax_block(){
@@ -340,6 +359,36 @@ function calculate_minavgmax_block(){
     // avg element style is from 55 to 250px left
     var percent = 195/(max-min)*(avg-min)+55;
     obj.find('.av').css('left',percent);
+}
+
+function sort_target_prices(){
+    var obj = $(this);
+    if(obj.hasClass('active')) { return; }
+    $('.title.list .pre_info span a').removeClass('active');
+    obj.addClass('active');
+
+    target_price_sort_info.direction = (obj.hasClass('up')) ? 'up' : 'down';
+    target_price_sort_info.slug = $(this).parent('span').attr('name');
+    var list_html = $('#target-price-list').clone();
+    $('#target-price-list').html('')
+
+    // do sort!
+    target_prices_list = get_sorted_target_prices(target_prices_list, target_price_sort_info);
+
+    for(i=0 ; i < target_prices_list.length ; i++){
+        $('#target-price-list').append(list_html.find('#'+target_prices_list[i].hash))
+    }
+}
+
+function get_sorted_target_prices(list, sort_info){
+    var new_list = $.extend([], list);
+
+    if(sort_info.direction == 'up'){
+        new_list.sort(function(a,b){return b[sort_info.slug]-a[sort_info.slug]});
+    }else{
+        new_list.sort(function(a,b){return a[sort_info.slug]-b[sort_info.slug]});
+    }
+    return new_list;
 }
 
 
@@ -358,6 +407,7 @@ $(function(){
     // In analyse page, on document ready, load first property!
     $('.analyse_menu div:first-child a').trigger('click');
 
+    process_target_prices_blocks();
     binds_for_target_price_list();
     calculate_minavgmax_block();
     load_more_target_prices();
@@ -445,8 +495,20 @@ function scroll_style_elements() {
             $('.horizontal_slider').addClass('absolute');
         }
     }
-    /*  */
+ 
+    // set target prices Date (html element on the right)
+    var obj, exit = false;
+    $('.target_price_list li').each(function(index, entry) {
+        if (exit) { return; }
+        obj = $(entry);
+        if(obj.offset().top <= window_scroll +50 && obj.offset().top + obj.outerHeight() + parseInt(obj.css('margin-bottom')) >= window_scroll +50){
+           $('.now').text(obj.attr('name'));
+           exit = true; 
+        }
 
+    });
+
+    /*
     $('.target_price_list').each(function(index, entry) {
         card_group_position = $(entry).position();
         card_group_height = $(entry).height();
@@ -458,6 +520,7 @@ function scroll_style_elements() {
             $('.now').text($(entry).attr('name'));
         }
     });
+    */
 
 }
 
@@ -471,14 +534,17 @@ function load_more_target_prices(){
         page_number +=1;
         /* Make a query */
         _url = "/page/" + page_number + "/";
+        // TODO: set target price sorting from {target_price_sort_info} variable
         $.ajax({
            url: _url,
            context: $("#target-price-list")
        }).done(function(data){
-            // $("#target-price-list br").before(data);
+            //$("#target-price-list br").before(data);
+            $("#target-price-list").append(data);
             /* Take an empty card slot, for the new card to start from the left, not right (better discriminating with dates) */
             // $(".target-price-list").after(data);
-            $('.latest_target_prices').append(data);
+            //$('.latest_target_prices').append(data);
+            process_target_prices_blocks();
             binds_for_target_price_list();
         }).error(function() {
             bottom_of_page = true;
@@ -491,6 +557,9 @@ function load_more_target_prices(){
 ***/
 
 $(window).scroll(function() {
+    if ($('.horizontal_slider').length !== 0 && horizontal_slider_top_offset === 0) {
+        horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
+    }
     load_more_target_prices();
     scroll_style_elements();
 });
