@@ -1,5 +1,8 @@
 /* Create Casper guy */
-var casper = require("casper").create();
+var casper = require("casper").create({
+    verbose: true,
+    logLevel: 'debug'
+});
 /* Top menu links */
 var top_menu_arr = [];
 var top_menu_obj = {};
@@ -12,6 +15,7 @@ var current_letter = alphabet[Math.floor(Math.random()*alphabet.length)];
 var top_menu_selector = "#mainnav li a";
 var companies_list_arr = [];
 var companies_list_obj = {};
+var page_number = 1;
 
 /**
 * Debugging tool to take the screen-shots
@@ -73,37 +77,59 @@ function parse_list() {
 * Checking if we met the last page
 ***/
 function is_this_a_last_page() {
-    var pages = document.querySelectorAll(".page_nav_bar a");
-    var next_page_number = 0;
-    var last_page_number = 0;
-    var href = [];
-    Array.prototype.map.call(pages, function(element) {
-        href = element.href.split("/");
-        if (element.innerText == 'last') {
-            last_page_number = href[href.length-1];
-        }
-        if (element.innerText) {
-            next_page_number = href[href.length-1];
+    this.waitForSelector(".page_nav_bar", function() {
+        var pages = document.querySelector(".page_nav_bar");
+        var next_page_number = 0;
+        var last_page_number = 0;
+        var href = [];
+        Array.prototype.map.call(pages, function(element) {
+            href = element.href.split("/");
+            this.echo('href:', href[href.length-1]);
+            if (element.innerText == 'last') {
+                last_page_number = href[href.length-1];
+            }
+            if (element.innerText == 'next') {
+                next_page_number = href[href.length-1];
+            }
+        });
+        this.echo('last_page_number:', last_page_number);
+        this.echo('next_page_number:', next_page_number);
+        if (last_page_number <= next_page_number) {
+            return false;
+        } else {
+            return true;
         }
     });
-    if (last_page_number == next_page_number) {
-        return false;
-    } else {
-        return true;
-    }
 }
 
 /**
 * Go to the page
 * Getting everything right with pagination
 ***/
-var go_to_page = function() {
-    this.thenOpen(url + top_menu_obj.companies_link + current_letter + page_number, function() {
-
+var go_to_next_page = function() {
+    var c_link = url + top_menu_obj.companies_link + '/' + current_letter + '/' + page_number;
+    this.open(c_link).then(function() {
+        take_screenshot.call(this);
         if ( is_this_a_last_page.call(this) ) {
+            this.echo('This is not the last page');
             page_number = page_number + 1;
+
+            /**
+            * Do all the parsing part
+            ***/
+            companies_list_arr = this.evaluate(parse_list);
+            this.echo(JSON.stringify(companies_list_arr));
+            
         } else {
-            /* Switch to the next letter, if the end of the letter pages was reached */
+            take_screenshot.call(this);
+            this.echo('This is the last page');
+            /**
+            * Page limit received, need to change the letter and star all over
+            * again
+            ***/
+            page_number = 1;
+            current_letter = alphabet[Math.floor(Math.random()*alphabet.length)];
+            // this.run(go_to_next_page);
         }
         
     });
@@ -122,12 +148,9 @@ casper.then(function() {
     top_menu_obj.companies_link = match_companies_link.call(this, top_menu_arr)[0];
     top_menu_obj.login_link = match_login_link.call(this, top_menu_arr)[0];
     /* Go for the companies list link */
-    this.thenOpen(url + top_menu_obj.companies_link, function() {
-        /* Get the list */
-        companies_list_arr = this.evaluate(parse_list);
-        this.echo(JSON.stringify(companies_list_arr));
-    });
 });
+
+casper.then(go_to_next_page);
 
 
 /**
