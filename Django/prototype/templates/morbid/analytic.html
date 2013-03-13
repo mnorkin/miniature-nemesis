@@ -34,7 +34,7 @@
 	<div class="left">
 		<div class="analyse_menu">
 			{% for feature in features %}
-			<div>
+			<div name="{{ feature.slug }}">
 				<a href="/feature_by_analytic/{{ analytic.slug }}/{{ feature.id }}/" class="{{ feature.slug }}">{{ feature.name }}</a>
 				<span></span>
 				<div class="info_box_content">

@@ -106,6 +106,16 @@ var graphs = (function() {
       return new_d;
     },
 
+    compare_graphs: function(name, slug, url){
+      /** Compares two graphs.
+       *  Current graph info we already know 
+       */
+
+      // TODO: implement.
+
+      console.log('comparing two graphs',name, slug, url);
+    },
+
     aggressiveness: function(url) {
       /**
         * Aggressiveness request

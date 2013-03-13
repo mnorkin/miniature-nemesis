@@ -95,8 +95,6 @@ function generate_pie(id, value) {
  * Draw target price block (call d3js)
  */
 function process_target_prices_blocks(){
-    console.log(target_prices_list, 'process target blocks')
-    for(i = 0 ; i< target_prices_list.length ; i++) console.log(target_prices_list[i].name)
     for(i = 0 ; i < target_prices_list.length ; i++){
         if(target_prices_list[i].processed) { continue; }
         target_prices_list[i].processed = true;
@@ -214,9 +212,7 @@ function open_graph(){
 
     obj = $(this);
     if(obj.hasClass('active')) { return false; }
-    var type = obj.attr('class');
-    type = type.toLowerCase();
-    type = type.replace(' ', '_');
+    var type = obj.parent('div').attr('name');
     var url = obj.attr('href');
     $('#chart').html('').attr('class', type);
     var graph_fx = eval('graphs.'+type);
@@ -235,8 +231,36 @@ function open_graph(){
     }
     // info box content
     $('.info_box').html( obj.siblings('div').html() );
+    show_compare_graph_buttons();
 
     return false; // prevent href
+}
+
+function show_compare_graph_buttons(){
+    var current = $('.analyse_menu a.active').attr('class');
+    if (current == undefined) { return; }
+    current = current.replace('active', '').trim();
+    $('.analyse_menu div').removeClass('can_compare');
+
+    switch (current){
+        case 'reach_time':
+            $('.analyse_menu div[name=profitability]').addClass('can_compare');
+            $('.analyse_menu div[name=impact_to_market]').addClass('can_compare');
+            $('.analyse_menu div[name=accuracy]').addClass('can_compare');
+        break;
+        case 'profitability':
+        case 'impact_to_market':
+        case 'accuracy':
+            $('.analyse_menu div[name=reach_time]').addClass('can_compare');
+        break;
+    }
+
+    $('.analyse_menu .can_compare > span').unbind('click').click(function(){
+        var slug = $(this).parent('div').attr('name');
+        var url = $(this).siblings('a').attr('href');
+        var name = $(this).siblings('a').text();
+        graphs.compare_graphs(name, slug, url);
+    })
 }
 
 function load_target_prices(){
@@ -376,6 +400,7 @@ function sort_target_prices(){
     for(i=0 ; i < target_prices_list.length ; i++){
         $('#target-price-list').append(list_html.find('#'+target_prices_list[i].hash))
     }
+    binds_for_target_price_list();
 }
 
 function get_sorted_target_prices(list, sort_info){
@@ -410,6 +435,7 @@ $(function(){
     calculate_minavgmax_block();
     load_more_target_prices();
     scroll_style_elements();
+    show_compare_graph_buttons();
 
     if ($('.horizontal_slider').length !== 0) {
         horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
@@ -533,23 +559,24 @@ function load_more_target_prices(){
            url: _url,
            context: $("#target-price-list")
        }).done(function(data){
-            //$("#target-price-list br").before(data);
             $("#target-price-list").append(data);
-            /* Take an empty card slot, for the new card to start from the left, not right (better discriminating with dates) */
-            // $(".target-price-list").after(data);
-            //$('.latest_target_prices').append(data);
-            process_target_prices_blocks();
-            binds_for_target_price_list();
+            // if one loaded page is not enough, bind and process if no more to load.
+            if(load_more_target_prices() == false){
+                process_target_prices_blocks();
+                binds_for_target_price_list();
+            } 
         }).error(function() {
             bottom_of_page = true;
         });
+        return true; // loaded more target prices
+    }else{
+        return false; // not loaded, enought
     }
 }
 
 /**
 * Scroll
 ***/
-
 $(window).scroll(function() {
     if ($('.horizontal_slider').length !== 0 && horizontal_slider_top_offset === 0) {
         horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
