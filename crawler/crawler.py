@@ -3,12 +3,17 @@
 Crawler
 """
 from lxml.html import parse  # Page parser
-from lxml.html import submit_form # Form submit
+from lxml.html import fromstring  # More control
+from lxml.html import submit_form  # Form submit
 from random import shuffle
 import json
 import httplib
 import re
 import datetime
+import urlparse
+import urllib
+import urllib2
+
 
 class crawler():
     """
@@ -30,10 +35,36 @@ class crawler():
         self.debug = True
         self.companies_list = []
         self.target_price_list = []
+        self.open_http = self.make_open_http()
         # if self.debug:
             # self.url = 'http://mstock.lt/'
             # self.companies_page = 'list.html'
             # self.company_page = 'aapl.html'
+
+    def url_with_query(self, url, values):
+        parts = urlparse.urlparse(url)
+        rest, (query, frag) = parts[:-2], parts[-2:]
+        return urlparse.urlunparse(rest + (urllib.urlencode(values), None))
+
+    def make_open_http(self):
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
+        opener.addheaders = []  # Hacking
+
+        def open_http(method, url, values={}):
+            if method == "POST":
+                return opener.open(url, urllib.urlencode(values))
+            else:
+                return opener.open(self.url_with_query(url, values))
+
+        return open_http
+
+    def go(self, page):
+        """
+        Method to go to the page
+        """
+        self.html = fromstring(self.open_http("GET", self.url + page).read())
+        # self.html = parse(self.url + page).getroot()
+        # self.current_url = self.url + page
 
     def rest(self, url, request, data=None):
         """
@@ -65,13 +96,6 @@ class crawler():
         """
         shuffle(self.alphabet)
         self.letter = str(self.alphabet.pop())
-
-    def go(self, page):
-        """
-        Method to go to the page
-        """
-        self.html = parse(self.url + page).getroot()
-        self.current_url = self.url + page
 
     def companies_next_page_available(self):
         """
@@ -239,11 +263,19 @@ class crawler():
         except Exception, e:
             raise e
 
+        login_form.action = self.url + '/' + login_form.action
         login_form.fields['username'] = 'arvydas.tamulis@gmail.com'
         login_form.fields['password'] = 'liko789'
 
-        self.html = parse(submit_form(login_form)).getroot()
+        submit_values = {'submit': login_form.fields['Login']}
 
+        submit_form(
+            login_form,
+            extra_values=submit_values, open_http=self.open_http
+        )
+
+        self.go('companies/A.+Schulman%2C+Inc.')
+        print self.html.text_content()
         return True
 
 if __name__ == '__main__':
