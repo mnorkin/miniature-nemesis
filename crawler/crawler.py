@@ -1,8 +1,10 @@
 #!/usr/bin/python2
 """
 Crawler
+
+App written specially for the Target Price project.
+
 """
-from lxml.html import parse  # Page parser
 from lxml.html import fromstring  # More control
 from lxml.html import submit_form  # Form submit
 from random import shuffle
@@ -36,10 +38,8 @@ class crawler():
         self.companies_list = []
         self.target_price_list = []
         self.open_http = self.make_open_http()
-        # if self.debug:
-            # self.url = 'http://mstock.lt/'
-            # self.companies_page = 'list.html'
-            # self.company_page = 'aapl.html'
+
+        self.shuffle_letter()  # Shuffle letter for initial browsing
 
     def url_with_query(self, url, values):
         parts = urlparse.urlparse(url)
@@ -93,13 +93,25 @@ class crawler():
     def shuffle_letter(self):
         """
         Method to shuffle the alphabet and return random letter
+
+        There are two possibilities: go for the pop() method, which returns the
+        last element from the list and removes it from the list completely, or
+        just say make a single request and keep all the letters in the alphabet.
+
+        The random letters distribution is uniform, so there is equal
+        probability for each letter to pop-out
         """
-        shuffle(self.alphabet)
-        self.letter = str(self.alphabet.pop())
+        shuffle(self.alphabet)  # Randomize the list
+        self.letter = str(self.alphabet[1])  # Return the letter
 
     def companies_next_page_available(self):
         """
         Checking if there is a next page in the current page
+
+        The method gets the links from the page_nav_bar class element and
+        fetches which of the following links are `last` and which is `previous`.
+        Using the numbers of those links (pagination numbers), one can define
+        then the page has reached its limit.
         """
         link_last = self.html.xpath(
             '//div[@class="page_nav_bar"][1]/a[text()="last"]')[0]
@@ -117,6 +129,8 @@ class crawler():
     def send_target_prices(self):
         """
         Method to send collected target prices
+
+        The method sends the target price data to the Crawler API server.
         """
 
         for target_price in self.target_price_list:
@@ -124,6 +138,11 @@ class crawler():
             if not response:
                 print "Target price send fail"
                 return False
+
+        return True
+        """
+        Return true if everything was send successfully
+        """
 
     def targetprice_parse_list(self, company_index=None):
         """
@@ -167,7 +186,7 @@ class crawler():
                 """
                 prices.append('0')
 
-            # Month-Day-Year
+            # Month-Day-Year (stupid Americans)
             date = datetime.datetime.strptime(items[4], "%m/%d/%y")
 
             item = {
@@ -216,19 +235,12 @@ class crawler():
             print "Companies list fail"
             return False
 
-    def companies(self):
+    def digesture_companies_list(self):
         """
-        Method to crawl the companies page
+        Method to scroll the companies list
         """
-        self.shuffle_letter()  # Shuffle the random letter
-        if self.debug:
-            self.go(self.companies_page)
-        else:
-            self.go(
-                self.companies_page
-                + '/' + self.letter + '/' + str(self.page_number)
-            )
-        self.companies_parse_list()
+
+        something_was_sent = False
         for company_index, company in enumerate(self.companies_list):
             if company['ticker'].isalpha():
                 response = self.rest(
@@ -242,7 +254,8 @@ class crawler():
                 """
                 print "Ticker exists and needs data, making the data happen"
                 if self.targetprice_parse_list(company_index):
-                    self.send_target_prices()
+                    if self.send_target_prices():
+                        something_was_sent = True
                 else:
                     print "Ticker target price list fail"
                     return False
@@ -252,9 +265,37 @@ class crawler():
                 """
                 print "Ticker does not exist or is very confidential with data"
 
+        return something_was_sent
+
+    def companies(self):
+        """
+        Method to crawl the companies page
+        """
+        self.go(
+            self.companies_page
+            + '/' + self.letter + '/' + str(self.page_number)
+        )  # Go the companies list page, with specific letter and page number
+
+        self.companies_parse_list()  # Make the list of companies in the page
+        if self.digesture_companies_list():  # Scroll through every company and check with server
+            """Check if any company in the list was good for the serve"""
+            self.shuffle_letter()  # Shuffle the random letter
+            self.page_number = 1  # Reset page numbering
+            self.companies()  # Start all over again
+        else:
+            """If no companies data was sent -- switch to the next page if available"""
+            if self.companies_next_page_available:  # If there is any more pages
+                self.page_number = self.page_number + 1  # Add next page
+            else:
+                self.shuffle_letter()  # Shuffle the next letter
+                self.page_number = 1  # Reset the pages
+            self.companies()  # Keep the job going
+
     def login(self):
         """
         Method to make a login happen
+
+        Handles all the login information and handling of form submission.
         """
         self.go(self.login_page)
         # Login form is right after the search form
@@ -262,6 +303,7 @@ class crawler():
             login_form = self.html.forms[1]
         except Exception, e:
             raise e
+            return False
 
         login_form.action = self.url + '/' + login_form.action
         login_form.fields['username'] = 'arvydas.tamulis@gmail.com'
@@ -274,10 +316,9 @@ class crawler():
             extra_values=submit_values, open_http=self.open_http
         )
 
-        self.go('companies/A.+Schulman%2C+Inc.')
-        print self.html.text_content()
         return True
 
 if __name__ == '__main__':
-    cra = crawler()
-    cra.companies()
+    cra = crawler()  # Define the crawler
+    cra.login()  # Make the login happen
+    cra.companies()  # Go to the companies page and start the job
