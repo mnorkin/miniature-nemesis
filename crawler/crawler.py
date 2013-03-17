@@ -18,8 +18,6 @@ import urllib
 import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
-from socksipyconnection import SocksiPyHandler
-import socks
 
 
 class crawler():
@@ -60,9 +58,11 @@ class crawler():
         Need to implement the threading right here
         """
 
+        self.shuffle_letter()  # shuffle letter for initial browsing
+        self.login()  # Make the login happen
+        self.login_check()  # Check if the user logged in
+
         while (self.check_time()):
-            self.shuffle_letter()  # shuffle letter for initial browsing
-            self.login()  # Make the login happen
             self.companies()  # Go to the companies page and start the job
 
     def check_time(self):
@@ -331,7 +331,6 @@ class crawler():
             self.shuffle_letter()  # Shuffle the random letter
             self.page_number = 1  # Reset page numbering
             logging.debug("Next letter: " + self.letter)
-            self.companies()  # Start all over again
         else:
             """If no companies data was sent -- switch to the next page if available"""
             logging.debug("No companies data was send, consider to go to the\
@@ -342,7 +341,7 @@ class crawler():
             else:
                 self.shuffle_letter()  # Shuffle the next letter
                 self.page_number = 1  # Reset the pages
-            self.companies()  # Keep the job going
+            return  # Return to main
 
     def login(self):
         """
@@ -370,6 +369,17 @@ class crawler():
         )
 
         return True
+
+    def login_check(self):
+        """
+        Checking if the login was successfully
+        """
+        self.go("my-account")
+
+        if len(self.html.xpath('//a[@href="/login?mode=logout"]')) == 0:
+            return False
+        else:
+            return True
 
 if __name__ == '__main__':
     cra = crawler()  # Define the crawler

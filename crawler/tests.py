@@ -12,8 +12,8 @@ class crawler_test(unittest.TestCase):
         """
         Setting up working environment
         """
-        self.normal_crawler = crawler()
-        self.another_crawler = crawler()
+        self.crawler_one = crawler()
+        self.crawler_two = crawler()
         self.server_ip = '84.240.27.174'
 
     def tearDown(self):
@@ -24,8 +24,8 @@ class crawler_test(unittest.TestCase):
 
     def test_shuffle(self):
         self.assertNotEqual(
-            self.normal_crawler.shuffle_letter().letter,
-            self.normal_crawler.shuffle_letter().letter, "Shuffle fail")
+            self.crawler_one.shuffle_letter().letter,
+            self.crawler_one.shuffle_letter().letter, "Shuffle fail")
 
     def test_login(self):
         """
@@ -46,9 +46,9 @@ class crawler_test(unittest.TestCase):
         """
         Checking if the tor is available
         """
-        self.normal_crawler.go_absolute('http://checkip.dyndns.org/')
+        self.crawler_one.go_absolute('http://checkip.dyndns.org/')
         self.assertNotEqual(
-            self.normal_crawler.html.body.text_content().split(" ")[-1],
+            self.crawler_one.html.body.text_content().split(" ")[-1],
             self.server_ip,
             'Tor support fail')
 
