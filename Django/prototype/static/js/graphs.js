@@ -12,8 +12,10 @@ var graphs = (function() {
   var _element_id = "chart"
   var _data = new Array();
   var full_data = new Array(); // refactor, real, full data variable.
+  var current_name;
   var host = "";
   var active_topbar = "";
+  var best_analytic = {value:0};
 
   var _number_of_graphs = 0
 
@@ -28,6 +30,9 @@ var graphs = (function() {
         * (not sure if needed anymore)
         */
       _url = url
+    },
+    get_best_analytic: function(){
+      return best_analytic;
     },
 
     topbar_show: function(slug) {
@@ -61,12 +66,14 @@ var graphs = (function() {
     },
 
     populate: function(json) {
-      full_data = new Array();
-      var tmp_obj;
+      var tmp_obj, f_data = new Array();
 
       for (i = 0;  i < json.length ; i++) {
         tmp_obj = {};
-        tmp_obj.value = Math.max(0, json[i].value); // TODO: why values come negatyve?
+        // TODO: why values come negatyve?
+        // set values max 100, min 0
+        tmp_obj.value = Math.max(0, json[i].value); 
+        tmp_obj.value = Math.min(100, tmp_obj.value);
 
         // analytics (banks) in graph
         if (json[i].ticker__slug == undefined){
@@ -81,21 +88,12 @@ var graphs = (function() {
           tmp_obj.type = 'ticker';
         }
 
-        full_data.push(tmp_obj);
+        f_data.push(tmp_obj);
+
+        if(tmp_obj.value > best_analytic.value) { best_analytic = tmp_obj}
       }
 
-      console.log(full_data, 'populate');
-
-
-      /*
-      if ( _number_of_graphs >= 1 ) {
-        console.log("dual graph")
-      } else {
-        console.log("single graph")
-      }
-      _number_of_graphs += 1
-      */
-      return this;
+      return f_data;
     },
 
     get__data: function(d){
@@ -106,16 +104,6 @@ var graphs = (function() {
       return new_d;
     },
 
-    compare_graphs: function(name, slug, url){
-      /** Compares two graphs.
-       *  Current graph info we already know 
-       */
-
-      // TODO: implement.
-
-      console.log('comparing two graphs',name, slug, url);
-    },
-
     aggressiveness: function(url) {
       /**
         * Aggressiveness request
@@ -123,7 +111,7 @@ var graphs = (function() {
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
-          graphs.populate(json)
+          full_data = graphs.populate(json)
           full_data.sort(function(a,b){return a.value-b.value});
           _data = graphs.get__data(full_data);
           graphs.draw_aggressiveness();
@@ -143,7 +131,7 @@ var graphs = (function() {
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
-          graphs.populate(json)
+          full_data = graphs.populate(json)
           full_data.sort(function(a,b){return b.value-a.value});
           _data = graphs.get__data(full_data);
           graphs.draw_profitability();
@@ -162,7 +150,7 @@ var graphs = (function() {
         */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
-          graphs.populate(json);
+          full_data = graphs.populate(json);
           full_data.sort(function(a,b){return b.value-a.value});
           _data = graphs.get__data(full_data);
           graphs.draw_accuracy();
@@ -180,7 +168,7 @@ var graphs = (function() {
         */
       d3.json(host + url, function(error, json) {
         if ( !error ) {
-          graphs.populate(json)
+          full_data = graphs.populate(json);
           full_data.sort(function(a,b){return b.value-a.value});
           _data = graphs.get__data(full_data);
           graphs.draw_reach_time();
@@ -200,7 +188,7 @@ var graphs = (function() {
       d3.json(host + url, function(error, json) {
         if ( !error ) {
 
-          graphs.populate(json)
+          full_data = graphs.populate(json);
           full_data.sort(function(a,b){return a.value-b.value});
           _data = graphs.get__data(full_data);
           graphs.draw_impact_to_stock();
@@ -221,7 +209,7 @@ var graphs = (function() {
         /* XHR check */
         if ( !error ) {
           /* Populate the data */
-          graphs.populate(json)
+          full_data = graphs.populate(json);
           full_data.sort(function(a,b){return a.value-b.value});
           _data = graphs.get__data(full_data);
           graphs.draw_proximity();
@@ -949,8 +937,8 @@ var graphs = (function() {
         .attr("d", data_arc)
         .attr('stroke-width', 1)
         .attr("stroke", "#fff")
-        .attr('fill', '#8dc6b3')
-        .attr('origin_fill', '#8dc6b3')
+        .attr('fill', '#bdcfdb')
+        .attr('origin_fill', '#bdcfdb')
         .attr('selectd', 0)
         .attr('name', function(d,i) { return full_data[i].slug} )
         .on("mouseover", function(d, i) {
@@ -969,6 +957,109 @@ var graphs = (function() {
         .attr('data_sum', function(d, i) { return d3.sum(_data) })
         .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")")
       return graphs
+    },
+
+  compare_graphs: function(name, slug, _url){
+      
+      d3.json(host + _url, function(error, json) {
+        if ( !error ) {
+          d3.selectAll("#" + _element_id + " svg").remove();
+          $('#chart').attr('class', '');
+          d3.selectAll("#chart div").remove()
+          var _data2 = [], full_data2 = graphs.populate(json);
+
+          // map data, first_feature[x] == second_feature[x]
+          for (i = 0;  i < full_data.length ; i++) {
+            for (j = 0;  j < full_data2.length ; j++) {
+              if(full_data[i].slug == full_data2[j].slug){
+                _data2.push(full_data2[j].value);
+                break;
+              }
+            }
+          }
+          graphs.draw_compare_graphs(graphs.current_name, name, _data2);
+          in_graph_select_active_elements();
+
+        } else {
+          console.log("Error on fetch data: ", error.status)
+        }
+      });
+  },
+
+  draw_compare_graphs: function(title1, title2, _data2){
+      /** Compares two graphs.
+       *  Current graph info we already know 
+       */
+
+      var w = $("#" + _element_id).width() ,
+      h = $("#" + _element_id).height() ,
+      rhw = w / 109,
+      rwh = h / 109,
+      translate_w = w/16,
+      graph_height = h-15,
+      translate = "translate(6," + h + ")";
+
+      var linear = d3.select("#" + _element_id).append("svg:svg")
+      .attr("width", w)
+      .attr("height", h);
+
+      linear.selectAll("#" + _element_id).data([0]).enter()
+      .append("svg:rect")
+      .attr('fill', "#e1c8b4")
+      .attr('height', graph_height-25)
+      .attr('width', 1)
+      .attr("x",  0)
+      .attr("y", -graph_height)
+      .attr("transform", translate);
+      linear.selectAll("#"+_element_id).data([0]).enter()
+      .append("svg:text")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .style("fill", "#bd9267")
+      .attr("dy", -graph_height + 10)
+      .attr("dx", 6)
+      .text(title2)
+      .attr("transform", translate);
+
+      linear.selectAll("#" + _element_id).data([100]).enter()
+      .append("svg:rect")
+      .attr("fill", "#e1c8b4")
+      .attr('width',  100*rhw)
+      .attr('height', 1)
+      .attr('y', -25 )
+      .attr('x', 0)
+      .attr("transform", translate);
+      linear.selectAll("#"+_element_id).data([0]).enter()
+      .append("svg:text")
+      .attr("text-anchor", "end")
+      .style("font-size", "12px")
+      .style("font-weight", "bold")
+      .style("fill", "#bd9267")
+      .attr("dy", -30)
+      .text(title1)
+      .attr("dx", function(){ return 100*rhw })
+      .attr("transform", translate);
+
+
+      linear.selectAll('#' + _element_id).data(_data).enter()
+      .append('svg:circle')
+      .attr('cx', function(d, i) {  return d*rhw  })
+      .attr('cy', function(d, i) {  return -(_data2[i]*rwh+25) })
+      .attr('r', 6)
+      .attr('fill', '#8bc8b6')
+      .attr('origin_fill', '#8bc8b6')
+      .attr('selectd', 0)
+      .attr('txt', function(d,i) { return _data[i] + ' %' })
+      .attr('name', function(d,i) {return full_data[i].slug} )
+      .on('mouseover', function(d, i) {
+        d3.select(this).attr("fill", "#e95201")
+        graphs.topbar_show(full_data[i].slug)
+      })
+      .on("mouseout", graphs.on_mouseout)
+      .attr("transform", translate);
+      
+      return graphs
     }
+
   };
 })();

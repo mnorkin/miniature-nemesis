@@ -214,26 +214,37 @@ function open_graph(){
     if(obj.hasClass('active')) { return false; }
     var type = obj.parent('div').attr('name');
     var url = obj.attr('href');
+    var name = obj.text();
     $('#chart').html('').attr('class', type);
     var graph_fx = eval('graphs.'+type);
 
     if(typeof(graph_fx) === 'function') {
         graph_fx(url);
+        graphs.current_name = name;
     } else {
         console.log('Graph not ready yet. ' + type);
     }
 
     $('.analyse_menu a').removeClass('active');
     obj.addClass('active');
-    // show first target price
-    if($('#bank li.active').length === 0) {
-        $('#bank li:first-child').addClass('active').removeClass('passive');
-    }
+    
     // info box content
     $('.info_box').html( obj.siblings('div').html() );
     show_compare_graph_buttons();
-
     return false; // prevent href
+}
+
+function set_active_analytic(){
+    // show first target price
+    if($('#bank li.active').length === 0) {
+        if(location.hash.length != 0){
+            var name = location.hash.substr(1);
+        }else{
+            var name = graphs.get_best_analytic().slug;
+        }
+        $('#bank li[name='+name+']').addClass('active').removeClass('passive');
+        $('.in_graph li[name='+name+']').addClass('active');
+    }
 }
 
 function show_compare_graph_buttons(){
@@ -378,8 +389,9 @@ function calculate_minavgmax_block(){
     var avg = obj.find('.av i').text();
     var max = obj.find('.mx i').text();
 
-    // avg element style is from 55 to 250px left
-    var percent = 195/(max-min)*(avg-min)+55;
+    // avg element style is from 55 to 250px left; 50 - 246
+    //var percent = 195/(max-min)*(avg-min)+55;
+    var percent = 196/(max-min)*(avg-min)+50;
     obj.find('.av').css('left',percent);
 }
 
@@ -475,6 +487,8 @@ function in_graph_entry_click(){
 }
 
 function in_graph_select_active_elements(){
+    set_active_analytic(); // for first time. if any
+
     var list = $('.in_graph .sear li');
     var obj, name, svg_element;
 

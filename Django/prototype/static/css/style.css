@@ -226,7 +226,7 @@ li{ list-style: none; }
     text-align: right;
     font-weight: bold;
     position: absolute;
-    top:39px;
+    top:41px;
     left:200px;
 }
 
@@ -243,8 +243,8 @@ li{ list-style: none; }
     top:13px;
     left:-117px;
     width:110px;
-    height: 25px;
-    line-height: 25px;
+    height: 24px;
+    line-height: 24px;
     font-size:12px;
     text-align: center;
 }
@@ -260,8 +260,8 @@ li{ list-style: none; }
 }
 
 .title .toggle{
-    height: 26px;
-    line-height: 23px;
+    height: 24px;
+    line-height: 24px;
     color:#fff;
     background: url('../images/compare_1.png') 0 0 no-repeat;
     display:inline-block;
@@ -662,23 +662,26 @@ li{ list-style: none; }
     width: 340px;
     border-left: 1px solid #e7e0da;
     height: 62px;
-    background: url('../images/min_max_1.png') 30px 20px no-repeat;
+    background: url('../images/min_max_2.png') 47px 20px no-repeat;
     position: relative;
     margin-left: 7px;
 }
 .corp_info .avg li{
     position: absolute;
-    top:3px;
-    left:20px;
+    top:5px;
+    left:10px;
     width:36px;
     text-align:center;
     display: inline-block;
     color:#c7a17a;
     font-weight: 200;
 }
+.corp_info .avg li.mn, .corp_info .avg li.mx{
+    top:17px;
+}
 .corp_info .avg li.av{
     left:150px;
-    background: url('../images/min_max_circle_1.png') 8px 19px no-repeat;
+    background: url('../images/min_max_circle_1.png') 8px 17px no-repeat;
 }
 
 .corp_info .avg li.mx{
@@ -687,9 +690,12 @@ li{ list-style: none; }
 .corp_info .avg li i{
     display: block;
     font-style: normal;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
     font-weight: bold;
     color:#444444;
+}
+.corp_info .avg li.mn i, .corp_info .avg li.mx i{
+    margin-bottom: -2px;
 }
 .corp_info.analytic{
     display: table;

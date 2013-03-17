@@ -1,5 +1,5 @@
 <li name="{{date|date:'M. d, Y'}}" class="entry chart" id="{{ target.hash }}01">
-  <a class="ticket" href="{{ target.ticker.get_absolute_url }}">
+  <a class="ticket" href="{{ target.ticker.get_absolute_url }}#{{ target.analytic.slug }}">
     <span class="ln"><span>{{ target.ticker.long_name }} </span></span>
     <span class="sn">({{ target.ticker.name }})</span>
     <span class="goust">{{ target.ticker.long_name }} </span>

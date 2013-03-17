@@ -68,13 +68,6 @@
 					<span class="number">{{ target.analytic.number_of_tp }}<strong>No of target prices</strong> </span>
 					<span class="number">{{ target.analytic.volatility_positive }}/{{ target.analytic.volatility_negative }}<strong>Volatility</strong> </span>
 				</li>
-				{% if target.fap %}
-					<!-- <ul> -->
-						<!-- {% for feature in target.fap %} -->
-							<!-- <li>{{ feature.feature.name }}: {{ feature.value }} {{ feature.feature.unit.name }}</li> -->
-						<!-- {% endfor %} -->
-					<!-- </ul> -->
-				{% endif %}
 			{% endfor %}
 		</ul>
 		
