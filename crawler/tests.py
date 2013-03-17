@@ -1,5 +1,43 @@
 import unittest
 from csv_parser import csv_parser
+from crawler import crawler
+
+
+class crawler_test(unittest.TestCase):
+    """
+    Unit test for the crawler
+    """
+    def setUp(self):
+        """
+        Setting up working environment
+        """
+        self.normal_crawler = crawler
+
+    def tearDown(self):
+        """
+        Garbage collecting
+        """
+        pass
+
+    def test_shuffle(self):
+        self.assertNotEqual(
+            self.normal_crawler.shuffle_letter().letter,
+            self.normal_crawler.shuffle_letter().letter, "Shuffle fail")
+
+    def test_login(self):
+        """
+        TODO:
+        * Make a true and false logins
+        """
+        pass
+
+    def test_page_limits(self):
+        """
+        TODO:
+        * Make a request to the current letter on the first page and the last
+        page and monitor if the next_page_available method returns true/false
+        """
+        pass
 
 
 class csv_parser_test(unittest.TestCase):

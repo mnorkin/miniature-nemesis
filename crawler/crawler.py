@@ -8,13 +8,16 @@ App written specially for the Target Price project.
 from lxml.html import fromstring  # More control
 from lxml.html import submit_form  # Form submit
 from random import shuffle
+from datetime import date
+from datetime import datetime
 import json
 import httplib
 import re
-import datetime
 import urlparse
 import urllib
-import urllib2
+import urllib2  # Access interwebs
+import logging  # Logging
+import os  # Directories
 
 
 class crawler():
@@ -38,8 +41,38 @@ class crawler():
         self.companies_list = []
         self.target_price_list = []
         self.open_http = self.make_open_http()
+        self.absolute_path = os.path.dirname(os.path.realpath(__file__))
+        self.logging_file = self.absolute_path
+        + '/logs/crawler_' + date.today().isoformat() + '.log'
+        self.logging_level = logging.DEBUG
+        self.start_hour = 12
+        self.len_hour = 8
+
+        logging.basicConfig(
+            filename=self.logging_file,
+            level=self.logging_level, format='%(asctime)s %(message)s')
+
+    def main(self):
+        """
+        Main things happens here.
+
+        Need to implement the threading right here
+        """
+
+        self.check_time()
 
         self.shuffle_letter()  # Shuffle letter for initial browsing
+        self.login()  # Make the login happen
+        self.companies()  # Go to the companies page and start the job
+
+    def check_time(self):
+        """
+        Time management guy
+        """
+        if datetime.now().hour >= self.start_hour and datetime.now() < self.start_hour + self.len_hour:
+            return True
+        else:
+            return False
 
     def url_with_query(self, url, values):
         parts = urlparse.urlparse(url)
@@ -63,8 +96,7 @@ class crawler():
         Method to go to the page
         """
         self.html = fromstring(self.open_http("GET", self.url + page).read())
-        # self.html = parse(self.url + page).getroot()
-        # self.current_url = self.url + page
+        self.current_url = self.url + page
 
     def rest(self, url, request, data=None):
         """
@@ -73,9 +105,6 @@ class crawler():
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         conn = httplib.HTTPConnection("localhost:8000")
-        print "Request: ", request
-        print "Params: ", params
-        print "Headers: ", headers
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         conn.close()
@@ -122,8 +151,12 @@ class crawler():
             link_last.attrib['href'].split("/")[-1] ==
             link_previous.attr['href'].split("/")[-1] + 1
         ):
+            logging.debug("No more pages available")
+            logging.debug("Current Url: " + self.current_url)
             return False
         else:
+            logging.debug("Pages are available")
+            logging.debug("Current Url: " + self.current_url)
             return True
 
     def send_target_prices(self):
@@ -136,7 +169,9 @@ class crawler():
         for target_price in self.target_price_list:
             response = self.rest("/api/target_prices/", "POST", target_price)
             if not response:
-                print "Target price send fail"
+                logging.error("Target price send fail")
+                logging.debug("Data wanted to send: ")
+                logging.debug(json.dumps(target_price))
                 return False
 
         return True
@@ -148,22 +183,14 @@ class crawler():
         """
         Method to visit the company page and get the list of the target prices
         """
-        if self.debug:
-            """
-            For debugging, go to the local page
-            """
-            self.go(self.company_page)
-        else:
-            """
-            For production, go to the appropriate page
-            """
-            self.go(self.companies_list[company_index]['link'])
+        self.go(self.companies_list[company_index]['link'])
 
         table = self.html.xpath('//table[2]/tbody/tr[position()>1]')
         """Select the second table in the page"""
 
         if len(table) < 1:
-            print "Companies target price list fail"
+            logging.error("Companies target table select fail")
+            logging.debug("Current url: " + self.current_url)
             return False
 
         self.target_price_list = []
@@ -187,7 +214,7 @@ class crawler():
                 prices.append('0')
 
             # Month-Day-Year (stupid Americans)
-            date = datetime.datetime.strptime(items[4], "%m/%d/%y")
+            date = datetime.strptime(items[4], "%m/%d/%y")
 
             item = {
                 'action': items[0],
@@ -206,6 +233,8 @@ class crawler():
         if len(self.target_price_list) > 1:
             return True
         else:
+            logging.error("Target price list fail")
+            logging.debug("Current url: " + self.current_url)
             return False
 
     def companies_parse_list(self):
@@ -215,7 +244,8 @@ class crawler():
         links = self.html.xpath('//div[@id="company-list"]//a')
 
         if len(links) < 1:
-            print "company-list links fail"
+            logging.error("company-list links select fail")
+            logging.debug("Current url: " + self.current_url)
             return False
 
         self.companies_list = []
@@ -232,7 +262,8 @@ class crawler():
         if len(self.companies_list) > 1:
             return True
         else:
-            print "Companies list fail"
+            logging.error("Companies list length fail")
+            logging.debug("Current url: " + self.current_url)
             return False
 
     def digesture_companies_list(self):
@@ -257,7 +288,8 @@ class crawler():
                     if self.send_target_prices():
                         something_was_sent = True
                 else:
-                    print "Ticker target price list fail"
+                    logging.error("Ticker target price list fail")
+                    logging.debug("Current url: " + self.current_url)
                     return False
             else:
                 """
@@ -279,13 +311,19 @@ class crawler():
         self.companies_parse_list()  # Make the list of companies in the page
         if self.digesture_companies_list():  # Scroll through every company and check with server
             """Check if any company in the list was good for the serve"""
+            logging.debug("Some target price data was send from the list")
+            logging.debug("Continue with the next letter from the big list")
             self.shuffle_letter()  # Shuffle the random letter
             self.page_number = 1  # Reset page numbering
+            logging.debug("Next letter: " + self.letter)
             self.companies()  # Start all over again
         else:
             """If no companies data was sent -- switch to the next page if available"""
+            logging.debug("No companies data was send, consider to go to the\
+                next page or switch to the next letter")
             if self.companies_next_page_available:  # If there is any more pages
                 self.page_number = self.page_number + 1  # Add next page
+                logging.debug("Moving to the next page: " + str(self.page_number))
             else:
                 self.shuffle_letter()  # Shuffle the next letter
                 self.page_number = 1  # Reset the pages
@@ -301,8 +339,8 @@ class crawler():
         # Login form is right after the search form
         try:
             login_form = self.html.forms[1]
-        except Exception, e:
-            raise e
+        except:
+            logging.error("Login form find fail")
             return False
 
         login_form.action = self.url + '/' + login_form.action
@@ -320,5 +358,4 @@ class crawler():
 
 if __name__ == '__main__':
     cra = crawler()  # Define the crawler
-    cra.login()  # Make the login happen
-    cra.companies()  # Go to the companies page and start the job
+    cra.main()  # Launch the main guy into the wild

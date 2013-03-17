@@ -32,7 +32,7 @@ def virtualenv(command):
     Virtualenv `sub shell`
     """
     with cd(env.code_root):
-        sudo(env.activate + '; ' + command, user=env.deploy_user)
+        runcmd(env.activate + '; ' + command, user=env.deploy_user)
 
 
 def test():
@@ -139,9 +139,9 @@ def upload_tar_from_git(path):
     require('whole_path', provided_by=[environment])
     "Create an archive from the current git version and upload it to the server"
     local('git archive --format=tar master | gzip > %s.tar.gz' % env.release)
-    sudo('mkdir -p %s' % path)
+    runcmd('mkdir -p %s' % path)
     put('%s.tar.gz' % env.release, '/tmp', mode=0755)
-    sudo('mv /tmp/%s.tar.gz %s/packages/' % (env.release, env.code_root))
+    runcmd('mv /tmp/%s.tar.gz %s/packages/' % (env.release, env.code_root))
 
     sudo('cd %s && tar zxf ../../../packages/%s.tar.gz' % (env.whole_path, env.release))
     # sudo('cp %s/nginx.conf /etc/nginx/sites-enabled/default' % env.whole_path)
@@ -205,7 +205,7 @@ def start_webserver():
     """
     Starting the server
     """
-    sudo("nginx -s reload")
+    # sudo("nginx -s reload")
     virtualenv('%s/releases/current/%s/manage.py syncdb --noinput' % (env.code_root, env.project_name))
     virtualenv('%s/releases/current/%s/manage.py collectstatic --noinput' % (env.code_root, env.project_name))
     virtualenv('%s/releases/current/%s/deamon.py start; sleep 2' % (env.code_root, env.project_name))
