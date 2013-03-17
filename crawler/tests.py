@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 import unittest
 from csv_parser import csv_parser
 from crawler import crawler
@@ -11,7 +12,9 @@ class crawler_test(unittest.TestCase):
         """
         Setting up working environment
         """
-        self.normal_crawler = crawler
+        self.normal_crawler = crawler()
+        self.another_crawler = crawler()
+        self.server_ip = '84.240.27.174'
 
     def tearDown(self):
         """
@@ -38,6 +41,16 @@ class crawler_test(unittest.TestCase):
         page and monitor if the next_page_available method returns true/false
         """
         pass
+
+    def test_tor(self):
+        """
+        Checking if the tor is available
+        """
+        self.normal_crawler.go_absolute('http://checkip.dyndns.org/')
+        self.assertNotEqual(
+            self.normal_crawler.html.body.text_content().split(" ")[-1],
+            self.server_ip,
+            'Tor support fail')
 
 
 class csv_parser_test(unittest.TestCase):

@@ -18,6 +18,8 @@ import urllib
 import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
+from socksipyconnection import SocksiPyHandler
+import socks
 
 
 class crawler():
@@ -42,10 +44,9 @@ class crawler():
         self.target_price_list = []
         self.open_http = self.make_open_http()
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path
-        + '/logs/crawler_' + date.today().isoformat() + '.log'
+        self.logging_file = self.absolute_path + '/logs/crawler_' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 12
+        self.start_hour = 22
         self.len_hour = 8
 
         logging.basicConfig(
@@ -59,17 +60,19 @@ class crawler():
         Need to implement the threading right here
         """
 
-        self.check_time()
-
-        self.shuffle_letter()  # Shuffle letter for initial browsing
-        self.login()  # Make the login happen
-        self.companies()  # Go to the companies page and start the job
+        while (self.check_time()):
+            self.shuffle_letter()  # shuffle letter for initial browsing
+            self.login()  # Make the login happen
+            self.companies()  # Go to the companies page and start the job
 
     def check_time(self):
         """
         Time management guy
         """
-        if datetime.now().hour >= self.start_hour and datetime.now() < self.start_hour + self.len_hour:
+        if (
+            datetime.now().hour >= self.start_hour and
+            datetime.now() < self.start_hour + self.len_hour
+        ):
             return True
         else:
             return False
@@ -80,8 +83,14 @@ class crawler():
         return urlparse.urlunparse(rest + (urllib.urlencode(values), None))
 
     def make_open_http(self):
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor())
-        opener.addheaders = []  # Hacking
+        proxy_support = urllib2.ProxyHandler({'http': '127.0.0.1:8118'})
+        """Tor support"""
+        cooki_support = urllib2.HTTPCookieProcessor()
+        """Cookies support"""
+        opener = urllib2.build_opener(cooki_support, proxy_support)
+        # opener = urllib2.build_opener(proxy_support)
+        opener.addheaders = [('User-agent', 'Mozilla/5.0')]  # Hacking
+        urllib2.install_opener(opener)
 
         def open_http(method, url, values={}):
             if method == "POST":
@@ -90,6 +99,12 @@ class crawler():
                 return opener.open(self.url_with_query(url, values))
 
         return open_http
+
+    def go_absolute(self, _url):
+        """
+        Absolute go to the page
+        """
+        self.html = fromstring(self.open_http("GET", _url).read())
 
     def go(self, page):
         """
