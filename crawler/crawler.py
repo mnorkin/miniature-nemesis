@@ -18,6 +18,7 @@ import urllib
 import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
+from mailmain import mailman
 
 
 class crawler():
@@ -46,6 +47,8 @@ class crawler():
         self.logging_level = logging.DEBUG
         self.start_hour = 22
         self.len_hour = 8
+        self.mailman = mailman(
+            'AKIAJKFJFUKWVJSBYA5Q', 'tdIQlhdUjXAC+CUkNPXjKLir3LuZKDiW2q96CFZn')
 
         logging.basicConfig(
             filename=self.logging_file,
@@ -184,6 +187,7 @@ class crawler():
         for target_price in self.target_price_list:
             response = self.rest("/api/target_prices/", "POST", target_price)
             if not response:
+                self.mailman.write('Target price send fail, please check the logs')
                 logging.error("Target price send fail")
                 logging.debug("Data wanted to send: ")
                 logging.debug(json.dumps(target_price))
@@ -204,6 +208,7 @@ class crawler():
         """Select the second table in the page"""
 
         if len(table) < 1:
+            self.mailman.write('Companies target table select fail, please check the logs')
             logging.error("Companies target table select fail")
             logging.debug("Current url: " + self.current_url)
             return False
@@ -248,6 +253,7 @@ class crawler():
         if len(self.target_price_list) > 1:
             return True
         else:
+            self.mailman.write('Target Price list fail, please check the logs')
             logging.error("Target price list fail")
             logging.debug("Current url: " + self.current_url)
             return False
@@ -259,6 +265,7 @@ class crawler():
         links = self.html.xpath('//div[@id="company-list"]//a')
 
         if len(links) < 1:
+            self.mailman.write('Company-list selector link fail, please check the logs')
             logging.error("company-list links select fail")
             logging.debug("Current url: " + self.current_url)
             return False
@@ -277,6 +284,7 @@ class crawler():
         if len(self.companies_list) > 1:
             return True
         else:
+            self.mailman.write('Companies list length fail, please check the logs')
             logging.error("Companies list length fail")
             logging.debug("Current url: " + self.current_url)
             return False
@@ -303,6 +311,7 @@ class crawler():
                     if self.send_target_prices():
                         something_was_sent = True
                 else:
+                    self.mailman.write('Ticker target prices list fail, please check the logs')
                     logging.error("Ticker target price list fail")
                     logging.debug("Current url: " + self.current_url)
                     return False
@@ -354,6 +363,7 @@ class crawler():
         try:
             login_form = self.html.forms[1]
         except:
+            self.mailman.write('Login form find fail, please check the logs')
             logging.error("Login form find fail")
             return False
 
