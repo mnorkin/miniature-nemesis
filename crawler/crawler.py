@@ -10,6 +10,7 @@ from lxml.html import submit_form  # Form submit
 from random import shuffle
 from datetime import date
 from datetime import datetime
+import time
 import json
 import httplib
 import re
@@ -45,10 +46,11 @@ class crawler():
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
         self.logging_file = self.absolute_path + '/logs/crawler_' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 22
-        self.len_hour = 8
+        self.start_hour = 1  # Then the crawler starts its job
+        self.len_hour = 8  # How long in hours the crawler works
         self.mailman = mailman(
-            'AKIAJKFJFUKWVJSBYA5Q', 'tdIQlhdUjXAC+CUkNPXjKLir3LuZKDiW2q96CFZn')
+            'AKIAJKFJFUKWVJSBYA5Q',
+            'tdIQlhdUjXAC+CUkNPXjKLir3LuZKDiW2q96CFZn')  # Mail-man keys to the box
 
         logging.basicConfig(
             filename=self.logging_file,
@@ -67,6 +69,7 @@ class crawler():
 
         while (self.check_time()):
             self.companies()  # Go to the companies page and start the job
+            time.sleep(400)
 
     def check_time(self):
         """
@@ -78,6 +81,7 @@ class crawler():
         ):
             return True
         else:
+            time.sleep(300)  # Wait for 5 minutes
             return False
 
     def url_with_query(self, url, values):

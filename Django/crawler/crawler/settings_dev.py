@@ -1,25 +1,32 @@
-# Django settings for prototype project.
+# Django settings for crawler project.
+
 import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('Maksim Norkin', 'maksim.norkin@ieee.org'),
+    ('Maksim Norkin', 'm.norkin@gmail.com'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'dev-morbid',                      # Or path to database file if using sqlite3.
-        'USER': 'postgres',                      # Not used with sqlite3.
-        'PASSWORD': 'fupHU8Ut',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'cra-morbid',  # Or path to database file if using sqlite3.
+        'USER': 'postgres',  # Not used with sqlite3.
+        'PASSWORD': 'fupHU8Ut',  # Not used with sqlite3.
+        'HOST': '',
+        # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',  # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+# Hosts/domain names that are valid for this site; required if DEBUG is False
+# See https://docs.djangoproject.com/en//ref/settings/#allowed-hosts
+ALLOWED_HOSTS = []
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -49,12 +56,12 @@ ROOT_PATH = os.path.dirname(os.path.realpath(__file__))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ROOT_PATH + '/media/'
+MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = '/media/'
+MEDIA_URL = ''
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -71,7 +78,6 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    ROOT_PATH + '/../static/',
 )
 
 # List of finder classes that know how to find static files in
@@ -83,7 +89,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'c7i^3fqd=ki8p9ic#&amp;)lj*qb#9ddj^na20qb-f4r(3404u+-a-'
+SECRET_KEY = 'nx8zug*-^im$ntbje)5$-c%m(10c1lg=t9@&amp;31k99f%^m@snb8'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -102,13 +108,12 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'prototype.urls'
+ROOT_URLCONF = 'crawler.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'prototype.wsgi.application'
+WSGI_APPLICATION = 'crawler.wsgi.application'
 
 TEMPLATE_DIRS = (
-    ROOT_PATH + '/../templates/',
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -125,12 +130,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
-    'gunicorn',
     'apikey',
-    'morbid'
+    'sink'
 )
-
-APIKEY_AUTHORIZATION_HEADER = 'App-Authorization'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

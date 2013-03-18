@@ -1,6 +1,7 @@
 from fabric.api import *
 # from fabric.contrib.project import rsync_project
-# from fabric.contrib import files, console
+from fabric.contrib import files
+# from fabric.contrib import console
 # from fabric import utils
 from fabric.operations import *
 import datetime
@@ -13,9 +14,9 @@ def environment():
     """
     Definition of the environment
     """
-    env.user = 'root'
+    env.user = 'agurkas'
     env.hosts = ['185.5.55.178']
-    env.deploy_user = 'root'
+    env.deploy_user = 'agurkas'
     env.version = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     env.release = env.version
     # Virtualenv path root
@@ -32,7 +33,7 @@ def virtualenv(command):
     Virtualenv `sub shell`
     """
     with cd(env.code_root):
-        runcmd(env.activate + '; ' + command, user=env.deploy_user)
+        run(env.activate + '; ' + command)
 
 
 def test():
@@ -52,8 +53,8 @@ def create_group():
 
     # Create a new group
     wheel_group = 'wheel'
-    runcmd('addgroup {group}'.format(group=wheel_group))
-    runcmd('echo "%{group} ALL=(ALL) ALL" >> /etc/sudoers'.format(group=wheel_group))
+    run('addgroup {group}'.format(group=wheel_group))
+    run('echo "%{group} ALL=(ALL) ALL" >> /etc/sudoers'.format(group=wheel_group))
 
 
 def create_user(wheel_username, wheel_password):
@@ -62,11 +63,11 @@ def create_user(wheel_username, wheel_password):
     wheel_group = 'wheel'
 
     # Create a new user
-    runcmd('adduser {username} --disabled-password --gecos ""'.format(username=wheel_username))
-    runcmd('adduser {username} {group}'.format(username=wheel_username, group=wheel_group))
+    run('adduser {username} --disabled-password --gecos ""'.format(username=wheel_username))
+    run('adduser {username} {group}'.format(username=wheel_username, group=wheel_group))
 
     # Set the password
-    runcmd('echo "{username}:{password}" | chpasswd'.format(username=wheel_username, password=wheel_password))
+    run('echo "{username}:{password}" | chpasswd'.format(username=wheel_username, password=wheel_password))
 
 
 def setup():
@@ -88,7 +89,7 @@ def setup():
     # sudo('apt-get install -y git-core')
     # sudo('apt-get install -y libpq-dev python-dev')
     # sudo('apt-get install -y python2.7-dev')
-    sudo('apt-get install -y libpq-dev')
+    # sudo('apt-get install -y libpq-dev')
 
     # Additional future configurations
     sudo('mkdir -p %s; cd %s; virtualenv .;source ./bin/activate' % (env.code_root, env.code_root))
@@ -139,9 +140,9 @@ def upload_tar_from_git(path):
     require('whole_path', provided_by=[environment])
     "Create an archive from the current git version and upload it to the server"
     local('git archive --format=tar master | gzip > %s.tar.gz' % env.release)
-    runcmd('mkdir -p %s' % path)
+    run('mkdir -p %s' % path)
     put('%s.tar.gz' % env.release, '/tmp', mode=0755)
-    runcmd('mv /tmp/%s.tar.gz %s/packages/' % (env.release, env.code_root))
+    run('mv /tmp/%s.tar.gz %s/packages/' % (env.release, env.code_root))
 
     sudo('cd %s && tar zxf ../../../packages/%s.tar.gz' % (env.whole_path, env.release))
     # sudo('cp %s/nginx.conf /etc/nginx/sites-enabled/default' % env.whole_path)
@@ -176,7 +177,7 @@ def symlink_current_release():
         sudo('cd %s; ln -nsf %s/ releases/current;\
             chown %s -R releases/current;\
             chgrp %s -R releases/current' % (env.code_root, env.release, env.user, env.user))
-    virtualenv('cd %s; chmod +x releases/current/%s/deamon.py' % (env.code_root, env.project_name))
+    sudo('cd %s; chmod +x releases/current/%s/deamon.py' % (env.code_root, env.project_name))
     virtualenv('cd %s;\
         mv releases/current/%s/prototype/settings.py releases/current/%s/prototype/settings_local.py' % (env.code_root, env.project_name, env.project_name))
     virtualenv('cd %s;\

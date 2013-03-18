@@ -110,7 +110,8 @@ class Daemon:
         # Try killing the daemon process
         try:
             while 1:
-                os.kill(pid, SIGTERM)
+                os.kill(pid, SIGTERM)  # Kill the first one
+                os.kill(pid+1, SIGTERM)  # And the second one
                 time.sleep(0.1)
         except OSError, err:
             err = str(err)
@@ -121,7 +122,9 @@ class Daemon:
                     print str(err)
                     sys.exit(1)
 
-        os.system('pkill gunicorn')
+        # os.system('pkill gunicorn')
+        # Now we have multiple gunicorns on the ground, so need to be more
+        # careful about killing everything gunicorn-ish
         """A fast and robust way to kill gunicorn server, otherwise not killable"""
 
     def restart(self):
@@ -140,7 +143,8 @@ class Daemon:
 
 class guniron_daemon(Daemon):
     def run(self):
-        os.system('cd /var/www/dev_targetprice/releases/current/morbid; gunicorn prototype.wsgi')
+        # Development version binds on 9000 port
+        os.system('cd /var/www/dev_targetprice/releases/current/morbid; gunicorn --bind=127.0.0.1:9000 prototype.wsgi')
 
 if __name__ == '__main__':
     """
@@ -148,8 +152,8 @@ if __name__ == '__main__':
     * A better logging solution, by date for example
     """
     log_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    log_path = "/var/log/gunicorn_everything_" + log_date + ".log"
-    deamon = guniron_daemon('/tmp/gunicorn-deamon.pid', '/dev/null', log_path, log_path)
+    log_path = "/var/log/dev-gunicorn_everything_" + log_date + ".log"
+    deamon = guniron_daemon('/tmp/dev-gunicorn-deamon.pid', '/dev/null', log_path, log_path)
 
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
