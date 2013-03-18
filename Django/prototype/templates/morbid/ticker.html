@@ -19,7 +19,13 @@
 	{% if ticker %}
 		
 	<ul class="corp_info">
-		<li class="name">{{ ticker.long_name }} ({{ ticker.name }})<div class="text-gradient"></div></li>
+		<li class="name sliding">
+			<span class="text">
+				<span class="slid">({{ ticker.name }}) {{ ticker.long_name }}</span>
+				<span class="bliur">&nbsp;</span>
+    			<span class="goust">&nbsp;</span>
+			</span>
+		</li>
 		<li class="price">{{ ticker.last_stock_price }}</li>
 		<li class="price_detail">1.50 (<i></i>3.25%)</li>
 		<li class="number">{{ ticker.number_of_analytics }} <span>Analysts</span> </li>
@@ -62,7 +68,13 @@
 		<ul class="bank" id="bank">
 			{% for target in target_prices %}
 				<li name="{{ target.analytic.slug }}" class="passive">
-					<span class="corp"><a href="{{target.analytic.get_absolute_url}}">{{ target.analytic }} </a></span> 
+					<span class="corp sliding">
+						<a class="text" href="{{target.analytic.get_absolute_url}}">
+							<span class="slid">{{ target.analytic }} </span>
+							<span class="bliur">&nbsp;</span>
+			    			<span class="goust">&nbsp;</span>
+						</a>
+					</span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price|cut:'.0' }} <strong>Last target price</strong> </span>
 					<span class="number">{{ target.analytic.number_of_tp }}<strong>No of target prices</strong> </span>

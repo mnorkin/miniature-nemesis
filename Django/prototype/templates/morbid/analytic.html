@@ -18,7 +18,13 @@
 {% if analytic %}
 
 	<ul class="corp_info analytic">
-		<li class="name">{{ analytic.name }}</li>
+		<li class="name sliding">
+			<span class="text">
+				<span class="slid"> {{ analytic.name }}</span>
+				<span class="bliur">&nbsp;</span>
+    			<span class="goust">&nbsp;</span>
+			</span>
+		</li>
 		<li class="thirteen"><strong>{{ analytic.number_of_companies }}</strong> Companies</li>
 		<li class="thirteen"><strong>{{ analytic.number_of_tp }}</strong> Active target prices</li>
 	</ul>
@@ -51,7 +57,13 @@
 		<ul class="bank" id="bank">
 			{% for target in target_prices %}
 				<li name="{{ target.ticker.slug }}" class="passive">
-					<span class="corp"><a href="{{target.ticker.get_absolute_url}}">{{ target.ticker }}</a></span> 
+					<span class="corp sliding">
+						<a class="text" href="{{target.ticker.get_absolute_url}}">
+							<span class="slid">{{ target.ticker }}</span>
+							<span class="bliur">&nbsp;</span>
+		    				<span class="goust">&nbsp;</span>
+						</a>
+					</span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price }} <strong>Last target price</strong> </span>
 					<span class="number">35.1<strong>No of target prices</strong> </span>

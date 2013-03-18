@@ -189,7 +189,7 @@ var graphs = (function() {
         if ( !error ) {
 
           full_data = graphs.populate(json);
-          full_data.sort(function(a,b){return a.value-b.value});
+          full_data.sort(function(a,b){return b.value-a.value});
           _data = graphs.get__data(full_data);
           graphs.draw_impact_to_stock();
           in_graph_select_active_elements();
@@ -231,9 +231,9 @@ var graphs = (function() {
 
       /* Calculate constants */
       var w = $("#" + _element_id).width() - 20,
-      h = $("#" + _element_id).height() - 40,
+      h = $("#" + _element_id).height() - 30,
       r = Math.min(w, h) / 20,
-      rhw = Math.min(w,h) /2.2,
+      rhw = Math.min(w,h) /2.25,
       color = d3.scale.category20c();
 
       var sun = d3.select("#"+_element_id).append("svg:svg")
@@ -242,8 +242,21 @@ var graphs = (function() {
       pi = Math.PI;
 
       // fill with bulk data to have lost of lines, circle r=0 for false value
-      var data_proximity = $.extend([], _data);
-      while(data_proximity.length < 50){ data_proximity.push(false); }
+      var lines = 50, data_proximity = [], full_data_proximity = [], n = 0, j = 0, space;
+      if (lines > _data.length){
+        for(i = 0 ; i < lines ; i++){
+          space = Math.floor( (lines-i-1) / (_data.length-j));
+          if(space <= n){
+            data_proximity.push(_data[j]); full_data_proximity.push(full_data[j]);
+            j++; n=0;
+          }else{
+            data_proximity.push(false); full_data_proximity.push({});
+            n++;
+          }
+        }
+      }else{
+        data_proximity = $.extend([], _data); full_data_proximity = $.extend([], full_data);
+      }
 
       angle_scale = d3.scale.linear().domain([0, data_proximity.length]).range([0, 2*pi])
 
@@ -285,14 +298,14 @@ var graphs = (function() {
       .attr('origin_fill', '#c0be81')
       .attr('selectd', 0)
       .attr('txt', function(d,i) { return data_proximity[i] + ' %' })
-      .attr('name', function(d,i) { return (i < full_data.length) ? full_data[i].slug : '' } )
+      .attr('name', function(d,i) { return full_data_proximity[i].slug } )
       .on('mouseover', function(d, i) {
         d3.select(this).attr("fill", "#e95201")
         var top = h/2+parseFloat(d3.select(this).attr('cy')) - 37
         var left = w/2+parseFloat(d3.select(this).attr('cx')) - 23
         var text = d3.select(this).attr('txt')
         graphs.tooltip_show(top, left, text)
-        graphs.topbar_show(full_data[i].slug);
+        graphs.topbar_show(full_data_proximity[i].slug);
       })
       .on("mouseout", graphs.on_mouseout);
 

@@ -161,41 +161,45 @@ li{ list-style: none; }
 }
 
 /** Long company names moving. If you find a better solution for that, I will buy you a beer! */
-.title .entry .ticket .ln{
+.sliding{
+    position: relative;
+}
+.title .entry .ticket .text, .sliding .text{
     display: inline-block;
-    width: 130px;
+    width: 170px;
     position: relative;
     text-align: left;
     overflow: hidden;
     height: 18px;
 }
-.title .entry .ticket .ln span{
+.corp_info .sliding .text{
+    width: 230px;
+}
+.corp_info.analytic .sliding .text{
+    width: 290px;
+}
+.bank .corp.sliding .text{
+    width: 180px;
+}
+
+.title .entry .ticket .text .slid, .sliding .text .slid{
     display: inline-block;
     position: relative;
     top:0;
     left: 0px;
     height: 18px;
-    width: 500px;
+    width: 800px;
 }
-.title .entry .ticket .sn{
+.title .entry .ticket .bliur, .sliding .bliur{
     background: url('../images/gradient_3.png') 2px 0 repeat-y;
     position: absolute;
-    left: 103px;
+    right: 0;
     top:0;
     display: inline-block;
-    padding-left: 30px;
-    width: 50px;
+    width: 25px;
+    height: 18px;
 }
-.title.list .entry .ticket .sn{
-    position: absolute;
-    top:1px;
-    right: 4px;
-    left: auto;
-    width: 40px;
-    padding-left: 23px;
-    text-align: center;
-}
-.title .entry  .goust{
+.title .entry .goust, .sliding .goust{
     visibility: hidden;
     position: absolute;
     left: -100px;

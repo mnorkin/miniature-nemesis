@@ -1,8 +1,10 @@
 <li name="{{date|date:'M. d, Y'}}" class="entry chart" id="{{ target.hash }}01">
-  <a class="ticket" href="{{ target.ticker.get_absolute_url }}#{{ target.analytic.slug }}">
-    <span class="ln"><span>{{ target.ticker.long_name }} </span></span>
-    <span class="sn">({{ target.ticker.name }})</span>
-    <span class="goust">{{ target.ticker.long_name }} </span>
+  <a class="ticket sliding" href="{{ target.ticker.get_absolute_url }}#{{ target.analytic.slug }}">
+    <span class="text">
+      <span class="slid">{{ target.ticker.long_name }} ({{ target.ticker.name }}) </span>
+      <span class="bliur">&nbsp;</span>
+      <span class="goust">&nbsp;</span>
+    </span>
   </a>
   <a class="analytic">{{ target.analytic }}</a>
   <span class="price">{{ target.price|cut:".0" }}</span>

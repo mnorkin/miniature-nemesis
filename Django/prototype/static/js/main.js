@@ -371,10 +371,12 @@ function binds_for_target_price_list(){
     // long company names moving
     $('.title .entry').hover(
         function() {
-           var left = Math.min(0, (125 - $(this).find('.goust').width()) );
-           $(this).find('.ln span').animate({'left': left}, (left * -15) );
+           var obj = $(this);
+           obj.find('.goust').text(obj.find('.text .slid').text());
+           var left = Math.min(0, (165 - obj.find('.goust').width()) );
+           obj.find('.text .slid').animate({'left': left}, (left * -15) );
        },
-       function(){ $(this).find('.ln span').stop().css({'left': 0});}
+       function(){ $(this).find('.text .slid').stop().css({'left': 0});}
        );
     $('.title .entry').click(function(){ location.href = $(this).find('a').attr('href');});
     $('.latest_target_prices .toggle').unbind('click').click(change_target_prices_list);
@@ -441,6 +443,18 @@ $(function(){
 
     // In analyse page, on document ready, load first property!
     $('.analyse_menu div:first-child a').trigger('click');
+
+    // long company names moving
+    $('.corp_info, .bank .corp').hover(
+        function() {
+           var obj = $(this);
+           obj.find('.goust').text(obj.find('.text .slid').text());
+           var left = Math.min(0, (obj.find('.text').width() - 5 - obj.find('.goust').width()) );
+           obj.find('.text .slid').animate({'left': left}, (left * -15) );
+       },
+       function(){ $(this).find('.text .slid').stop().css({'left': 0});}
+    );
+
 
     process_target_prices_blocks();
     binds_for_target_price_list();
