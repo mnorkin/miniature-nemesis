@@ -32,7 +32,7 @@ class crawler():
         """
         Initialization of the crawler buddy
         """
-        self.url = 'http://stocktargetprices2.com/'
+        self.url = 'http://stocktargetprices.com/'
         self.current_url = self.url
         self.html = None
         self.login_page = 'login'
@@ -130,11 +130,12 @@ class crawler():
         """
         Method to go to the page
         """
+        logging.debug('Going to: ' + page)
         try:
             self.html = fromstring(self.open_http("GET", self.url + page).read())
             self.current_url = self.url + page
-            return True
         except urllib2.URLError:
+            logging.debug('Urllib2.URLError : ' + self.url + page)
             time.sleep(1000*cycle)  # Sleeping time
             if cycle < 10:
                 self.go(page, cycle + 1)
@@ -142,10 +143,16 @@ class crawler():
                 mailman.write('Cannot connect to the page')
                 logging.debug('Connection to the page failed')
                 return False
+        return True
 
     def rest(self, url, request, data=None, cycle=1):
         """
         Rest interface for the crawler API
+
+        Then the page does not respond, returning the 502 error, added a
+        listener for that. Waiting ensures, that nothing does drop off, and
+        one can immediately respond to such a system fault, because the email
+        is deployed to the developer.
         """
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
@@ -186,6 +193,7 @@ class crawler():
         """
         shuffle(self.alphabet)  # Randomize the list
         self.letter = str(self.alphabet[1])  # Return the letter
+        self.page_number = 1
 
     def companies_next_page_available(self):
         """
@@ -240,22 +248,32 @@ class crawler():
         """
         self.go(self.companies_list[company_index]['link'])
 
-        table = self.html.xpath('//table[2]/tbody/tr[position()>1]')
+        # table = self.html.xpath('//table[2]/tbody/tr[position()>1]')
+        table = self.html.xpath('//table[2]/tr')
         """Select the second table in the page"""
 
         if len(table) < 1:
-            self.mailman.write('Companies target table select fail, please check the logs')
-            logging.error("Companies target table select fail")
-            logging.debug("Current url: " + self.current_url)
-            return False
+            """
+            This only means, that there exists only one table, trying it
+            """
+            table = self.html.xpath('//table[1]/tr')
+            if len(table) < 1:
+                self.mailman.write('Companies target table select fail, please check the logs')
+                logging.error("Companies target table select fail")
+                logging.debug("Current url: " + self.current_url)
+                logging.debug("Table contents\n" + self.html.text_content())
+                return False
 
         self.target_price_list = []
 
         for entry in table:
-            items = entry.text_content().split('\n')[:-1]
+            # items = entry.text_content().replace('\t', '').split('\n')[:-1]
+            items = entry.getchildren()
             """Split the table entry row into places"""
             prices = re.findall(
-                r'[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?', items[3])
+                r'[+-]? *(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?', items[3].text_content().replace('\t', ''))
+            # prices = re.findall(
+                # r'[0-9,\,]+\.?[0-9]+', entry.text_content().replace('\t', ''))
             """Scan and find any prices"""
 
             if len(prices) == 0:
@@ -269,19 +287,22 @@ class crawler():
                 """
                 prices.append('0')
 
+            logging.debug('Plain data: ' + entry.text_content().strip())
             # Month-Day-Year (stupid Americans)
-            date = datetime.strptime(items[4], "%m/%d/%y")
+            date = datetime.strptime(items[-1].text_content().strip(), "%m/%d/%y")
 
             item = {
-                'action': items[0],
-                'analytic': items[1],
-                'rating': items[2],
+                'action': items[0].text_content().strip(),
+                'analytic': items[1].text_content().strip(),
+                'rating': items[2].text.strip(),
                 'price0': prices[0],
                 'price1': prices[1],
                 'date': date.strftime('%Y-%m-%d'),
                 'ticker': self.companies_list[company_index]['ticker']
             }
             """Form a list item"""
+
+            logging.debug("Filtered data: " + json.dumps(item))
 
             self.target_price_list.append(item)
             """Append to the buffer"""
@@ -292,6 +313,7 @@ class crawler():
             self.mailman.write('Target Price list fail, please check the logs')
             logging.error("Target price list fail")
             logging.debug("Current url: " + self.current_url)
+            logging.debug("Data\n" + json.dumps(self.target_price_list))
             return False
 
     def companies_parse_list(self):
@@ -330,7 +352,7 @@ class crawler():
         Method to scroll the companies list
         """
 
-        something_was_sent = False
+        # something_was_sent = False
         for company_index, company in enumerate(self.companies_list):
             if company['ticker'].isalpha():
                 response = self.rest(
@@ -342,10 +364,10 @@ class crawler():
                 """
                 Feed the API with data
                 """
-                print "Ticker exists and needs data, making the data happen"
+                logging.debug("Ticker %s exists and needs data, making the data happen" % company['ticker'])
                 if self.targetprice_parse_list(company_index):
                     if self.send_target_prices():
-                        something_was_sent = True
+                        return True
                 else:
                     self.mailman.write('Ticker target prices list fail, please check the logs')
                     logging.error("Ticker target price list fail")
@@ -355,9 +377,9 @@ class crawler():
                 """
                 API said it's ok, go on to the next one
                 """
-                print "Ticker does not exist or is very confidential with data"
+                logging.debug("Ticker %s does not exist or is very confidential with data" % company['ticker'])
 
-        return something_was_sent
+        return False
 
     def companies(self):
         """
@@ -395,6 +417,7 @@ class crawler():
         Handles all the login information and handling of form submission.
         """
         self.go(self.login_page)
+        logging.debug('Login into the system as ' + self.login_username)
         # Login form is right after the search form
         try:
             login_form = self.html.forms[1]

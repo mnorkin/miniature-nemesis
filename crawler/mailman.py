@@ -15,7 +15,7 @@ class mailman():
         self.access_key_id = _access_key_id
         self.secret_access_key = _secret_access_key
         self.amazon_ses = AmazonSES(self.access_key_id, self.secret_access_key)
-        self.send_from = 'mailman-noreply@crawler.baklazanas.lt'
+        self.send_from = 'maksim.norkin@ieee.org'
         self.send_to = 'm.norkin@gmail.com'
         self.topic = 'Crawler mail-man reporting'
         self.message = EmailMessage()
