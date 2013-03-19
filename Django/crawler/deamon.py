@@ -123,9 +123,8 @@ class Daemon:
                     sys.exit(1)
 
         # os.system('pkill gunicorn')
-        """A fast and robust way to kill gunicorn server, otherwise not killable"""
-        # This method does assume that the server has only one gunicorn server,
-        # no multiple servers are available
+        os.system('ps aux | grep cra_targetprice | awk "{print $2}" | xargs -r kill -9')
+        # Filtering out process, which runs in `cra_targetprice` directory and kill it
 
     def restart(self):
         """

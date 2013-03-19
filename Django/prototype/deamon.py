@@ -123,8 +123,8 @@ class Daemon:
                     sys.exit(1)
 
         # os.system('pkill gunicorn')
-        # Now we have multiple gunicorns on the ground, so need to be more
-        # careful about killing everything gunicorn-ish
+        os.system('ps aux | grep dev_targetprice | awk {"print $2"} | xargs -r kill -9')
+        # Filtering-out the process, which takes in `dev_targetprice` directory and kill it !
         """A fast and robust way to kill gunicorn server, otherwise not killable"""
 
     def restart(self):
