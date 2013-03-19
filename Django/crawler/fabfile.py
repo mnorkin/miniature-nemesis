@@ -1,17 +1,18 @@
 from fabric.api import *
-from fabtic.operations import *
+from fabric.contrib import files
+from fabric.operations import *
 import datetime
 
 env.project_name = 'crawler'
 
 
 def environment():
-    env.user = 'root'
+    env.user = 'agurkas'
     env.hosts = ['185.5.55.178']
     env.deploy_user = 'agurkas'
     env.version = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     env.release = env.version
-    env.code_root = '/var/www/crawler'
+    env.code_root = '/var/www/cra_targetprice'
     env.activate = 'source %s/bin/activate' % env.code_root
     env.code_root_parent = '/var/www'
     env.whole_path = '%s/releases/%s/%s' % (env.code_root, env.release, env.project_name)
@@ -23,7 +24,7 @@ def virtualenv(command):
     Virtualenv `sub shell`
     """
     with cd(env.code_root):
-        runcmd(env.activate + '; ' + command, user=env.deploy_user)
+        run(env.activate + '; ' + command)
 
 
 def test():
@@ -48,7 +49,7 @@ def setup():
     require('hosts', provided_by=[environment])
     require('code_root')
 
-    runcmd('mkdir -p %s' % (env.code_root))
+    run('mkdir -p %s' % (env.code_root))
     virtualenv('mkdir releases; mkdir shared; mkdir packages')
 
     reset_permissions()
@@ -62,7 +63,7 @@ def deploy():
     require('hosts', provided_by=[environment])
     require('whole_path', provided_by=[environment])
     require('code_root')
-    update_tar_from_git(env.whole_path)
+    upload_tar_from_git(env.whole_path)
     install_requirements()
     symlink_current_release()
     restart_webserver()
@@ -75,7 +76,7 @@ def update():
     require('hosts', provided_by=[environment])
     require('whole_path', provided_by=[environment])
     require('code_root')
-    update_tar_from_git(env.whole_path)
+    upload_tar_from_git(env.whole_path)
     install_requirements()
     symlink_current_release()
     restart_webserver()
@@ -88,10 +89,10 @@ def upload_tar_from_git(path):
     require('release', provided_by=[environment])
     require('whole_path', provided_by=[environment])
     local('git archive --format=tar master | gzip > %s.tar.gz' % env.release)
-    runcmd('mkdir -p %s' % path)
+    run('mkdir -p %s' % path)
     put('%s.tar.gz' % env.release, '/tmp', mode=0755)
-    runcmd('mv /tmp/%s.tar.gz %s/packages/' % (env.release, env.code_root))
-    runcmd('cd %s && tar zxf ../../../packages/%s.tar.gz' % (env.whole_path, env.release))
+    run('mv /tmp/%s.tar.gz %s/packages/' % (env.release, env.code_root))
+    run('cd %s && tar zxf ../../../packages/%s.tar.gz' % (env.whole_path, env.release))
     local('rm %s.tar.gz' % env.release)
     reset_permissions()
 
@@ -116,23 +117,23 @@ def symlink_current_release():
 
     if not files.exists(symlink_path):
         with cd(env.code_root):
-            runcmd('ln -s %s/ releases/current' % env.release)
+            run('ln -s %s/ releases/current' % env.release)
     else:
         with cd(env.code_root):
-            runcmd('ln -nsf %s/ releases/current' % env.release)
+            run('ln -nsf %s/ releases/current' % env.release)
 
     with cd(env.code_root):
-        runcmd('chown %s -R releases/current' % env.deploy_user)
-        runcmd('chgrp %s -R releases/current' % env.deploy_user)
+        run('chown %s -R releases/current' % env.deploy_user)
+        run('chgrp %s -R releases/current' % env.deploy_user)
 
     with cd(env.code_root + '/releases/current'):
-        runcmd('chmod +x %s/daemon.py' % env.project_name)
+        run('chmod +x %s/deamon.py' % env.project_name)
         # Set the appropriate permissions to launch the daemon
-        runcmd(
+        run(
             'mv %s/crawler/settings.py %s/crawler/settings_local.py' %
             (env.project_name, env.project_name))
         # Rename the development version of settings as local
-        runcmd(
+        run(
             'mv %s/crawler/settings_dev.py %s/crawler/settings.py' %
             (env.project_name, env.project_name))
         # Rename the server settings to the current settings

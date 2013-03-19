@@ -144,7 +144,7 @@ class Daemon:
 class guniron_daemon(Daemon):
     def run(self):
         # Crawler binds on 9050 port
-        os.system('cd /var/www/crawler/releases/current/morbid; gunicorn  --bind=127.0.0.1:9050 crawler.wsgi')
+        os.system('cd /var/www/crawler/releases/current/crawler; gunicorn  --bind=127.0.0.1:9050 crawler.wsgi')
 
 if __name__ == '__main__':
     """
