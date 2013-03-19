@@ -12,7 +12,8 @@ def send(request, url, data):
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("185.5.55.178")
-        conn = httplib.HTTPConnection("localhost:8000")
+        # conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection("cra.baklazanas.lt")
         print "Request: ", request
         print "Params: ", params
         print "Headers: ", headers

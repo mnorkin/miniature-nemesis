@@ -8,6 +8,7 @@ App written specially for the Target Price project.
 from lxml.html import fromstring  # More control
 from lxml.html import submit_form  # Form submit
 from random import shuffle
+from random import random
 from datetime import date
 from datetime import datetime
 import time
@@ -19,7 +20,7 @@ import urllib
 import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
-from mailmain import mailman
+from mailman import mailman
 
 
 class crawler():
@@ -31,10 +32,12 @@ class crawler():
         """
         Initialization of the crawler buddy
         """
-        self.url = 'http://stocktargetprices.com/'
+        self.url = 'http://stocktargetprices2.com/'
         self.current_url = self.url
         self.html = None
         self.login_page = 'login'
+        self.login_username = 'arvydas.tamulis@gmail.com'
+        self.login_password = 'liko789'
         self.companies_page = 'companies'
         self.alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.letter = None
@@ -69,7 +72,17 @@ class crawler():
 
         while (self.check_time()):
             self.companies()  # Go to the companies page and start the job
-            time.sleep(400)
+            sleep_time = int(random() * 300) + 30
+            time.sleep(sleep_time)
+            logging.debug("sleeping: " + sleep_time)
+            if not self.login_check():
+                if not self.login():
+                    mailman.write(
+                        "User cannot login: %s. Quiting user support" % self.login_username)
+                    logging.error("Login fail for user %s. Quitting it's support " % self.login_username)
+                return
+
+        logging.debug("Quitting")
 
     def check_time(self):
         """
@@ -113,33 +126,52 @@ class crawler():
         """
         self.html = fromstring(self.open_http("GET", _url).read())
 
-    def go(self, page):
+    def go(self, page, cycle=1):
         """
         Method to go to the page
         """
-        self.html = fromstring(self.open_http("GET", self.url + page).read())
-        self.current_url = self.url + page
+        try:
+            self.html = fromstring(self.open_http("GET", self.url + page).read())
+            self.current_url = self.url + page
+            return True
+        except urllib2.URLError:
+            time.sleep(1000*cycle)  # Sleeping time
+            if cycle < 10:
+                self.go(page, cycle + 1)
+            else:
+                mailman.write('Cannot connect to the page')
+                logging.debug('Connection to the page failed')
+                return False
 
-    def rest(self, url, request, data=None):
+    def rest(self, url, request, data=None, cycle=1):
         """
         Rest interface for the crawler API
         """
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
-        conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection("cra.baklazanas.lt")
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         conn.close()
-        if response.status == 200 and request.upper() == 'GET':  # ALL_OK
-            return True
-        elif response.status == 201 and request.upper() == 'POST':  # CREATED
-            return True
-        elif response.status == 200 and request.upper() == 'PUT':  # ALL_OK
-            return True
-        elif response.status == 204 and request.upper() == 'DELETE':  # DELETED
-            return True
+        if response.status != 502:
+            if response.status == 200 and request.upper() == 'GET':  # ALL_OK
+                return True
+            elif response.status == 201 and request.upper() == 'POST':  # CREATED
+                return True
+            elif response.status == 200 and request.upper() == 'PUT':  # ALL_OK
+                return True
+            elif response.status == 204 and request.upper() == 'DELETE':  # DELETED
+                return True
+            else:
+                return None
         else:
-            return None
+            time.sleep(1000*cycle)  # Sleeping
+            if cycle < 10:
+                return self.rest(url, request, data, cycle + 1)
+            else:
+                mailman.write('Cannot connect to cra.baklazanas.lt, check logs')
+                logging.error('Cannot connect to cra.baklazanas.lt')
+                return False
 
     def shuffle_letter(self):
         """
@@ -372,8 +404,8 @@ class crawler():
             return False
 
         login_form.action = self.url + '/' + login_form.action
-        login_form.fields['username'] = 'arvydas.tamulis@gmail.com'
-        login_form.fields['password'] = 'liko789'
+        login_form.fields['username'] = self.login_username
+        login_form.fields['password'] = self.login_password
 
         submit_values = {'submit': login_form.fields['Login']}
 
@@ -382,7 +414,7 @@ class crawler():
             extra_values=submit_values, open_http=self.open_http
         )
 
-        return True
+        return self.login_check()
 
     def login_check(self):
         """
