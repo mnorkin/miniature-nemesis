@@ -103,8 +103,11 @@ def install_requirements():
     """
     require('release', provided_by=[environment])
     require('whole_path', provided_by=[environment])
-    virtualenv('export PATH=/usr/bin:$PATH')
-    virtualenv('pip install -r %s/requirements.txt' % env.whole_path)
+    sudo('cd %s; virtualenv .;source ./bin/activate;\
+        export PATH=/usr/bin:"$PATH";\
+        pip install -r %s/requirements.txt' % (env.code_root, env.whole_path))
+    # virtualenv('export PATH=/usr/bin:$PATH')
+    # virtualenv('pip install -r %s/requirements.txt' % env.whole_path)
     reset_permissions()
 
 
