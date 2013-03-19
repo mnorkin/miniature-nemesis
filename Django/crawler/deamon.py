@@ -144,7 +144,7 @@ class Daemon:
 class guniron_daemon(Daemon):
     def run(self):
         # Crawler binds on 9050 port
-        os.system('cd /var/www/crawler/releases/current/morbid; gunicorn  --bind=127.0.0.1:9050 prototype.wsgi')
+        os.system('cd /var/www/crawler/releases/current/morbid; gunicorn  --bind=127.0.0.1:9050 crawler.wsgi')
 
 if __name__ == '__main__':
     """
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     """
     log_date = datetime.datetime.now().strftime('%Y-%m-%d')
     log_path = "/var/log/gunicorn_everything_" + log_date + ".log"
-    deamon = guniron_daemon('/tmp/dev-gunicorn-deamon.pid', '/dev/null', log_path, log_path)
+    deamon = guniron_daemon('/tmp/cra-gunicorn-deamon.pid', '/dev/null', log_path, log_path)
 
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
