@@ -73,8 +73,8 @@ class crawler():
         while (self.check_time()):
             self.companies()  # Go to the companies page and start the job
             sleep_time = int(random() * 300) + 30
+            logging.debug("sleeping: " + str(sleep_time))
             time.sleep(sleep_time)
-            logging.debug("sleeping: " + sleep_time)
             if not self.login_check():
                 if not self.login():
                     mailman.write(
