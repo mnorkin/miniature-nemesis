@@ -123,7 +123,7 @@ class Daemon:
                     sys.exit(1)
 
         # os.system('pkill gunicorn')
-        os.system('ps aux | grep cra_targetprice | awk "{print $2}" | xargs -r kill -9')
+        os.system("ps aux | grep '127.0.0.1:9050' | awk '{print $2}' | xargs -r kill -9")
         # Filtering out process, which runs in `cra_targetprice` directory and kill it
 
     def restart(self):

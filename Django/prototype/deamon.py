@@ -123,7 +123,7 @@ class Daemon:
                     sys.exit(1)
 
         # os.system('pkill gunicorn')
-        os.system('ps aux | grep dev_targetprice | awk {"print $2"} | xargs -r kill -9')
+        os.system("ps aux | grep '127.0.0.1:9000' | awk '{print $2}' | xargs -r kill -9")
         # Filtering-out the process, which takes in `dev_targetprice` directory and kill it !
         """A fast and robust way to kill gunicorn server, otherwise not killable"""
 

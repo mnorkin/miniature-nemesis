@@ -157,8 +157,8 @@ def stop_webserver():
     deamon_root = "%s/releases/current/%s/deamon.py" % (
         env.code_root, env.project_name)
     if files.exists(deamon_root):
-        virtualenv(
-            '%s/releases/current/%s/deamon.py stop' %
+        sudo(
+            '%s/releases/current/%s/deamon.py stop; sleep 2' %
             (env.code_root, env.project_name))
 
 
