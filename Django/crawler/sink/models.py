@@ -19,6 +19,9 @@ class Ticker(models.Model):
     ticker = models.CharField(max_length=200)
     market = models.CharField(max_length=200)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Market(models.Model):
     """
@@ -26,12 +29,18 @@ class Market(models.Model):
     """
     name = models.CharField(max_length=200)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Analytic(models.Model):
     """
     Analytic
     """
     name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
 
 
 class TargetPrice(models.Model):
@@ -45,6 +54,9 @@ class TargetPrice(models.Model):
     price1 = models.FloatField()
     ticker = models.ForeignKey(Ticker)
     date = models.DateField()
+
+    def __unicode__(self):
+        return self.analytic
 
 
 class TickerChange(models.Model):
