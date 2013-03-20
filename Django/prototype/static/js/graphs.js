@@ -768,22 +768,16 @@ var graphs = (function() {
       pi = Math.PI;
       phase = 0
       var sun_data = [0, 0, 100];
-      var w = $("#" + _element_id).width() - 20,
+      var w = $("#" + _element_id).width() - 0,
         h = $("#" + _element_id).height() -120,
-        r = Math.min(w,h) / 2.3,
+        r = Math.min(w,h) / 2.2,
         rhw = Math.min(w,h) / 2.4,
         color = d3.scale.category20c();
       
       number_of_data_for_full_graph = 4
-      //console.log(full_data, _data)
 
       line_width = w/7
       rect_w = 20;
-      // if (_data.length <= number_of_data_for_full_graph) {
-      //   angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2, pi/2]);
-      // } else {
-      //   angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2-phase, pi-phase]);
-      // }
 
       if ( _data.length <= number_of_data_for_full_graph ) {
         angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-pi/2, pi/2]);
@@ -817,6 +811,9 @@ var graphs = (function() {
           sun.selectAll("path.data")
             .data(_data)
             .attr("d", data_arc)
+          sun.selectAll("path.data2")
+            .data(_data)
+            .attr("d", data_arc2)
         });
 
       var angle_arc = d3.svg.arc()
@@ -892,7 +889,7 @@ var graphs = (function() {
       }
       
       var data_arc = d3.svg.arc()
-        .innerRadius(function(d, i) { return sun_data[1]+r })
+        .innerRadius(function(d, i) { return sun_data[1]+r+30 })
         .startAngle(function(d, i) {
           start_angle = calculate_start_angle(i, angle_scale);
           return start_angle
@@ -908,20 +905,38 @@ var graphs = (function() {
           return radius
         })
 
+       var data_arc2 = d3.svg.arc()
+        .innerRadius(function(d, i) { return sun_data[1]+140 })
+        .startAngle(function(d, i) {
+          start_angle = calculate_start_angle(i, angle_scale);
+          return start_angle
+        })
+        .endAngle(function(d, i) {
+          end_angle = calculate_end_angle(i, angle_scale)
+          return end_angle
+        })
+        .outerRadius(function(d, i) {
+
+          radius = sun_data[2]/100*rhw+46;
+          return radius
+        })
+
       var sun = d3.select("#"+_element_id).append("svg:svg")
         .attr("width", w)
         .attr("height", h);
 
+      // scroller rect
       if ( _data.length > number_of_data_for_full_graph ) {
-        sun.append('svg:line')
-          .attr("x1", w/2-w/14)
-          .attr("y1", h-h/32)
-          .attr('x2', w/2+w/14)
-          .attr("y2", h-h/32)
-          .attr('stroke', "black")
-          .attr("width", w/2)
-          .attr("height", 1)
-
+        sun.append('svg:rect')
+          .attr("x", w/2-w/14)
+          .attr("y", h-h/32)
+          .attr('width', (w/2+w/14)- (w/2-w/14) )
+          .attr("height", 5)
+          .attr('rx',4)
+          .attr('ry',4)
+          .attr('fill', "#ccb5a5")
+          .attr('stroke', "#baa08b")
+       
         var circle = sun.append("g");
         circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
           .enter().append('circle')
@@ -929,19 +944,12 @@ var graphs = (function() {
           .attr('cy', function(d){ return d.cy })
           .attr('r', 8)
           .call(dragCircle)
-          .attr('fill', 'blue')
+          .attr('fill', '#df5401')
           .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
       }
       
 
-      sun.selectAll('#'+_element_id)
-        .data(sun_data).enter()
-        .append('svg:path')
-        .attr("d", angle_arc )
-        .attr('stroke-width', 0.3)
-        .attr('fill', 'transparent')
-        .attr("stroke", "grey")
-        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
+     
 
       sun.selectAll("#" + _element_id)
         .data(_data).enter()
@@ -949,7 +957,7 @@ var graphs = (function() {
         .attr('class', 'data')
         .attr("d", data_arc)
         .attr('stroke-width', 1)
-        .attr("stroke", "#fff")
+        .attr("stroke", "#bab8a9")
         .attr('fill', '#bdcfdb')
         .attr('origin_fill', '#bdcfdb')
         .attr('selectd', 0)
@@ -968,7 +976,21 @@ var graphs = (function() {
         .attr('txt', function(d) { return d +"%" })
         .attr('enumerator', function(d, i) { return i })
         .attr('data_sum', function(d, i) { return d3.sum(_data) })
-        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")")
+        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2)+ ")") 
+
+        // in bottom we have the same svg path only smaller..
+       sun.selectAll('#'+_element_id)
+        .data(_data).enter()
+        .append('svg:path')
+        .attr('class', 'data2')
+        .attr("d", data_arc2 )
+        .attr('stroke-width', 1)
+        .attr('fill', 'transparent')
+        .attr("stroke", "#bab8a9")
+        .attr('enumerator', function(d, i) { return i })
+        .attr('data_sum', function(d, i) { return d3.sum(_data) })
+        .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
+
       return graphs
     },
 
