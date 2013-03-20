@@ -90,7 +90,7 @@ class crawler():
         """
         if (
             datetime.now().hour >= self.start_hour and
-            datetime.now() < self.start_hour + self.len_hour
+            datetime.now().hour < self.start_hour + self.len_hour
         ):
             return True
         else:
