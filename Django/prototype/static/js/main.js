@@ -377,10 +377,23 @@ function binds_for_target_price_list(){
            obj.find('.text .slid').animate({'left': left}, (left * -15) );
        },
        function(){ $(this).find('.text .slid').stop().css({'left': 0});}
-       );
+    );
     $('.title .entry').click(function(){ location.href = $(this).find('a').attr('href');});
     $('.latest_target_prices .toggle').unbind('click').click(change_target_prices_list);
     $('.title.list .pre_info span a').unbind('click').click(sort_target_prices);
+
+    // hide company name if it's company page or bank page
+    if($('.inner_target_prices').attr('type') != undefined && $('.latest_target_prices').length != 0){
+       var obj, who =  $('.inner_target_prices').attr('type');
+       $('.inner_target_prices').removeAttr('type');
+        $('#target-price-list .entry').each(function(){
+            obj = $(this);
+            if(who == 'ticker'){
+                obj.find('.text .slid').text(obj.find('.analytic').text());
+            }
+            obj.find('.analytic').text(obj.find('.date').text())
+        });
+    }
 }
 
 function calculate_minavgmax_block(){

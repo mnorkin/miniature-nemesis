@@ -215,6 +215,9 @@ li{ list-style: none; }
     font-weight: bold;
     margin-top: 7px;
 }
+.title .entry .date{
+    display: none;
+}
 
 .fixed {
     position: fixed;
@@ -251,6 +254,9 @@ li{ list-style: none; }
     line-height: 24px;
     font-size:12px;
     text-align: center;
+}
+.inner_target_prices .now{
+    visibility: hidden;
 }
 
 .title .now::after{
@@ -540,7 +546,7 @@ li{ list-style: none; }
 }
 
 .title.list .pre_info span a{
-    border-bottom: 7px solid #b78f65;
+    border-top: 7px solid #b78f65;
     border-right: 7px solid transparent;
     border-left: 7px solid transparent;
     display: inline-block;
@@ -548,15 +554,15 @@ li{ list-style: none; }
     cursor: pointer;
 }
 .title.list .pre_info span a:hover, .title.list .pre_info span a.active{
-    border-bottom: 7px solid #e95200;
-}
-.title.list .pre_info span a:nth-child(even){
-    margin: -6px 2px 0 2px;
-    border-bottom: 0;
-    border-top: 7px solid #b78f65;
-}
-.title.list .pre_info span a:nth-child(even):hover, .title.list .pre_info span a:nth-child(even).active{
     border-top: 7px solid #e95200;
+}
+.title.list .pre_info span a.down{
+    margin: -6px 2px 0 2px;
+    border-top: 0;
+    border-bottom: 7px solid #b78f65;
+}
+.title.list .pre_info span a.down:hover, .title.list .pre_info span a.down:active{
+    border-bottom: 7px solid #e95200;
 }
 
 

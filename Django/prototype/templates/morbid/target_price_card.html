@@ -8,6 +8,7 @@
   </a>
   <a class="analytic">{{ target.analytic }}</a>
   <span class="price">{{ target.price|cut:".0" }}</span>
+  <span class="date">{{target.date|date:"M. d, Y"}}</span>
 
   <span class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
     <strong>{{ target.change|floatformat:1|cut:"-"|cut:".0" }}%</strong>
