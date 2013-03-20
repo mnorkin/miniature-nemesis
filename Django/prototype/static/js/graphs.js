@@ -480,7 +480,7 @@ var graphs = (function() {
         rhw = Math.min(w,h) / 1.56,
         color = d3.scale.category20c();
 
-      number_of_data_for_full_graph = 40
+      number_of_data_for_full_graph = 8
       
       line_width = w/7
       rect_w = 20;
@@ -496,12 +496,13 @@ var graphs = (function() {
       var dragCircle = d3.behavior.drag()
         .on('dragstart', function(){
           d3.event.sourceEvent.stopPropagation();
-          console.log('Start Dragging Circle');
-          console.log(d3.event)
+          //console.log('Start Dragging Circle');
+          //console.log(d3.event)
         })
         .on('dragend', function(d, i) {
-          console.log("Drag end", d.cx)
+          //console.log("Drag end", d.cx)
           d3.select(this).attr('cx', d.cx)
+          d3.select(this).attr("transform", "translate("+d.cx+", 0)");
         })
         .on('drag', function(d,i){
           d.cx += d3.event.dx;
@@ -512,6 +513,7 @@ var graphs = (function() {
             d.cx = -w/14
           }
           d3.select(this).attr('cx', d.cx)
+          d3.select(this).attr("transform", "translate("+d.cx+", 0)");
           phase = line_angle_scale(d.cx)
           angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi/2-phase, pi-phase]);
           sun.selectAll("path.data")
@@ -600,16 +602,28 @@ var graphs = (function() {
         .attr("height", h);
 
       if (_data.length > number_of_data_for_full_graph) {
-        sun.append('svg:line')
-          .attr("x1", w/2-w/14)
-          .attr("y1", h-h/32)
-          .attr('x2', w/2+w/14)
-          .attr("y2", h-h/32)
-          .attr('stroke', "black")
-          .attr("width", w/2)
-          .attr("height", 1)
+        
+        sun.append('svg:rect')
+          .attr("x", w/2-w/14)
+          .attr("y", h-h/32)
+          .attr('width', (w/2+w/14)-(w/2-w/14)+10 )
+          .attr("height", 5)
+          .attr('rx',4)
+          .attr('ry',4)
+          .attr('fill', "#ccb5a5")
+          .attr('stroke', "#baa08b")
+      
+      var path = sun.append("g").attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")");
+          path.append('path')
+          .data([{cx: -w/14}])
+          .attr('d', 'm 0.0389418,0.0432822 9.9610575,0 -0.06029,5.0188999 0,5.2846009 -5.2480518,4.6774 -0.01414,-0.038 L 0,10.005182 0.049611,0.0241822')
+          .attr('fill', '#df5401')
+          .call(dragCircle)
+          .attr('cx', function(d){ return d.cx })
+          .attr("transform", "translate("+(-w/14)+", 0)")
+          .attr('style','cursor:pointer');
 
-        var circle = sun.append("g");
+        /*var circle = sun.append("g");
         circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
           .enter().append('circle')
           .attr('cx', function(d){ return d.cx })
@@ -617,7 +631,7 @@ var graphs = (function() {
           .attr('r', 8)
           .call(dragCircle)
           .attr('fill', 'blue')
-          .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
+          .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")*/
       }
       
 
@@ -774,7 +788,7 @@ var graphs = (function() {
         rhw = Math.min(w,h) / 2.4,
         color = d3.scale.category20c();
       
-      number_of_data_for_full_graph = 4
+      number_of_data_for_full_graph = 8
 
       line_width = w/7
       rect_w = 20;
@@ -790,12 +804,13 @@ var graphs = (function() {
       var dragCircle = d3.behavior.drag()
         .on('dragstart', function(){
           d3.event.sourceEvent.stopPropagation();
-          console.log('Start Dragging Circle');
-          console.log(d3.event)
+          //console.log('Start Dragging Circle');
+          //console.log(d3.event)
         })
         .on('dragend', function(d, i) {
-          console.log("Drag end", d.cx)
+          //console.log("Drag end", d.cx)
           d3.select(this).attr('cx', d.cx)
+          d3.select(this).attr('transform', 'translate('+d.cx+',0)');
         })
         .on('drag', function(d,i){
           d.cx += d3.event.dx;
@@ -806,6 +821,7 @@ var graphs = (function() {
             d.cx = -w/14
           }
           d3.select(this).attr('cx', d.cx)
+          d3.select(this).attr('transform', 'translate('+d.cx+',0)');
           phase = line_angle_scale(d.cx)
           angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-pi/2-phase, pi-phase]);
           sun.selectAll("path.data")
@@ -816,6 +832,7 @@ var graphs = (function() {
             .attr("d", data_arc2)
         });
 
+     /*   
       var angle_arc = d3.svg.arc()
         .innerRadius(function(d, i) { return r })
         .outerRadius(function(d, i) { return d/100*rhw+r })
@@ -824,9 +841,9 @@ var graphs = (function() {
         })
         .endAngle(function(d, i) { 
           return pi/2
-        });
+        });*/
 
-      console.log("Data sum:", d3.sum(_data))
+      //console.log("Data sum:", d3.sum(_data))
 
       var calculate_start_angle = function(i, angle_scale) {
         angle_sum = 0
@@ -859,7 +876,7 @@ var graphs = (function() {
           angle_sum += _data[k]
         };
 
-        console.log("End angle sum:", angle_sum)
+        //console.log("End angle sum:", angle_sum)
 
         end_angle = angle_scale(angle_sum)
         start_angle = calculate_start_angle(i, angle_scale)
@@ -899,9 +916,7 @@ var graphs = (function() {
           return end_angle
         })
         .outerRadius(function(d, i) {
-
           radius = sun_data[2]/100*rhw+r;
-
           return radius
         })
 
@@ -916,7 +931,6 @@ var graphs = (function() {
           return end_angle
         })
         .outerRadius(function(d, i) {
-
           radius = sun_data[2]/100*rhw+46;
           return radius
         })
@@ -930,14 +944,24 @@ var graphs = (function() {
         sun.append('svg:rect')
           .attr("x", w/2-w/14)
           .attr("y", h-h/32)
-          .attr('width', (w/2+w/14)- (w/2-w/14) )
+          .attr('width', (w/2+w/14)-(w/2-w/14)+10 )
           .attr("height", 5)
           .attr('rx',4)
           .attr('ry',4)
           .attr('fill', "#ccb5a5")
           .attr('stroke', "#baa08b")
        
-        var circle = sun.append("g");
+      var path = sun.append("g").attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")");
+          path.append('path')
+          .data([{cx: -w/14}])
+          .attr('d', 'm 0.0389418,0.0432822 9.9610575,0 -0.06029,5.0188999 0,5.2846009 -5.2480518,4.6774 -0.01414,-0.038 L 0,10.005182 0.049611,0.0241822')
+          .attr('fill', '#df5401')
+          .call(dragCircle)
+          .attr('cx', function(d){ return d.cx })
+          .attr("transform", "translate("+(-w/14)+", 0)")
+          .attr('style','cursor:pointer');
+
+      /*var circle = sun.append("g");
         circle.selectAll("circle").data([{cx: -w/14, cy: h/32}])
           .enter().append('circle')
           .attr('cx', function(d){ return d.cx })
@@ -945,7 +969,7 @@ var graphs = (function() {
           .attr('r', 8)
           .call(dragCircle)
           .attr('fill', '#df5401')
-          .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")")
+          .attr("transform", "translate(" + w/2 + "," + (h - h/32*2) + ")"); */
       }
       
 

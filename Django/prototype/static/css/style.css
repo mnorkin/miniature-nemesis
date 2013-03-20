@@ -164,13 +164,15 @@ li{ list-style: none; }
 .sliding{
     position: relative;
 }
+.title .entry .ticket .text{
+    height: 18px;
+}
 .title .entry .ticket .text, .sliding .text{
     display: inline-block;
     width: 170px;
     position: relative;
     text-align: left;
     overflow: hidden;
-    height: 18px;
 }
 .corp_info .sliding .text{
     width: 230px;
@@ -187,7 +189,6 @@ li{ list-style: none; }
     position: relative;
     top:0;
     left: 0px;
-    height: 18px;
     width: 800px;
 }
 .title .entry .ticket .bliur, .sliding .bliur{
@@ -197,14 +198,13 @@ li{ list-style: none; }
     top:0;
     display: inline-block;
     width: 25px;
-    height: 18px;
 }
 .title .entry .goust, .sliding .goust{
     visibility: hidden;
     position: absolute;
     left: -100px;
     top:-100px;
-    height: 14px;
+    height: 20px;
 }
 /* END */
 
