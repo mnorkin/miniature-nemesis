@@ -23,7 +23,6 @@ var graphs = (function() {
   d3.selectAll("#" + _element_id + " svg").remove()
 
   return {
-
     set_url: function(url) {
       /**
         * Setting url

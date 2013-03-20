@@ -7,6 +7,7 @@ var page_number = Number();
 var horizontal_slider_top_offset = 0;
 var bottom_of_page = false;
 
+
 function generate_grid_element(id, dataset, posName) {
 
     if (id !== null && dataset > 1) {
