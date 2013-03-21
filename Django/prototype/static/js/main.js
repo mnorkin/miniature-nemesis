@@ -469,7 +469,6 @@ $(function(){
        function(){ $(this).find('.text .slid').stop().css({'left': 0});}
     );
 
-
     process_target_prices_blocks();
     binds_for_target_price_list();
     calculate_minavgmax_block();
@@ -494,8 +493,11 @@ function in_graph_click(){
     if(obj.parents().length > 2){
         obj.addClass('tmp');
         obj.addClass('active');
+        $(".in_graph .sear ul").niceScroll({'cursorborder':'0px', 'cursorcolor':'#cdcdcd', 'cursorwidth': '6px'}); // nice scroll
+        $('#ascrail2000, #ascrail2000-hr').css('visibility', 'visible'); // nice scroll
     }else{
         $('.in_graph').removeClass('active');
+        $('#ascrail2000, #ascrail2000-hr').css('visibility', 'hidden'); // nice scroll
     }
 }
 

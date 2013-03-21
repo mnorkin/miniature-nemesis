@@ -945,10 +945,9 @@ li{ list-style: none; }
     border: 1px solid #e7ded5;
     width:175px;
     margin-bottom: 20px;
-    max-height: 263px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    max-height: 200px;
 }
+#ascrail2000{ margin-left: -2px; }
 .in_graph .sear li{
     width:158px;
     padding:7px 0 7px 17px;
@@ -963,7 +962,7 @@ li{ list-style: none; }
     border-bottom: 0;
 }
 .in_graph .sear li:hover{
-    background: url('../images/in_graph_add_1.png') 85% 50% no-repeat #f3ede8;
+    background: url('../images/in_graph_add_1.png') 93% 50% no-repeat #f3ede8;
 }
 .in_graph .sear li.active{
     background: #ed702d;
@@ -971,7 +970,7 @@ li{ list-style: none; }
     border-bottom: 1px solid #e7ded5;
 }
 .in_graph .sear li.active:hover{
-    background: url('../images/in_graph_remove_1.png') 85% 50% no-repeat #ed702d;
+    background: url('../images/in_graph_remove_1.png') 93% 50% no-repeat #ed702d;
 }
 
 .info_box{
