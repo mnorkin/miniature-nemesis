@@ -363,13 +363,21 @@ li{ list-style: none; }
     top:4px;
 }
 
-.title.grid .chart .circle{
+/*.title.grid .chart .circle{
     position: absolute;
     width:81px;
     height: 81px;
     background: url('../images/circle_2.png') 0 0 no-repeat;
     top:15px;
     right: 12px;
+    text-align: center;
+}*/
+.title.grid .chart .circle{
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    top: 6px;
+    right: 3px;
     text-align: center;
 }
 .title.grid .chart .circle strong{
