@@ -57,11 +57,13 @@ function generate_pie(id, value) {
     if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
 
     var percent = value;
-    var dataset = [percent,(100-percent)];
+    var dataset = [percent];
 
-    var width = 81,
-    height = 81,
+    var width = 90,
+    height = 90,
     radius = Math.min(width, height) / 2;
+
+    var pi = Math.PI;
 
     var fill_color = "#b7cd44";
 
@@ -72,24 +74,253 @@ function generate_pie(id, value) {
     var colors = [fill_color, 'transparent'];
 
     var pie = d3.layout.pie()
-    .sort(null);
+        .sort(null);
 
     var arc = d3.svg.arc()
-    .innerRadius(35)
-    .outerRadius(35);
+        .innerRadius(30)
+        .outerRadius(40)
+        .startAngle(0)
+        .endAngle(function(d, i) {
+            return 2*pi*(d.value-100)/100;
+        });
+
+    var arc2 = d3.svg.arc()
+        .innerRadius(0)
+        .outerRadius(30)
+        .startAngle(0)
+        .endAngle(function(d, i) {
+            return 2*pi*(d.value-100)/100;
+        });
+
+    var m_arc = d3.svg.arc()
+        .innerRadius(30)
+        .outerRadius(40)
+        .startAngle(0)
+        .endAngle(function(d, i) {
+            return 2*pi*(d.value)/100;
+        });
+
+    var angle_scale = d3.scale.linear().domain([0, 100]).range([0, pi]);
 
     var svg = d3.select("#" + id + ' .circle').append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    var path = svg.selectAll("path")
-    .data(pie(dataset))
-    .enter().append("path")
-    .attr("stroke", function(d, i) { return colors[i]; })
-    .attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
-    .attr("d", arc);
+    var gradient = svg.append('radialGradient')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 40)
+        .attr('fx', '0%')
+        .attr('fy', '0%')
+        .attr('id', 'gradient')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    gradient.append('stop')
+        .attr('offset', '60%')
+        .attr('style', "stop-color: #b6c64a; stop-opacity: 1");
+
+    gradient.append('stop')
+        .attr('offset', '100%')
+        .attr('style', 'stop-color: #c3d75a; stop-opacity: 1');
+
+    var gradient_data_inner = svg.append('radialGradient')
+        .attr('cx', 0)
+        .attr('cy', 1)
+        .attr('r', 31)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'gradient_data_inner')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    gradient_data_inner.append('stop')
+        .attr('offset', '90%')
+        .attr('style', "stop-color: #fff; stop-opacity: 1");
+
+    gradient_data_inner.append('stop')
+        .attr('offset', '100%')
+        .attr('style', 'stop-color: #333; stop-opacity: 0.7');
+
+    var gradient3 = svg.append('radialGradient')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 45)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'gradient3')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    gradient3.append('stop')
+        .attr('offset', '0%')
+        .attr('style', "stop-color: #333; stop-opacity: 1");
+
+    gradient3.append('stop')
+        .attr('offset', '100%')
+        .attr('style', 'stop-color: #000; stop-opacity: 0');
+
+    var gradient_inner_empty_down = svg.append('radialGradient')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 45)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'gradient_inner_empty_down')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    gradient_inner_empty_down.append('stop')
+        .attr('offset', '50%')
+        .attr('style', "stop-color: #333; stop-opacity: 1");
+
+    gradient_inner_empty_down.append('stop')
+        .attr('offset', '80%')
+        .attr('style', 'stop-color: #d6c4ae; stop-opacity: 0');
+
+    var gradient_inner_empty_out = svg.append('radialGradient')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 45)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'gradient_inner_empty_out')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    gradient_inner_empty_out.append('stop')
+        .attr('offset', '80%')
+        .attr('style', 'stop-color: #d6c4ae; stop-opacity: 0');
+
+    gradient_inner_empty_out.append('stop')
+        .attr('offset', '100%')
+        .attr('style', "stop-color: #333; stop-opacity: 1");
+
+    /* Ellipse gradient */
+    var ellipse_gradient = svg.append('radialGradient')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 40)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'ellipse_gradient')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    ellipse_gradient.append('stop')
+        .attr('offset', '70%')
+        // .attr('style', 'stop-color: #c8d95c; stop-opacity: 1');
+        .attr('style', 'stop-color: #b6c64a; stop-opacity: 1');
+
+    ellipse_gradient.append('stop')
+        .attr('offset', '100%')
+        // .attr('style', "stop-color: #bed054; stop-opacity: 1");
+        .attr('style', "stop-color: #c3d75a; stop-opacity: 1");
+
+    /* Layer 1 -- global shadow */
+    svg
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 2)
+        .attr('r', 39)
+        .attr('stroke-width', 1)
+        .attr('fill', 'url(#gradient3)');
+
+    /* Layer 2 -- Data visualization */
+    svg
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 40.1)
+        .attr('stroke-width', 0)
+        .attr('fill', 'url(#gradient)');
+
+    /* Layer 4 -- overlap data visualization  */
+    svg.selectAll('path')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', '#d6c4ae')
+        .attr('d', arc);
+
+    /* Inner shadows */
+    svg.selectAll('path2')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', 'url(#gradient_inner_empty_down)')
+        .attr('d', arc);
+
+    svg.selectAll('path3')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', 'url(#gradient_inner_empty_out)')
+        .attr('d', arc);
+
+    /* Ellipses to hide the bulky borders in the start and the end */
+    svg
+        .append('ellipse')
+        .attr('cx', 0)
+        .attr('cy', -35)
+        .attr('rx', 4)
+        .attr('ry', 5)
+        .attr('fill', 'url(#ellipse_gradient)');
+
+    svg.selectAll('ellipse2').data(pie(dataset)).enter()
+        .append('ellipse')
+        .attr('cx', 0)
+        .attr('cy', -35)
+        .attr('rx', 4)
+        .attr('ry', 5)
+        .attr('fill', 'url(#ellipse_gradient)')
+        .attr('transform', function(d) {
+            console.log(d.value, angle_scale(d.value));
+            var value = 360*(d.value)/100;
+            return 'rotate('+value+')';
+        });
+
+    /* Layer 5 -- inner circle, to hide the Data visualization main circle */
+    svg
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 30)
+        .attr('stroke-width', 0)
+        .attr('fill', '#fff');
+
+        /* Layer 3 -- Data inner gradient */
+    svg
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 30)
+        .attr('stroke-width', 0)
+        .attr('fill', 'url(#gradient_data_inner)');
+
+    svg.selectAll('path4')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', '#fff')
+        .attr('d', arc2);
+
+    /* Text */
+    svg.selectAll('text').data(dataset)
+        .enter().append('text')
+        .attr('text-anchor', 'middle')
+        .attr('y', 5)
+        .attr('x', 0)
+        .attr('font-size', '18px')
+        .attr('fill', '#b9d240')
+        .text(function(d) { console.log(d); return Math.round(d).toString() + '%';});
+
+
+    // var path_bottom = svg.selectAll("path")
+    //     .data(pie(dataset))
+    //     .enter().append("path")
+    //     .attr("stroke", function(d, i) { return colors[i]; })
+    //     .attr('style', 'fill:#000;stroke-width:10; stroke-linejoin:round;')
+    //     .attr("d", arc);
+
+    // var path_top = svg.selectAll("path")
+        // .data(pie(dataset))
+        // .enter().append("path")
+        // .attr("stroke", function(d, i) { return colors[i]; })
+        // .attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
+        // .attr("d", arc);
 }
 
 /*
@@ -566,7 +797,7 @@ function scroll_style_elements() {
     $('.target_price_list li').each(function(index, entry) {
         if (exit) { return; }
         obj = $(entry);
-        if(obj.offset().top <= window_scroll +50 && obj.offset().top + obj.outerHeight() + parseInt(obj.css('margin-bottom'), int) >= window_scroll +50) {
+        if(obj.offset().top <= window_scroll +50 && obj.offset().top + obj.outerHeight() + parseInt(obj.css('margin-bottom'), 10) >= window_scroll +50) {
            $('.now').text(obj.attr('name'));
            exit = true;
         }
