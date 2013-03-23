@@ -92,6 +92,14 @@ function generate_pie(id, value) {
             return 2*pi*(d.value-100)/100;
         });
 
+    var arc3 = d3.svg.arc()
+        .innerRadius(40)
+        .outerRadius(45)
+        .startAngle(0)
+        .endAngle(function(d, i) {
+            return 2*pi*(d.value-100)/100;
+        });
+
     var m_arc = d3.svg.arc()
         .innerRadius(30)
         .outerRadius(40)
@@ -126,21 +134,38 @@ function generate_pie(id, value) {
         .attr('style', 'stop-color: #c3d75a; stop-opacity: 1');
 
     var gradient_data_inner = svg.append('radialGradient')
-        .attr('cx', 0)
-        .attr('cy', 1)
-        .attr('r', 31)
+        .attr('cx', 2)
+        .attr('cy', 3)
+        .attr('r', 40)
         .attr('fx', 0)
         .attr('fy', 0)
         .attr('id', 'gradient_data_inner')
         .attr('gradientUnits', 'userSpaceOnUse');
 
     gradient_data_inner.append('stop')
-        .attr('offset', '90%')
-        .attr('style', "stop-color: #fff; stop-opacity: 1");
+        .attr('offset', '70%')
+        .attr('style', "stop-color: #fff; stop-opacity: 0.8");
 
     gradient_data_inner.append('stop')
         .attr('offset', '100%')
-        .attr('style', 'stop-color: #333; stop-opacity: 0.7');
+        .attr('style', 'stop-color: #333; stop-opacity: 1');
+
+    var gradient_data_outer = svg.append('radialGradient')
+        .attr('cx', 2)
+        .attr('cy', 5)
+        .attr('r', 39)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'gradient_data_outer')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    gradient_data_outer.append('stop')
+        .attr('offset', '60%')
+        .attr('style', 'stop-color: #333; stop-opacity: 1');
+
+    gradient_data_outer.append('stop')
+        .attr('offset', '100%')
+        .attr('style', 'stop-color: #fff; stop-opacity: 1');
 
     var gradient3 = svg.append('radialGradient')
         .attr('cx', 0)
@@ -212,6 +237,16 @@ function generate_pie(id, value) {
         .attr('offset', '100%')
         // .attr('style', "stop-color: #bed054; stop-opacity: 1");
         .attr('style', "stop-color: #c3d75a; stop-opacity: 1");
+
+    /* outer shadow */
+    svg
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 2)
+        .attr('r', 42)
+        .attr('stroke-width', 0)
+        .attr('fill', 'url(#gradient_data_outer)');
+
 
     /* Layer 1 -- global shadow */
     svg
@@ -296,6 +331,13 @@ function generate_pie(id, value) {
         .enter().append('path')
         .attr('fill', '#fff')
         .attr('d', arc2);
+
+    /* outer fill */
+    svg.selectAll('path6')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', '#fff')
+        .attr('d', arc3);
 
     /* Text */
     svg.selectAll('text').data(dataset)
