@@ -13,6 +13,7 @@ var graphs = (function () {
     var _data = [];
     var full_data = []; // refactor, real, full data variable.
     var current_name;
+    var current_slug;
     var host = "";
     var active_topbar = "";
     var best_analytic = {
@@ -65,7 +66,7 @@ var graphs = (function () {
         },
 
         on_mouseout: function () {
-            if (d3.select(this).attr('selectd') === 0) {
+            if (d3.select(this).attr('selectd') == 0) {
                 d3.select(this).attr("fill", d3.select(this).attr('origin_fill'));
             }
         },
@@ -111,6 +112,46 @@ var graphs = (function () {
             return new_d;
         },
 
+        /* Reorder full_data array, move active element to begin of array */
+        reorder: function(order_elem_name){
+            var elem, to_end = true;
+            switch(graphs.current_slug){
+                case 'profitability':
+                case 'impact_to_market':
+                case 'accuracy':
+                to_end = false;
+                break;
+            }
+
+            for (var i = 0 ; i < full_data.length; i++) {
+                if(full_data[i].slug == order_elem_name){
+                    if(to_end == true){
+                        full_data.push(full_data[i]);
+                        full_data.splice(i, 1);
+                    }else{
+                        full_data.unshift(full_data[i]);
+                        full_data.splice(i+1, 1);
+                    }
+                    break;
+                }
+            }
+            return;
+        },
+
+        reorder_from_array: function(elements_names){
+            for (var i = 0 ; i < elements_names.length ; i++) {
+                graphs.reorder(elements_names[i]);
+            }
+        },
+        
+        draw_reordered: function(){
+
+            d3.selectAll("#" + _element_id + " svg").remove();
+            _data = graphs.get__data(full_data);
+            var graph_fx = eval('graphs.draw_'+graphs.current_slug);
+            graph_fx(); // run
+        },
+
         aggressiveness: function (url) {
             /**
              * Aggressiveness request
@@ -144,6 +185,8 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
+                    _elemen = in_graph_get_active_elements();
+                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
                     graphs.draw_profitability();
                     in_graph_select_active_elements();
@@ -165,6 +208,8 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
+                    _elemen = in_graph_get_active_elements();
+                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
                     graphs.draw_accuracy();
                     in_graph_select_active_elements();
@@ -185,6 +230,8 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
+                    _elemen = in_graph_get_active_elements();
+                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
                     graphs.draw_reach_time();
                     in_graph_select_active_elements();
@@ -207,8 +254,10 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
+                    _elemen = in_graph_get_active_elements();
+                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
-                    graphs.draw_impact_to_stock();
+                    graphs.draw_impact_to_market();
                     in_graph_select_active_elements();
 
                 } else {
@@ -882,7 +931,7 @@ var graphs = (function () {
             return graphs;
         },
 
-        draw_impact_to_stock: function () {
+        draw_impact_to_market: function () {
             /**
              * Method to draw impact to market
              */

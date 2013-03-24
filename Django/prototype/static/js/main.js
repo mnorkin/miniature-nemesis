@@ -495,6 +495,7 @@ function open_graph(){
     if(typeof(graph_fx) === 'function') {
         graph_fx(url);
         graphs.current_name = name;
+        graphs.current_slug = type;
     } else {
         console.log('Graph not ready yet. ' + type);
     }
@@ -778,16 +779,30 @@ function in_graph_click(){
 function in_graph_entry_click(){
     var obj = $(this);
     var name = obj.attr('name');
-    var svg_element = $('#chart svg [name='+name+']');
 
     if(obj.hasClass('active')){
         obj.removeClass('active');
-        svg_element.attr('fill', svg_element.attr('origin_fill') ).attr('selectd', 0);
-
     }else{
         obj.addClass('active');
-        svg_element.attr('fill', '#e95201').attr('selectd', 1);
+        graphs.reorder(name);
     }
+
+    graphs.draw_reordered();
+    in_graph_select_active_elements();
+}
+
+function in_graph_get_active_elements(){
+    var list = $('.in_graph .sear li');
+    var obj, name, active_elements = [];
+
+    list.each(function(){
+        obj = $(this);
+        name = obj.attr('name');
+        if(obj.hasClass('active')){
+            active_elements.push(name);
+        }
+    });
+    return active_elements;
 }
 
 function in_graph_select_active_elements(){
