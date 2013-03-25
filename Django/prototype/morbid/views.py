@@ -97,6 +97,19 @@ def ticker(request, slug):
 
     return HttpResponse(t.render(c))
 
+def tickers(request):
+    """
+    Returning all the tickers, in the system
+    """
+    _tickers = Ticker.objects.all()
+    tickers = []
+
+    for ticker in _tickers:
+        item = {'name' : ticker.long_name, 'url': ticker.get_absolute_url()}
+        tickers.append(item)
+
+    return HttpResponse(json.dumps(tickers, indent=4))
+
 
 def ticker_data(request, ticker):
     PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
