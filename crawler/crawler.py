@@ -49,8 +49,8 @@ class crawler():
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
         self.logging_file = self.absolute_path + '/logs/crawler_' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 1  # Then the crawler starts its job
-        self.len_hour = 8  # How long in hours the crawler works
+        self.start_hour = 12  # Then the crawler starts its job
+        self.len_hour = 7  # How long in hours the crawler works
         self.mailman = mailman(
             'AKIAJKFJFUKWVJSBYA5Q',
             'tdIQlhdUjXAC+CUkNPXjKLir3LuZKDiW2q96CFZn')  # Mail-man keys to the box
@@ -172,6 +172,8 @@ class crawler():
             else:
                 return None
         else:
+            logging.debug('Received 502 error on connecting to\
+cra.baklazanas.lt, sleeping')
             time.sleep(1000*cycle)  # Sleeping
             if cycle < 10:
                 return self.rest(url, request, data, cycle + 1)
@@ -193,7 +195,7 @@ class crawler():
         """
         shuffle(self.alphabet)  # Randomize the list
         self.letter = str(self.alphabet[1])  # Return the letter
-        self.page_number = 1
+        self.page_number = 1  # also reset the page numbering
 
     def companies_next_page_available(self):
         """
@@ -206,17 +208,21 @@ class crawler():
         """
         link_last = self.html.xpath(
             '//div[@class="page_nav_bar"][1]/a[text()="last"]')[0]
-        link_previous = self.html.xpath(
-            '//div[@class="page_nav_bar"][1]/a[text()="previous"]')[0]
+        # link_previous = self.html.xpath(
+        #     '//div[@class="page_nav_bar"][1]/a[text()="previous"]')[0]
+
+        logging.debug('Checking if there are more pages')
+        logging.debug(link_last.attrib['href'].split('/')[-1])
+        logging.debug(self.page_number)
 
         if (
-            link_last.attrib['href'].split("/")[-1] ==
-            link_previous.attr['href'].split("/")[-1] + 1
+            int(link_last.attrib['href'].split("/")[-1]) == self.page_number
         ):
             logging.debug("No more pages available")
             logging.debug("Current Url: " + self.current_url)
             return False
         else:
+
             logging.debug("Pages are available")
             logging.debug("Current Url: " + self.current_url)
             return True
@@ -252,12 +258,12 @@ class crawler():
         table = self.html.xpath('//table[2]/tr')
         """Select the second table in the page"""
 
-        if len(table) < 1:
+        if len(table) <= 0:
             """
             This only means, that there exists only one table, trying it
             """
             table = self.html.xpath('//table[1]/tr')
-            if len(table) < 1:
+            if len(table) <= 0:
                 self.mailman.write('Companies target table select fail, please check the logs')
                 logging.error("Companies target table select fail")
                 logging.debug("Current url: " + self.current_url)
@@ -332,9 +338,9 @@ class crawler():
 
         for link in links:
             item = {
-                'name': link.text.split("(")[0].strip(),
-                'market': link.text.split("(")[1].split(")")[0].split(":")[0],
-                'ticker': link.text.split("(")[1].split(")")[0].split(":")[1],
+                'name': " ".join(re.findall('\S+', link.text)[:-1]),
+                'market': re.findall('\w+', re.findall('\S+', link.text)[-1])[0],
+                'ticker': re.findall('\w+', re.findall('\S+', link.text)[-1])[1],
                 'link': link.attrib['href']
             }
             self.companies_list.append(item)
@@ -369,10 +375,8 @@ class crawler():
                     if self.send_target_prices():
                         return True
                 else:
-                    self.mailman.write('Ticker target prices list fail, please check the logs')
                     logging.error("Ticker target price list fail")
                     logging.debug("Current url: " + self.current_url)
-                    return False
             else:
                 """
                 API said it's ok, go on to the next one
@@ -396,7 +400,6 @@ class crawler():
             logging.debug("Some target price data was send from the list")
             logging.debug("Continue with the next letter from the big list")
             self.shuffle_letter()  # Shuffle the random letter
-            self.page_number = 1  # Reset page numbering
             logging.debug("Next letter: " + self.letter)
         else:
             """If no companies data was sent -- switch to the next page if available"""
@@ -407,7 +410,6 @@ class crawler():
                 logging.debug("Moving to the next page: " + str(self.page_number))
             else:
                 self.shuffle_letter()  # Shuffle the next letter
-                self.page_number = 1  # Reset the pages
             return  # Return to main
 
     def login(self):
@@ -446,8 +448,10 @@ class crawler():
         self.go("my-account")
 
         if len(self.html.xpath('//a[@href="/login?mode=logout"]')) == 0:
+            logging.debug('User is not logged in')
             return False
         else:
+            logging.debug('User is logged in')
             return True
 
 if __name__ == '__main__':

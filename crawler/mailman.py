@@ -32,4 +32,5 @@ class mailman():
         """
         Sending a message
         """
-        self.amazon_ses.sendEmail(self.send_from, self.send_to, self.message)
+        pass
+        # self.amazon_ses.sendEmail(self.send_from, self.send_to, self.message)
