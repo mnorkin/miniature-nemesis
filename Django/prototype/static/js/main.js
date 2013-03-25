@@ -30,21 +30,28 @@ function generate_grid_element(id, dataset, posName) {
         }
 
         var x = d3.scale.linear()
-        .domain([0, max_value])
-        .range([0, width]);
+            .domain([0, max_value])
+            .range([0, width]);
 
-        var chart = d3.selectAll("#" + id + ' .'+posName).append('svg').attr('width', width).attr('height', '20').append('g');
+        var chart = d3.selectAll("#" + id + ' .'+posName)
+            .append('svg')
+            .attr('width', width)
+            .attr('height', '20')
+            .append('g');
+
         chart.selectAll('rect')
-        .data(dataset)
-        .enter().append('rect')
-        .attr('height', 13)
-        .attr('y', 0)
-        .attr('fill', gradiends[posName])
-        .attr('rx',4)
-        .attr('ry',4)
-        .attr('txt', function(d,i){ return (posName == 'reach_time') ? d+' days':  d+'%';} )
-        .transition().duration(500).attr('width', x)
-        .text( String );
+            .data(dataset)
+            .enter().append('rect')
+            .attr('height', 13)
+            .attr('y', 0)
+            .attr('fill', gradiends[posName])
+            .attr('rx',4)
+            .attr('ry',4)
+            .attr('txt', function(d,i){
+                return (posName == 'reach_time') ? d+' days':  d+'%';
+            })
+            .transition().duration(500).attr('width', x)
+            .text( String );
 
     } else {
         return;
@@ -58,6 +65,7 @@ function generate_pie(id, value) {
 
     var percent = value;
     var dataset = [percent];
+    var false_dataset = [ 50 ];
 
     var width = 90,
     height = 90,
@@ -108,7 +116,32 @@ function generate_pie(id, value) {
             return 2*pi*(d.value)/100;
         });
 
-    var angle_scale = d3.scale.linear().domain([0, 100]).range([0, pi]);
+    var ellipse_shadow_arc = d3.svg.arc()
+        .innerRadius(0)
+        .outerRadius(10)
+        .startAngle(0)
+        .endAngle(function(d, i) {
+            return -pi;
+        });
+    var ellipse_shadow_arc2 = d3.svg.arc()
+        .innerRadius(0)
+        .outerRadius(10)
+        .startAngle(0)
+        .endAngle(function(d, i) {
+            return pi;
+        });
+
+    var angle_scale = d3.scale.linear()
+        .domain([0, 100])
+        .range([0, pi]);
+
+    var ellipse_shadow_cos_scale = d3.scale.linear()
+        .domain([0, pi])
+        .range([-35, -35]);
+
+    var ellipse_shadow_sin_scale = d3.scale.linear()
+        .domain([0, pi])
+        .range([34, 39])
 
     var svg = d3.select("#" + id + ' .circle').append("svg")
         .attr("width", width)
@@ -230,13 +263,45 @@ function generate_pie(id, value) {
 
     ellipse_gradient.append('stop')
         .attr('offset', '70%')
-        // .attr('style', 'stop-color: #c8d95c; stop-opacity: 1');
         .attr('style', 'stop-color: #b6c64a; stop-opacity: 1');
 
     ellipse_gradient.append('stop')
         .attr('offset', '100%')
-        // .attr('style', "stop-color: #bed054; stop-opacity: 1");
         .attr('style', "stop-color: #c3d75a; stop-opacity: 1");
+
+    var ellipse_shadow_gradient = svg.append('radialGradient')
+        .attr('cx', 2)
+        .attr('cy', 1)
+        .attr('r', 7)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'ellipse_shadow_gradient')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    ellipse_shadow_gradient.append('stop')
+        .attr('offset', '40%')
+        .attr('style', 'stop-color: #333; stop-opacity: 0.4');
+
+    ellipse_shadow_gradient.append('stop')
+        .attr('offset', '100%')
+        .attr('style', 'stop-color: #000; stop-opacity: 0');
+
+    var ellipse_shadow_gradient2 = svg.append('radialGradient')
+        .attr('cx', 2)
+        .attr('cy', 1)
+        .attr('r', 6)
+        .attr('fx', 0)
+        .attr('fy', 0)
+        .attr('id', 'ellipse_shadow_gradient2')
+        .attr('gradientUnits', 'userSpaceOnUse');
+
+    ellipse_shadow_gradient2.append('stop')
+        .attr('offset', '40%')
+        .attr('style', 'stop-color: #333; stop-opacity: 0.4');
+
+    ellipse_shadow_gradient2.append('stop')
+        .attr('offset', '100%')
+        .attr('style', 'stop-color: #000; stop-opacity: 0');
 
     /* outer shadow */
     svg
@@ -286,6 +351,60 @@ function generate_pie(id, value) {
         .attr('fill', 'url(#gradient_inner_empty_out)')
         .attr('d', arc);
 
+    /* Layer 5 -- inner circle, to hide the Data visualization main circle */
+    svg
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 30)
+        .attr('stroke-width', 0)
+        .attr('fill', '#fff');
+
+    /* Layer 3 -- Data inner gradient */
+    svg
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 30)
+        .attr('stroke-width', 0)
+        .attr('fill', 'url(#gradient_data_inner)');
+
+    /* Filling inner gradient space */
+    svg.selectAll('path4')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', '#fff')
+        .attr('d', arc2);
+
+    /* Filling outer gradient fill */
+    svg.selectAll('path6')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', '#fff')
+        .attr('d', arc3);
+
+    /* Shadow for the ellipse */
+    svg.selectAll('path5')
+        .data(pie(false_dataset))
+        .enter().append('path')
+        .attr('fill', 'url(#ellipse_shadow_gradient)')
+        .attr('d', ellipse_shadow_arc)
+        .attr('transform', 'translate(0, -34)');
+
+    /* Shadow for the ellipse */
+    svg.selectAll('path5')
+        .data(pie(dataset))
+        .enter().append('path')
+        .attr('fill', 'url(#ellipse_shadow_gradient2)')
+        .attr('d', ellipse_shadow_arc2)
+        .attr('transform', function(d) {
+            var value = 2*pi*(d.value)/100;
+            var sin_angle = ellipse_shadow_sin_scale(value % pi)*Math.sin(value);
+            var cos_angle = ellipse_shadow_cos_scale(value % pi)*Math.cos(value);
+            return 'translate('+sin_angle+', '+cos_angle+') rotate('+(57*value)+')';
+            // return 'translate('+sin_angle+', '+cos_angle+')';
+        });
+
     /* Ellipses to hide the bulky borders in the start and the end */
     svg
         .append('ellipse')
@@ -295,6 +414,7 @@ function generate_pie(id, value) {
         .attr('ry', 5)
         .attr('fill', 'url(#ellipse_gradient)');
 
+    /* Second ellipse on the end of the data */
     svg.selectAll('ellipse2').data(pie(dataset)).enter()
         .append('ellipse')
         .attr('cx', 0)
@@ -308,37 +428,6 @@ function generate_pie(id, value) {
             return 'rotate('+value+')';
         });
 
-    /* Layer 5 -- inner circle, to hide the Data visualization main circle */
-    svg
-        .append('circle')
-        .attr('cx', 0)
-        .attr('cy', 0)
-        .attr('r', 30)
-        .attr('stroke-width', 0)
-        .attr('fill', '#fff');
-
-        /* Layer 3 -- Data inner gradient */
-    svg
-        .append('circle')
-        .attr('cx', 0)
-        .attr('cy', 0)
-        .attr('r', 30)
-        .attr('stroke-width', 0)
-        .attr('fill', 'url(#gradient_data_inner)');
-
-    svg.selectAll('path4')
-        .data(pie(dataset))
-        .enter().append('path')
-        .attr('fill', '#fff')
-        .attr('d', arc2);
-
-    /* outer fill */
-    svg.selectAll('path6')
-        .data(pie(dataset))
-        .enter().append('path')
-        .attr('fill', '#fff')
-        .attr('d', arc3);
-
     /* Text */
     svg.selectAll('text').data(dataset)
         .enter().append('text')
@@ -348,6 +437,16 @@ function generate_pie(id, value) {
         .attr('font-size', '18px')
         .attr('fill', '#b9d240')
         .text(function(d) { console.log(d); return Math.round(d).toString() + '%';});
+
+    /* Shadow for the ellipse2 */
+    // svg.selectAll('path7')
+    //     .append('path')
+    //     .attr('fill', 'url(#ellipse_shadow_gradient')
+    //     .attr('d', ellipse_shadow_arc)
+    //     .attr('transform', function(d) {
+    //         var value = 360*(d.value)/100;
+    //         return 'rotate(' + value + ')';
+    //     });
 
 
     // var path_bottom = svg.selectAll("path")
@@ -854,7 +953,10 @@ function scroll_style_elements() {
     $('.target_price_list li').each(function(index, entry) {
         if (exit) { return; }
         obj = $(entry);
-        if(obj.offset().top <= window_scroll +50 && obj.offset().top + obj.outerHeight() + parseInt(obj.css('margin-bottom'), 10) >= window_scroll +50) {
+        if (
+            obj.offset().top <= window_scroll +50 &&
+            obj.offset().top + obj.outerHeight() +
+            parseInt(obj.css('margin-bottom'), 10) >= window_scroll +50) {
            $('.now').text(obj.attr('name'));
            exit = true;
         }
@@ -869,7 +971,8 @@ function scroll_style_elements() {
         console.log('Window scroll: ', window_scroll - horizontal_slider_top_offset + 20);
         console.log('Card group top: ', card_group_position.top);
         console.log('card group top+height: ', card_group_position.top + card_group_height);
-        if ( window_scroll - horizontal_slider_top_offset + 50 > card_group_position.top && window_scroll - horizontal_slider_top_offset + 50 < card_group_position.top + card_group_height ) {
+        if ( window_scroll - horizontal_slider_top_offset + 50 > card_group_position.top &&
+        window_scroll - horizontal_slider_top_offset + 50 < card_group_position.top + card_group_height ) {
             $('.now').text($(entry).attr('name'));
         }
     });
@@ -883,7 +986,8 @@ function load_more_target_prices(){
 
     /* Give it a bigger offset, for better experience */
 
-    if ($(window).scrollTop() + $(window).height() >= $(document).height() && bottom_of_page === false) {
+    if ($(window).scrollTop() + $(window).height() >= $(document).height() &&
+        bottom_of_page === false) {
         page_number +=1;
         /* Make a query */
         _url = "/page/" + page_number + "/";
