@@ -1,0 +1,29 @@
+{% load bootstrap_toolkit %}
+<html>
+<head>
+    <title>Stats </title>
+    {% bootstrap_stylesheet_tag %}
+    {% bootstrap_javascript_tag %}
+</head>
+
+<body>
+    <div class="container">
+        {% bootstrap_messages %}
+
+        <div class="hero-unit">
+            <h1>Work progress</h1>
+            <p></p>
+            <p>Number to go: <span class="badge">{{tt}}</span></p>
+            <p>Number of done: <span class="badge badge-success">{{nt}}</span></p>
+            <p>Number remaining: <span class="badge badge-warning">{{tl}}</span></p>
+        </div>
+
+        <div class="progress progress-striped active">
+            <div class="bar bar-warning" style="width: {{ rt }}%;"></div>
+            <div class="bar bar-success" style="width: {{ cp }}%;"></div>
+        </div>
+
+    </div>
+
+</body>
+</html>

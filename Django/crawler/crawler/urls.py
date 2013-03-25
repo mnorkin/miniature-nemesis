@@ -9,6 +9,8 @@ urlpatterns = patterns(
     '',
     url(r'^api/', include('api.urls')),
 
+    url(r'^progress/', 'sink.views.progress'),
+
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 

@@ -56,7 +56,7 @@ class TargetPrice(models.Model):
     date = models.DateField()
 
     def __unicode__(self):
-        return self.ticker
+        return self.ticker.name
 
 
 class TickerChange(models.Model):

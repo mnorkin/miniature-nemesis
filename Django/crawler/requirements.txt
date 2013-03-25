@@ -4,3 +4,4 @@ django-apikey
 gunicorn
 psycopg2
 pyyaml
+django-bootstrap-toolkit
