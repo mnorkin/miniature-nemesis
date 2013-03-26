@@ -605,21 +605,41 @@ function open_graph(){
     // info box content
     $('.info_box').html( obj.siblings('div').html() );
     show_compare_graph_buttons();
+    hash_set_feature(type)
     return false; // prevent href
 }
 
 function set_active_analytic(){
     // show first target price
     if($('#bank li.active').length === 0) {
-        var name = '';
-        if(location.hash.length !== 0){
-            name = location.hash.substr(1);
-        }else{
+        var name = hash_get('company');
+        if(name.length == 0){
             name = graphs.get_best_analytic().slug;
+            hash_set_company(name);
         }
         $('#bank li[name='+name+']').addClass('active').removeClass('passive');
         $('.in_graph li[name='+name+']').addClass('active');
     }
+}
+
+/** Get from #hash. opt = "company" or opt = "feature" */
+function hash_get(opt){
+    if(location.hash.length !== 0){
+        var name = location.hash.substr(1);
+        var arr = name.split('|', 2);
+        if(opt == 'company'){ return (arr[0] == undefined) ? '' : arr[0]; }
+        else if(opt == 'feature'){ return (arr[1] == undefined) ? '' : arr[1]; }
+    }else{
+        return '';
+    }
+}
+function hash_set_company(name){
+    var feature = hash_get('feature');
+    location.hash = '#'+name+'|'+feature;
+}
+function hash_set_feature(name){
+    var company = hash_get('company');
+    location.hash = '#'+company+'|'+name;
 }
 
 function show_compare_graph_buttons(){
@@ -629,15 +649,15 @@ function show_compare_graph_buttons(){
     $('.analyse_menu div').removeClass('can_compare');
 
     switch (current){
-        case 'reach_time':
-            $('.analyse_menu div[name=profitability]').addClass('can_compare');
-            $('.analyse_menu div[name=impact_to_market]').addClass('can_compare');
-            $('.analyse_menu div[name=accuracy]').addClass('can_compare');
-        break;
-        case 'profitability':
-        case 'impact_to_market':
         case 'accuracy':
-            $('.analyse_menu div[name=reach_time]').addClass('can_compare');
+            $('.analyse_menu div[name=proximity]').addClass('can_compare');
+            $('.analyse_menu div[name=profitability]').addClass('can_compare');
+            $('.analyse_menu div[name=aggressiveness]').addClass('can_compare');
+        break;
+        case 'proximity':
+        case 'profitability':
+        case 'aggressiveness':
+            $('.analyse_menu div[name=accuracy]').addClass('can_compare');
         break;
     }
 
@@ -675,6 +695,7 @@ function load_target_prices(){
                 }
             });
         });
+        hash_set_feature('target_prices');
         // sets Analysis html back from container
     } else {
         $('.inner_target_prices').animate({'opacity': 0}, 50, function(){
@@ -683,6 +704,13 @@ function load_target_prices(){
             $('.inner_content').removeClass('hidden').css('opacity',0);
             $('.inner_content').animate({'opacity':1}, 100);
         });
+        var feature = $('.analyse_menu a.active');
+        if(feature.length == 0){  
+            $('.analyse_menu div:first-child a').trigger('click'); 
+            feature = $('.analyse_menu a.active');
+        }
+        feature = feature.parent('div').attr('name');
+        hash_set_feature(feature);
     }
     return false;
 }
@@ -829,8 +857,15 @@ $(function(){
 
     $('.inner_buttons a').click(load_target_prices);
 
-    // In analyse page, on document ready, load first property!
-    $('.analyse_menu div:first-child a').trigger('click');
+    // In analyse page, on document ready, load first property or take from hash!
+    var feature = hash_get('feature');
+    if(feature == 'target_prices'){
+        $('.inner_buttons a.ta').trigger('click');
+    }else if(feature.length){
+        $('.analyse_menu div[name='+feature+'] a').trigger('click');
+    }else{
+        $('.analyse_menu div:first-child a').trigger('click');
+    }
 
     // long company names moving
     $('.corp_info, .bank .corp').hover(
@@ -878,16 +913,15 @@ function in_graph_click(){
 function in_graph_entry_click(){
     var obj = $(this);
     var name = obj.attr('name');
+    var svg_element = $('#chart svg [name='+name+']');
 
     if(obj.hasClass('active')){
         obj.removeClass('active');
+        svg_element.attr('fill', svg_element.attr('origin_fill')).attr('selectd', 0);
     }else{
         obj.addClass('active');
-        graphs.reorder(name);
+        svg_element.attr('fill', '#e95201').attr('selectd', 1);
     }
-
-    graphs.draw_reordered();
-    in_graph_select_active_elements();
 }
 
 function in_graph_get_active_elements(){
@@ -901,6 +935,7 @@ function in_graph_get_active_elements(){
             active_elements.push(name);
         }
     });
+    return [];
     return active_elements;
 }
 

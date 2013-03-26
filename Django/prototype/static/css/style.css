@@ -113,6 +113,9 @@ li{ list-style: none; }
     text-align: left;
     cursor: pointer;
 }
+.search_res li:hover{
+    background: #f3ede8;
+}
 .inner .search_res li{
     width: 222px;
 }
@@ -953,7 +956,7 @@ li{ list-style: none; }
     border: 1px solid #e7ded5;
     width:175px;
     margin-bottom: 20px;
-    max-height: 200px;
+    max-height: 390px;
 }
 #ascrail2000{ margin-left: -2px; }
 .in_graph .sear li{

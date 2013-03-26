@@ -113,7 +113,7 @@ var graphs = (function () {
         },
 
         /* Reorder full_data array, move active element to begin of array */
-        reorder: function(order_elem_name){
+        reorder_UNUSED: function(order_elem_name){
             var elem, to_end = true;
             switch(graphs.current_slug){
                 case 'profitability':
@@ -136,15 +136,8 @@ var graphs = (function () {
                 }
             }
             return;
-        },
-
-        reorder_from_array: function(elements_names){
-            for (var i = 0 ; i < elements_names.length ; i++) {
-                graphs.reorder(elements_names[i]);
-            }
-        },
-        
-        draw_reordered: function(){
+        },        
+        draw_reordered_UNUSED: function(){
 
             d3.selectAll("#" + _element_id + " svg").remove();
             _data = graphs.get__data(full_data);
@@ -185,8 +178,6 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
-                    _elemen = in_graph_get_active_elements();
-                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
                     graphs.draw_profitability();
                     in_graph_select_active_elements();
@@ -208,8 +199,6 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
-                    _elemen = in_graph_get_active_elements();
-                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
                     graphs.draw_accuracy();
                     in_graph_select_active_elements();
@@ -230,8 +219,6 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
-                    _elemen = in_graph_get_active_elements();
-                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
                     graphs.draw_reach_time();
                     in_graph_select_active_elements();
@@ -254,8 +241,6 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
-                    _elemen = in_graph_get_active_elements();
-                    graphs.reorder_from_array(_elemen);
                     _data = graphs.get__data(full_data);
                     graphs.draw_impact_to_market();
                     in_graph_select_active_elements();
