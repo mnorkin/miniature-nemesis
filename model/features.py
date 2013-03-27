@@ -7,6 +7,7 @@ import utils
 import inspect
 import array
 import stock_quote
+import logging
 
 
 class Features:
@@ -27,29 +28,80 @@ class Features:
     calculated_feature_data = []
     beta = 1
 
+    # Units of measurement
     units = {
-        'percent': {'unit_id': 1, 'name': 'Percent', 'value': '%'},
-        'days': {'unit_id': 2, 'name': 'Days', 'value': 'd'}
+        'percent': {
+            'unit_id': 1,
+            'name': 'Percent',
+            'value': '%'
+        },
+        'days': {
+            'unit_id': 2,
+            'name': 'Days',
+            'value': 'd'
+        }
     }
 
+    # Features
     features = {
         'accuracy':
-        {'id': 1, 'name': 'Accuracy', 'display_in_frontpage': 1, 'unit_id': 1},
+        {
+            'id': 1,
+            'name': 'Accuracy',
+            'display_in_frontpage': 1,
+            'unit_id': 1,
+            'position': 1
+        },
         'closeness':
-        {'id': 2, 'name': 'Closeness', 'display_in_frontpage': 0, 'unit_id': 1},
+        {
+            'id': 2,
+            'name': 'Proximity',
+            'display_in_frontpage': 0,
+            'unit_id': 1,
+            'position': 2
+        },
         'difference':
-        {'id': 3, 'name': 'Difference', 'display_in_frontpage': 0, 'unit_id': 1},
+        {
+            'id': 3,
+            'name': 'Aggressiveness',
+            'display_in_frontpage': 0,
+            'unit_id': 1,
+            'position': 3
+        },
         'profitability':
-        {'id': 4, 'name': 'Profitability', 'display_in_frontpage': 1, 'unit_id': 1},
-        'max_profitability':
-        {'id': 5, 'name': 'Max profitability', 'display_in_frontpage': 0, 'unit_id': 1},
-        'impact_to_market':
-        {'id': 6, 'name': 'Impact to market', 'display_in_frontpage': 0, 'unit_id': 1},
+        {
+            'id': 4,
+            'name': 'Profitability',
+            'display_in_frontpage': 1,
+            'unit_id': 1,
+            'position': 4
+        },
         'reach_time':
-        {'id': 7, 'name': 'Reach time', 'display_in_frontpage': 1, 'unit_id': 2}
+        {
+            'id': 7,
+            'name': 'Reach time',
+            'display_in_frontpage': 1,
+            'unit_id': 2,
+            'position': 5
+        },
+        'impact_to_market':
+        {
+            'id': 6,
+            'name': 'Impact to market',
+            'display_in_frontpage': 0,
+            'unit_id': 1,
+            'position': 6
+        }
     }
 
-    def __init__(self, target_data=None, stock_data=None, beta=None, plot=False, calculate=False):
+    def __init__(
+        self,
+        target_data=None,
+        stock_data=None,
+        beta=None,
+        plot=False,
+        calculate=False
+    ):
         """
         Initialization of the class
         * Pass the arguments to fetch the target price data
@@ -88,6 +140,8 @@ class Features:
                     if utils.DEBUG:
                         print item
                     self.calculated_feature_data.append(item)
+
+        # TODO: define logging
 
     def values(self):
         return self.calculated_feature_data

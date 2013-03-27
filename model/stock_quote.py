@@ -94,16 +94,11 @@ def get_beta(ticker):
     """
     Getting beta measure of ticker (currently only stock market is SP500 (^GSPC))
     """
-
     beta = None
-
     if ticker:
-
         beta = database.get_beta(ticker)
-
         if beta:
             return beta
-
         else:
             PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
             url = 'http://finance.yahoo.com/q?s=%s' % (ticker)
@@ -120,5 +115,4 @@ def get_beta(ticker):
                         database.write_beta(ticker, beta)
                     except ValueError:
                         beta = None
-
     return beta

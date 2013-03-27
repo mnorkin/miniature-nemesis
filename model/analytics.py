@@ -8,7 +8,7 @@ class Analytics:
     Analytic object
     """
 
-    def fetch(self, analytic=None):
+    def collect_and_send(self, analytic=None):
         """
         Fetching analytics data to the server
 
@@ -43,7 +43,10 @@ class Analytics:
             analytic_stats = database.get_analytic(analytic)
             analytic_data = database.get_analytics(analytic)
             number_of_companies = analytic_stats['number_of_companies']
-            number_of_tp = analytic_data['number_of_tp']
+            try:
+                number_of_tp = analytic_data['number_of_tp']
+            except TypeError:
+                number_of_tp = 0
             last_target_price = analytic_stats['last_target_price']
             volatility_positive = analytic_stats['volatility_positive']
             volatility_negative = analytic_stats['volatility_negative']
@@ -84,7 +87,8 @@ class Analytics:
                 if rest.send("PUT", "/api/analytics/", data):
                     return True
                 else:
-                    # Literally, something should be wrong on front-end side, if this does not work
+                    # Literally, something should be wrong on front-end side,
+                    # if this does not work
                     return False
         else:
             return False

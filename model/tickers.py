@@ -9,7 +9,7 @@ class Tickers:
     Ticker object
     """
 
-    def fetch(self, ticker=None):
+    def collect_and_send(self, ticker=None):
         """
         Fetching ticker information to the server
         """

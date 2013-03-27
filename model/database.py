@@ -45,16 +45,10 @@ def get_analytics(ticker=None):
     cur = connect_to_mysql()
     # Collect all the analytics
 
-    if not utils.DEBUG:
-        if not ticker:
-            cur.execute("SELECT DISTINCT(`analytic`) FROM `entries`")
-        else:
-            cur.execute("SELECT DISTINCT(`analytic`) FROM `entries` WHERE `ticket`='%s'" % re.escape(ticker))
+    if not ticker:
+        cur.execute("SELECT DISTINCT(`analytic`) FROM `entries`")
     else:
-        if not ticker:
-            cur.execute("SELECT DISTINCT(`analytic`) FROM `entries` LIMIT 5,1")
-        else:
-            cur.execute("SELECT DISTINCT(`analytic`) FROM `entries` WHERE `ticket`='%s' LIMIT 5,1" % re.escape(ticker))
+        cur.execute("SELECT DISTINCT(`analytic`) FROM `entries` WHERE `ticket`='%s'" % re.escape(ticker))
 
     results = []
 
