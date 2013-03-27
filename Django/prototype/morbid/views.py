@@ -97,6 +97,7 @@ def ticker(request, slug):
 
     return HttpResponse(t.render(c))
 
+
 def tickers(request):
     """
     Returning all the tickers, in the system
@@ -105,7 +106,11 @@ def tickers(request):
     tickers = []
 
     for ticker in _tickers:
-        item = {'name' : ticker.name, 'long_name' : ticker.long_name, 'url': ticker.get_absolute_url()}
+        item = {
+            'name': ticker.name,
+            'long_name': ticker.long_name,
+            'url': ticker.get_absolute_url()
+        }
         tickers.append(item)
 
     return HttpResponse(json.dumps(tickers, indent=4))
