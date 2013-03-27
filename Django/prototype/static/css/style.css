@@ -113,6 +113,10 @@ li{ list-style: none; }
     text-align: left;
     cursor: pointer;
 }
+#header .search_res li a{
+    display: block;
+    margin-right: 10px;
+}
 .search_res li:hover{
     background: #f3ede8;
 }
@@ -122,6 +126,10 @@ li{ list-style: none; }
 .search_res li.inf{
     background: #d1c1b0;
     color:#fff;
+}
+.search_res li.inf span{
+    float: right;
+    color: #444;
 }
 .search_res li.active{
     background: #e7e0d9;
@@ -1075,4 +1083,87 @@ li{ list-style: none; }
 .target_price_list {
     /*border-bottom: 10px solid #333;*/
     /*margin-bottom: 10px;*/
+}
+
+
+#popup {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    top:0;
+    left: 0;
+    display: none;
+}
+#popup .overlay{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.51;
+    z-index: 900;
+}
+#popup .content {
+    width: 600px;
+    background: #fff;
+    height: 85%;
+    min-height: 400px;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    top:0;
+    z-index: 901;
+}
+#popup .top{
+    height: 27px;
+    border-bottom: 1px solid #e5dbd2;
+    padding: 20px;
+    background: #fff;
+}
+#popup h3{
+    color:#e95200;
+    font-size: 25px;
+    line-height: 27px;
+    float: left;
+    font-weight: 200; 
+}
+#popup .close{
+    display: inline-block;
+    float: right;
+    width: 29px;
+    height: 28px;
+    background: url('../images/popup_close.png') 0 0 no-repeat;
+    cursor: pointer;
+}
+#popup .list{
+    text-align: left;
+    height: 90%;
+    overflow-y: scroll;
+}
+#popup .list a, .search_result a{
+    font-weight: 200;
+    width: 46%;
+    padding-left: 20px;
+    height: 25px;
+    margin: 10px 0;
+    display: block;
+    float: left;
+    line-height: 25px;
+    font-size: 14px;
+    color:#444444;
+}
+#popup .list a:nth-of-type(odd), .search_result a:nth-of-type(odd){
+    border-right: 1px solid #e5dbd2;
+}
+#popup .list span, .search_result span{
+    float: left;
+    width: 100%;
+    display: inline-block;
+    border-bottom: 1px dashed #e5dbd2;
+}
+
+.search_result{
+    width: 600px;
+    margin: 0 auto;
+    padding-left: 94px;
 }

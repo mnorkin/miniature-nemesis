@@ -105,7 +105,7 @@ def tickers(request):
     tickers = []
 
     for ticker in _tickers:
-        item = {'name' : ticker.long_name, 'url': ticker.get_absolute_url()}
+        item = {'name' : ticker.name, 'long_name' : ticker.long_name, 'url': ticker.get_absolute_url()}
         tickers.append(item)
 
     return HttpResponse(json.dumps(tickers, indent=4))
@@ -333,7 +333,7 @@ def search(self, search_me):
         analytics.append(item)
 
     for ticker in raw_tickers:
-        item = {'name': ticker.long_name, 'url': ticker.get_absolute_url()}
+        item = {'name': ticker.long_name, 'ticker': ticker.name, 'url': ticker.get_absolute_url()}
         tickers.append(item)
 
     results['tickers'] = list(tickers)

@@ -6,6 +6,7 @@ var page_number = Number();
 
 var horizontal_slider_top_offset = 0;
 var bottom_of_page = false;
+var search_result = {};
 
 
 function generate_grid_element(id, dataset, posName) {
@@ -486,7 +487,10 @@ function process_search(dom_obj, e){
     var url = '/search/'+ obj.val()+'/';
 
     if (key == 40 || key == 38){ process_search_nav(key); return; }
-    if($(dom_obj).attr('type') == "submit"){ location.href = $('#search_inp').attr('href');  return; }
+    if($(dom_obj).attr('type') == "submit"){ 
+        if($('#search_inp').attr('href') != undefined){ location.href = $('#search_inp').attr('href'); }  
+        return false;
+    }
 
     if(obj.val().length < 1) {
         $('.search_res').html('');
@@ -498,17 +502,20 @@ function process_search(dom_obj, e){
         dataType: "json"
     }).done(function(resp) {
         var resp_html = '';
+        search_result = resp;
 
         if(resp.tickers.length){
-            resp_html += '<li class="inf">Companies</li>';
+            resp_html += '<li class="inf"><a onclick="return process_search_page(\'tickers\')" href="">Companies <span>See all</span></a></li>';
             for(i=0; i < resp.tickers.length ; i++){
+                if(i >= 5) { break; }
                 resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+'</a></li>';
             }
         }
 
         if(resp.analytics.length) {
-            resp_html += '<li class="inf">Analytics</li>';
+            resp_html += '<li class="inf"><a onclick="return process_search_page(\'analytics\')" href="">Analytics<span>See all</span><a/></li>';
             for(i=0; i < resp.analytics.length ; i++){
+                if(i >= 5) { break; }
                 resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
             }
         }
@@ -576,6 +583,22 @@ function process_search_nav(key){
             }
         }
     }
+}
+
+function process_search_page(type){
+    var response = '', elem, name, search_resul = search_result[type];
+
+    for (var i = 0; i < search_resul.length; i++) {
+        name = (type == 'tickers') ? search_resul[i].name + ' ('+search_resul[i].ticker+')' : search_resul[i].name;
+        elem = '<a href="'+search_resul[i].url+'">'+name+'</a>';
+        response += elem;
+        if(i % 2) { response += '<span></span>'; }
+    };
+    
+    $('#content').html('<div class="search_result"></div>');
+    $('#content .search_result').append(response);
+    $('#content .search_result').append('<br class="clear" />');
+    return false;
 }
 
 /**
@@ -878,6 +901,31 @@ $(function(){
        function(){ $(this).find('.text .slid').stop().css({'left': 0});}
     );
 
+    // s&p500 index popup
+    $('.sp500').click(function(){
+        var list = $('#popup .list'), elem;
+        $.ajax({
+           url: '/tickers/',
+           dataType: 'json',
+        }).done(function(data){
+            $('body').css('overflow', 'hidden');
+            $('#popup').show();
+            $('#popup .list').height( $('#popup .content').height() - 68);
+            for (var i = 0; i < data.length; i++) {
+                elem = '<a href="'+data[i].url+'">'+data[i].long_name+' ('+data[i].name+')</a>';
+                list.append(elem);
+                if(i % 2) { list.append('<span></span>'); }
+            };
+            list.append('<br class="clear" />');
+        });
+        return false;
+    });
+    $('#popup .close, #popup .overlay').click(function(){
+        $('body').css('overflow', 'auto');
+        $('#popup').hide();
+        $('#popup .list').html('');
+    });
+
     process_target_prices_blocks();
     binds_for_target_price_list();
     calculate_minavgmax_block();
@@ -1055,6 +1103,11 @@ $(window).scroll(function() {
     }
     load_more_target_prices();
     scroll_style_elements();
+});
+
+/** window resize **/
+$(window).resize(function(){
+    $('#popup .list').height( $('#popup .content').height() - 68);
 });
 
 
