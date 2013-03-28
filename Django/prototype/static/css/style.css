@@ -928,7 +928,7 @@ li{ list-style: none; }
     position: absolute;
     width:177px;
     right: 0;
-    z-index: 1;
+    z-index: 20;
 }
 .in_graph button{
     background: url('../images/analyse_1.png') 16px 50% no-repeat #e95200;

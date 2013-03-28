@@ -874,6 +874,7 @@ $(function(){
     $('body').click(in_graph_click);
     $('.in_graph').click(in_graph_click);
     $('.in_graph .sear li').click(in_graph_entry_click);
+    $('.in_graph .sear li').hover(in_graph_entry_hover);
     // to clear search proposals
     $('body').click(function () { $('.search_res').html(''); });
     $('.analyse_menu a').click(open_graph);
@@ -972,6 +973,22 @@ function in_graph_entry_click(){
     }
 }
 
+function in_graph_entry_hover(e){
+    var obj = $(this);
+    var name = obj.attr('name');
+    var svg_element = $('#chart svg [name='+name+']');
+    if(e.type == 'mouseenter'){
+        svg_element.attr('fill', '#e95201').css('opacity', 0.7);
+        graphs.topbar_show(obj.attr('name'));
+
+    }else if (e.type == 'mouseleave' && obj.hasClass('active')){
+        svg_element.css('opacity', 1);
+
+    }else if (e.type == 'mouseleave'){
+        svg_element.attr('fill', svg_element.attr('origin_fill')).css('opacity', 1);
+    }
+}
+
 function in_graph_get_active_elements(){
     var list = $('.in_graph .sear li');
     var obj, name, active_elements = [];
@@ -984,7 +1001,7 @@ function in_graph_get_active_elements(){
         }
     });
     return [];
-    return active_elements;
+    //return active_elements;
 }
 
 function in_graph_select_active_elements(){

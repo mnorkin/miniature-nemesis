@@ -69,6 +69,18 @@ var graphs = (function () {
             if (d3.select(this).attr('selectd') == 0) {
                 d3.select(this).attr("fill", d3.select(this).attr('origin_fill'));
             }
+            d3.select(this).style('opacity', 1);
+        },
+
+        on_click: function(){
+            var name = d3.select(this).attr('name');
+            $('.in_graph .sear li[name='+name+']').trigger('click');
+        },
+
+        center_element: function(){
+            var obj = $('#chart path[name=rbc-capital-markets]');
+            console.log(obj);
+            return obj;
         },
 
         populate: function (json) {
@@ -372,14 +384,15 @@ var graphs = (function () {
                 return full_data_proximity[i].slug;
             })
                 .on('mouseover', function (d, i) {
-                d3.select(this).attr("fill", "#e95201");
+                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
                 var top = h / 2 + parseFloat(d3.select(this).attr('cy')) - 37;
                 var left = w / 2 + parseFloat(d3.select(this).attr('cx')) - 23;
                 var text = d3.select(this).attr('txt');
                 graphs.tooltip_show(top, left, text);
                 graphs.topbar_show(full_data_proximity[i].slug);
             })
-                .on("mouseout", graphs.on_mouseout);
+                .on("mouseout", graphs.on_mouseout)
+                .on("click" , graphs.on_click);
 
             sun.append('circle')
                 .style('stroke', 'grey')
@@ -473,14 +486,15 @@ var graphs = (function () {
                 return full_data[i].slug;
             })
                 .on('mouseover', function (d, i) {
-                d3.select(this).attr("fill", "#e95201");
+                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
                 var top = h / 2 + parseFloat(d3.select(this).attr('cy')) - 34;
                 var left = w / 2 + parseFloat(d3.select(this).attr('cx')) - 22.5;
                 var text = d3.select(this).attr('txt');
                 graphs.tooltip_show(top, left, text);
                 graphs.topbar_show(full_data[i].slug);
             })
-                .on("mouseout", graphs.on_mouseout);
+                .on("mouseout", graphs.on_mouseout)
+                .on("click" , graphs.on_click);
             return graphs;
         },
 
@@ -567,7 +581,7 @@ var graphs = (function () {
             })
 
             .on('mouseover', function (d, i) {
-                d3.select(this).attr("fill", "#e95201");
+                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
                 var top = h + parseFloat(d3.select(this).attr('cy')) - 37;
                 var left = translate_w / 3 * 2 + parseFloat(d3.select(this).attr('cx')) - 23;
                 var text = d3.select(this).attr('txt');
@@ -575,6 +589,7 @@ var graphs = (function () {
                 graphs.topbar_show(full_data[i].slug);
             })
                 .on("mouseout", graphs.on_mouseout)
+                .on("click" , graphs.on_click)
                 .attr("transform", translate);
             return graphs;
         },
@@ -603,19 +618,21 @@ var graphs = (function () {
                 angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi / 2, pi / 2]);
             } else {
                 angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi / 2 - phase, pi - phase]);
+                _angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi / 2 - phase, pi - phase]);
             }
 
             line_angle_scale = d3.scale.linear().domain([-w / 14, w / 14]).range([0, 1 / 2 * pi]);
 
             var dragCircle = d3.behavior.drag()
                 .on('dragstart', function () {
-                d3.event.sourceEvent.stopPropagation();
+                //d3.event.sourceEvent.stopPropagation();
             })
                 .on('dragend', function (d, i) {
-                d3.select(this).attr('cx', d.cx);
-                d3.select(this).attr("transform", "translate(" + d.cx + ", 0)");
+                //d3.select(this).attr('cx', d.cx);
+                //d3.select(this).attr("transform", "translate(" + d.cx + ", 0)");
             })
                 .on('drag', function (d, i) {
+                console.log(d,i)
                 d.cx += d3.event.dx;
                 if (d.cx > w / 14) {
                     d.cx = w / 14;
@@ -629,6 +646,29 @@ var graphs = (function () {
                 angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi / 2 - phase, pi - phase]);
                 sun.selectAll("path.data")
                     .data(_data)
+                    .attr("d", data_arc);
+            });
+
+
+            $('.in_graph .sear li').click(function(){
+                /* Scroll to selected circle element */
+                /* TODO: make it work good. */
+                return; /* turn off */
+
+                if($(this).hasClass('active') == false) { return; }
+                //var name = $(this).attr('name');
+                //var obj = $('#chart svg path[name='+name+']');
+                d = {cx:  25};
+
+                d3.select('.scroller')
+                    .transition().duration(700).ease('linear')
+                    .attr('cx', d.cx).attr("transform", "translate(" + d.cx + ", 0)");
+
+                phase = line_angle_scale(d.cx);
+                angle_scale = d3.scale.linear().domain([0, _data.length]).range([-pi / 2 - phase, pi - phase]);
+                sun.selectAll("path.data")
+                    .data(_data)
+                    .transition().duration(750).ease('linear')
                     .attr("d", data_arc);
             });
 
@@ -736,6 +776,7 @@ var graphs = (function () {
                     .attr('d', 'm 0.0389418,0.0432822 9.9610575,0 -0.06029,5.0188999 0,5.2846009 -5.2480518,4.6774 -0.01414,-0.038 L 0,10.005182 0.049611,0.0241822')
                     .attr('fill', '#df5401')
                     .call(dragCircle)
+                    .attr('class', 'scroller')
                     .attr('cx', function (d) {
                     return d.cx;
                 })
@@ -766,7 +807,7 @@ var graphs = (function () {
                 return full_data[i].slug;
             })
                 .on("mouseover", function (d, i) {
-                d3.select(this).attr("fill", "#e95201");
+                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
                 var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator'))) + angle_scale(parseFloat(d3.select(this).attr('enumerator')) + 1)) / 2 - pi;
                 var radius = parseFloat(d3.select(this).attr('txt'));
                 var top = (h - h / 8) + Math.cos(angle) * (radius * rhw / 100 + r);
@@ -776,6 +817,7 @@ var graphs = (function () {
                 graphs.topbar_show(full_data[i].slug);
             })
                 .on("mouseout", graphs.on_mouseout)
+                .on("click" , graphs.on_click)
                 .attr('txt', function (d) {
                 return d + "%";
             })
@@ -903,7 +945,7 @@ var graphs = (function () {
                 return full_data[i].slug;
             })
                 .on('mouseover', function (d, i) {
-                d3.select(this).attr("fill", "#e95201");
+                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
                 var top = h + parseFloat(d3.select(this).attr('cy')) - 37;
                 var left = translate_w / 3 * 2 + parseFloat(d3.select(this).attr('cx')) - 23;
                 var text = d3.select(this).attr('txt');
@@ -911,6 +953,7 @@ var graphs = (function () {
                 graphs.topbar_show(full_data[i].slug);
             })
                 .on("mouseout", graphs.on_mouseout)
+                .on("click" , graphs.on_click)
                 .attr("transform", translate);
 
             return graphs;
@@ -1115,7 +1158,7 @@ var graphs = (function () {
                 .on("mouseover", function (d, i) {
                 var angle = (calculate_start_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale) + calculate_end_angle(parseFloat(d3.select(this).attr('enumerator')), angle_scale)) / 2 + pi;
                 var radius = sun_data[2] / 100 * rhw + r;
-                d3.select(this).attr("fill", "#e95201");
+                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
                 var top = (h - h / 8) + Math.cos(angle) * radius;
                 var left = w / 2 - Math.sin(angle) * radius;
                 var text = d3.select(this).attr('txt');
@@ -1123,6 +1166,7 @@ var graphs = (function () {
                 graphs.topbar_show(full_data[i].slug);
             })
                 .on("mouseout", graphs.on_mouseout)
+                .on("click" , graphs.on_click)
                 .attr('txt', function (d) {
                 return d + "%";
             })
@@ -1258,10 +1302,11 @@ var graphs = (function () {
                 return full_data[i].slug;
             })
                 .on('mouseover', function (d, i) {
-                d3.select(this).attr("fill", "#e95201");
+                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
                 graphs.topbar_show(full_data[i].slug);
             })
                 .on("mouseout", graphs.on_mouseout)
+                .on("click" , graphs.on_click)
                 .attr("transform", translate);
 
             return graphs;
