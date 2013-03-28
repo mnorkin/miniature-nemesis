@@ -17,11 +17,11 @@ class Unit(models.Model):
     """ The units of the feature """
 
     name = models.CharField(max_length=200)
-    """Name of the unit of measure
-    @type: C{str}"""
+    """ Name of the unit of measure
+        @type: C{str}"""
     value = models.CharField(max_length=200)
-    """The value (sign) of the measure (days, percent)
-    @type: C{str}"""
+    """ The value (sign) of the measure (days, percent)
+        @type: C{str}"""
 
     def __unicode__(self):
         """
@@ -36,20 +36,20 @@ class Feature(models.Model):
     """
 
     name = models.CharField(max_length=200)
-    """Name of the measure
-    @type: C{str}"""
+    """ Name of the measure
+        @type: C{str}"""
     unit = models.ForeignKey(Unit)
-    """The units of the measure
-    @type: L{Unit}"""
+    """ The units of the measure
+        @type: L{Unit}"""
     display_in_frontpage = models.BooleanField()
-    """Boolean to display in frontpage
-    @type: C{boolean}"""
+    """ Boolean to display in frontpage
+        @type: C{boolean}"""
     description = models.TextField()
-    """Description of the feature
-    @type: C{text}"""
+    """ Description of the feature
+        @type: C{text}"""
     slug = models.SlugField(max_length=200, unique=True)
-    """Slug of the feature
-    @type: C{str}"""
+    """ Slug of the feature
+        @type: C{str}"""
 
     def __unicode__(self):
         """
@@ -64,26 +64,14 @@ class Analytic(models.Model):
     """
 
     name = models.CharField(max_length=200)
-    """Name of analytic
-    @type: C{str}"""
-    number_of_companies = models.IntegerField()
-    """Number of tp analytic released
-    @type: C{integer}"""
-    number_of_tp = models.IntegerField()
-    """Number of target prices released by analytic
-         @type: C{integer}"""
-    volatility_positive = models.IntegerField()
-    """Measure of uncertainty, total number of target prices
-         @type: C{integer}"""
-    volatility_negative = models.IntegerField()
-    """Measure of uncertainty, total number of target prices, failed to keep the 250 days
-         @type: C{integer}"""
+    """ Name of analytic
+        @type: C{str}"""
     last_target_price = models.FloatField()
-    """Last target price analytic released
-         @type: C{float}"""
+    """ Last target price analytic released
+        @type: C{float}"""
 
     slug = models.SlugField()
-    """Slug to reach the page of analytic
+    """ Slug to reach the page of analytic
         @type: C{str}"""
 
     def get_absolute_url(self):
@@ -109,32 +97,26 @@ class Ticker(models.Model):
     """
 
     name = models.CharField(max_length=200)
-    """Name of the Ticker (AAPL, GOOG)
-         @type: C{str}"""
+    """ Name of the Ticker (AAPL, GOOG)
+        @type: C{str}"""
     long_name = models.CharField(max_length=200)
-    """Full name of the Ticker (Apple Inc, Google Inc)
-         @type: C{str}"""
+    """ Full name of the Ticker (Apple Inc, Google Inc)
+        @type: C{str}"""
     last_stock_price = models.FloatField()
-    """Last stock price of the Ticker (live update maybe)
-         @type: C{float}"""
-    number_of_analytics = models.IntegerField()
-    """Number of analytics analyzing the Ticker
-         @type: C{integer}"""
-    number_of_tp = models.IntegerField()
-    """How many target prices does the Ticker have
-         @type: C{integer}"""
+    """ Last stock price of the Ticker (live update maybe)
+        @type: C{float}"""
     consensus_min = models.FloatField()
-    """Minimum value for the consensus measure
-         @type: C{float}"""
+    """ Minimum value for the consensus measure
+        @type: C{float}"""
     consensus_avg = models.FloatField()
-    """Average value for the consensus measure
-         @type: C{float}"""
+    """ Average value for the consensus measure
+        @type: C{float}"""
     consensus_max = models.FloatField()
-    """Maximum value for the consensus measure
-         @type: C{float}"""
+    """ Maximum value for the consensus measure
+        @type: C{float}"""
 
     slug = models.SlugField()
-    """The slug to reach the page
+    """ The slug to reach the page
         @type: C{str}"""
 
     def get_absolute_url(self):
@@ -156,23 +138,54 @@ class Ticker(models.Model):
         return self.long_name + " (" + self.name + ")"
 
 
+class TargetPriceNumberAnalyticTicker(models.Model):
+    """
+    Number of target prices to the ticker, given by the specific analytic
+    """
+    analytic = models.ForeignKey(Analytic)
+    ticker = models.ForeignKey(Ticker)
+    number = models.IntegerField()
+
+    def __unicode__(self):
+        """
+        Unicode return
+        """
+        return str(self.number)
+
+
+class Volatility(models.Model):
+    """
+    Volatility measure
+    """
+    analytic = models.ForeignKey(Analytic)
+    ticker = models.ForeignKey(Ticker)
+    number = models.IntegerField()
+    total = models.IntegerField()
+
+    def __unicode__(self):
+        """
+        Unicode return
+        """
+        return str(self.number) + '/' + str(self.total)
+
+
 class FeatureAnalyticTicker(models.Model):
     """
     The place where analytic, Ticker and feature meets
     """
 
     value = models.FloatField()
-    """The value of the feature
-         @type: C{float}"""
+    """ The value of the feature
+        @type: C{float}"""
     feature = models.ForeignKey(Feature)
-    """Defines the type of the feature (how near, fixation, ...)
-         @type: L{Feature}"""
+    """ Defines the type of the feature (how near, fixation, ...)
+        @type: L{Feature}"""
     analytic = models.ForeignKey(Analytic)
-    """The analytic for which the feature was calculated
-         @type: L{Analytic}"""
+    """ The analytic for which the feature was calculated
+        @type: L{Analytic}"""
     ticker = models.ForeignKey(Ticker)
-    """The Ticker on which the feature was calculated
-         @type: L{Ticker}"""
+    """ The Ticker on which the feature was calculated
+        @type: L{Ticker}"""
 
     def hash(self):
         all_letters = string.lowercase
@@ -209,20 +222,20 @@ class TargetPrice(models.Model):
     """
 
     date = models.DateField()
-    """The date of released target price
-         @type: C{Date}"""
+    """ The date of released target price
+        @type: C{Date}"""
     price = models.FloatField()
-    """The price of the target price
-         @type: C{Float}"""
+    """ The price of the target price
+        @type: C{Float}"""
     change = models.FloatField()
-    """The price change over the last price
-         @type: C{Float}"""
+    """ The price change over the last price
+        @type: C{Float}"""
     ticker = models.ForeignKey(Ticker)
-    """The Ticker on which target price was released
-         @type: L{Ticker}"""
+    """ The Ticker on which target price was released
+        @type: L{Ticker}"""
     analytic = models.ForeignKey(Analytic)
-    """The analytic, which published the target price
-         @type: L{Analytic}"""
+    """ The analytic, which published the target price
+        @type: L{Analytic}"""
 
     objects = TargetPriceManager()
 

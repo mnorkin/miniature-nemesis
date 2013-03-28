@@ -1,4 +1,12 @@
-from morbid.models import ApiKey, FeatureAnalyticTicker, Feature, TargetPrice, Ticker, Analytic, Unit
+from morbid.models import ApiKey
+from morbid.models import FeatureAnalyticTicker
+from morbid.models import Feature
+from morbid.models import TargetPrice
+from morbid.models import Ticker
+from morbid.models import Analytic
+from morbid.models import Unit
+from morbid.models import Volatility
+from morbid.models import TargetPriceNumberAnalyticTicker
 from piston.handler import BaseHandler
 from piston.utils import rc, validate
 from django.http import HttpResponse, Http404
@@ -33,6 +41,124 @@ class ApiKeyHandler(BaseHandler):
         #     # return HttpResponse(api_key)
 
 
+class TargetPriceNumberAnalyticTickerHandler(BaseHandler):
+    """
+    Number of Target prices for the ticker by the Analytic
+    """
+
+    model = TargetPriceNumberAnalyticTicker
+
+    def read(self, request, analytic_slug=None, ticker_slug=None):
+        if analytic_slug and ticker_slug:
+            tpnat = TargetPriceNumberAnalyticTicker.get(
+                analytic=Analytic.objects.get(slug=analytic_slug),
+                ticker=Ticker.objects.get(slug=ticker_slug))
+            return tpnat
+        else:
+            return TargetPriceNumberAnalyticTicker.objects.all()
+
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+            tpnat = TargetPriceNumberAnalyticTicker
+            try:
+                tpnat = self.mmodel.objects.get(
+                    analytic=Analytic.objects.get(slug=data['analytic_slug']),
+                    ticker=Ticker.objects.get(slug=data['ticker_slug']))
+                return rc.DUPLICATE_ENTRY
+            except tpnat.DoesNotExist:
+                em = self.model(
+                    analytic=Analytic.objects.get(slug=data['analytic_slug']),
+                    ticker=Ticker.objects.get(slug=data['ticker_slug']),
+                    number=data['number'])
+                em.save()
+                return rc.CREATED
+        else:
+            super(TargetPriceNumberAnalyticTicker, self).create(request)
+
+    def update(self, request):
+        if request.content_type:
+            data = request.data
+            em = self.model.objects.get(
+                analytic=Analytic.objects.get(slug=data['analytic_slug']),
+                ticker=Ticker.objects.get(slug=data['ticker_slug']))
+            em.number = data['number']
+            em.save()
+            return rc.ALL_OK
+        else:
+            super(TargetPriceNumberAnalyticTicker, self).create(request)
+
+    def delete(self, request, analytic_slug=None, ticker_slug=None):
+        if analytic_slug and ticker_slug:
+            em = self.model.objects.get(
+                analytic=Analytic.objects.get(slug=analytic_slug),
+                ticker=Ticker.objects.get(slug=ticker_slug))
+            em.delete()
+            return rc.DELETED
+        else:
+            super(TargetPriceNumberAnalyticTicker, self).create(request)
+
+
+class VolatilityHandler(BaseHandler):
+    """
+    Volatility Handler
+    """
+    model = Volatility
+
+    def read(self, request, analytic_slug=None, ticker_slug=None):
+        if analytic_slug and ticker_slug:
+            volatility = Volatility.objects.get(
+                analytic=Analytic.objects.get(slug=analytic_slug),
+                ticker=Ticker.objects.get(slug=ticker_slug))
+            return volatility
+        else:
+            return Volatility.objects.all()
+
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+            volatility = Volatility
+            try:
+                volatility = self.model.objects.get(
+                    analytic=Analytic.objects.get(slug=data['analytic_slug']),
+                    ticker=Ticker.objects.get(slug=data['ticker_slug']))
+                return rc.DUPLICATE_ENTRY
+            except volatility.DoesNotExist:
+                em = self.model(
+                    analytic=Analytic.objects.get(slug=data['analytic_slug']),
+                    ticker=Ticker.objects.get(slug=data['ticker_slug']),
+                    total=data['total'],
+                    number=data['number'])
+                em.save()
+                return rc.CREATED
+
+        else:
+            super(Volatility, self).create(request)
+
+    def update(self, request):
+        if request.content_type:
+            data = request.data
+            em = self.model.objects.get(
+                analytic=Analytic.objects.get(slug=data['analytic_slug']),
+                ticker=Ticker.objects.get(slug=data['ticker_slug']))
+            em.number = data['number']
+            em.total = data['total']
+            em.save()
+            return rc.ALL_OK
+        else:
+            super(Volatility, self).create(request)
+
+    def delete(self, request, analytic_slug=None, ticker_slug=None):
+        if analytic_slug and ticker_slug:
+            em = self.model.objects.get(
+                analytic=Analytic.objects.get(slug=analytic_slug),
+                ticker=Ticker.objects.get(slug=ticker_slug))
+            em.delete()
+            return rc.DELETED
+        else:
+            super(Volatility, self).create(request)
+
+
 class AnalyticHandler(BaseHandler):
     """
     Analytic data handler
@@ -65,10 +191,6 @@ class AnalyticHandler(BaseHandler):
             except analytic.DoesNotExist:
                 em = self.model(
                     name=data['name'],
-                    number_of_companies=data['number_of_companies'],
-                    number_of_tp=data['number_of_tp'],
-                    volatility_positive=data['volatility_positive'],
-                    volatility_negative=data['volatility_negative'],
                     last_target_price=data['last_target_price'],
                     slug=data['slug']
                 )
@@ -84,9 +206,6 @@ class AnalyticHandler(BaseHandler):
             em = self.model.objects.get(slug=data['slug'])
 
             em.name = data['name']
-            em.number_of_companies = data['number_of_companies']
-            em.number_of_tp = data['number_of_tp']
-            em.volatility_positive = data['volatility_negative']
             em.last_target_price = data['last_target_price']
 
             em.save()
@@ -101,7 +220,7 @@ class AnalyticHandler(BaseHandler):
 
             em = self.model.objects.get(slug=data['slug'])
 
-            em.delete
+            em.delete()
 
             return rc.DELETED
         else:
@@ -139,8 +258,6 @@ class TickerHandler(BaseHandler):
                     name=data['name'],
                     long_name=data['long_name'],
                     last_stock_price=data['last_stock_price'],
-                    number_of_analytics=data['number_of_analytics'],
-                    number_of_tp=data['number_of_tp'],
                     consensus_min=data['consensus_min'],
                     consensus_avg=data['consensus_avg'],
                     consensus_max=data['consensus_max'],
@@ -165,8 +282,6 @@ class TickerHandler(BaseHandler):
             em.name = data['name']
             em.long_name = data['long_name']
             em.last_stock_price = data['last_stock_price']
-            em.number_of_analytics = data['number_of_analytics']
-            em.number_of_tp = data['number_of_tp']
             em.consensus_min = data['consensus_min']
             em.consensus_avg = data['consensus_avg']
             em.consensus_max = data['consensus_max']
