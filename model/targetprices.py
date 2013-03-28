@@ -6,11 +6,12 @@ import rest
 
 
 class TargetPrices:
+    """
+    Target prices matters
+    """
 
     def send(self, data=None):
-
         if data:
-
             if rest.send("POST", "/api/target_prices/", data):
                 """Trying to send POST"""
                 return True

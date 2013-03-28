@@ -28,11 +28,13 @@ class App():
         Initialization of the class
         """
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path
-        + '/logs/' + date.today().isoformat() + '.log'
+        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
+        self.logging_level = logging.DEBUG
         logging.basicConfig(
             filename=self.logging_file,
-            level=self.logging_level, foramt='%(asctime)s %(message)s')
+            level=self.logging_level, format='%(asctime)s %(message)s')
+
+        logging.debug('Starting up...')
 
     def fetch_units(self):
         """
@@ -100,10 +102,14 @@ class App():
         feature_analytic_tickers = FeatureAnalyticTickers()
         targetprices = TargetPrices()
 
+        logging.debug('Getting the target prices')
+
         for target_price in database.get_targetprices():
             """
             Get the most recent target prices
             """
+            logging.debug('Target price %s of %s' % (
+                target_price['ticker'], target_price['analytic']))
             ticker_slug = utils.slugify(target_price['ticker'])
             analytic_slug = utils.slugify(target_price['analytic'])
 

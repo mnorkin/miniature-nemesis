@@ -33,12 +33,9 @@ class Tickers:
         if ticker:
             ticker_consensus = database.get_consensus(ticker)
             ticker_yahoo = stock_quote.get_ticker_data(ticker)
-            ticker_stats = database.get_ticker(ticker)
             name = ticker
             long_name = ticker_yahoo['long_name']
             last_stock_price = ticker_yahoo['last_stock_price']
-            number_of_analytics = database.get_targetprices(ticker=ticker).__len__()
-            number_of_tp = ticker_stats['number_of_tp']
             consensus_min = ticker_consensus['consensus_min']
             consensus_avg = ticker_consensus['consensus_avg']
             consensus_max = ticker_consensus['consensus_max']
@@ -48,8 +45,6 @@ class Tickers:
                 'name': name,
                 'long_name': long_name.replace('"', ''),
                 'last_stock_price': last_stock_price,
-                'number_of_analytics': number_of_analytics,
-                'number_of_tp': number_of_tp,
                 'consensus_min': consensus_min,
                 'consensus_avg': consensus_avg,
                 'consensus_max': consensus_max,

@@ -21,23 +21,25 @@ import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
 from mailman import mailman
+import threading
 
 
-class crawler():
+class crawler(threading.Thread):
     """
     Crawler class
     """
 
-    def __init__(self):
+    def __init__(self, _login_username, _login_password):
         """
         Initialization of the crawler buddy
         """
+        threading.Thread.__init__(self)
         self.url = 'http://stocktargetprices.com/'
         self.current_url = self.url
         self.html = None
         self.login_page = 'login'
-        self.login_username = 'arvydas.tamulis@gmail.com'
-        self.login_password = 'liko789'
+        self.login_username = _login_username
+        self.login_password = _login_password
         self.companies_page = 'companies'
         self.alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.letter = None
@@ -47,9 +49,9 @@ class crawler():
         self.target_price_list = []
         self.open_http = self.make_open_http()
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path + '/logs/crawler_' + date.today().isoformat() + '.log'
+        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 12  # Then the crawler starts its job
+        self.start_hour = 22  # Then the crawler starts its job
         self.len_hour = 7  # How long in hours the crawler works
         self.mailman = mailman(
             'AKIAJKFJFUKWVJSBYA5Q',
@@ -59,12 +61,15 @@ class crawler():
             filename=self.logging_file,
             level=self.logging_level, format='%(asctime)s %(message)s')
 
-    def main(self):
+    def run(self):
         """
         Main things happens here.
 
         Need to implement the threading right here
         """
+        logging.debug('Randomizing the start for %s ' % self.login_username)
+        time.sleep(int(random() * 100))
+        logging.debug('And here it goes')
 
         self.shuffle_letter()  # shuffle letter for initial browsing
         self.login()  # Make the login happen
@@ -220,11 +225,13 @@ cra.baklazanas.lt, sleeping')
         ):
             logging.debug("No more pages available")
             logging.debug("Current Url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return False
         else:
 
             logging.debug("Pages are available")
             logging.debug("Current Url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return True
 
     def send_target_prices(self):
@@ -293,7 +300,7 @@ cra.baklazanas.lt, sleeping')
                 """
                 prices.append('0')
 
-            logging.debug('Plain data: ' + entry.text_content().strip())
+            # logging.debug('Plain data: ' + entry.text_content().strip())
             # Month-Day-Year (stupid Americans)
             date = datetime.strptime(items[-1].text_content().strip(), "%m/%d/%y")
 
@@ -313,7 +320,7 @@ cra.baklazanas.lt, sleeping')
             self.target_price_list.append(item)
             """Append to the buffer"""
 
-        if len(self.target_price_list) > 1:
+        if len(self.target_price_list) >= 1:
             return True
         else:
             self.mailman.write('Target Price list fail, please check the logs')
@@ -332,6 +339,7 @@ cra.baklazanas.lt, sleeping')
             self.mailman.write('Company-list selector link fail, please check the logs')
             logging.error("company-list links select fail")
             logging.debug("Current url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return False
 
         self.companies_list = []
@@ -345,12 +353,13 @@ cra.baklazanas.lt, sleeping')
             }
             self.companies_list.append(item)
 
-        if len(self.companies_list) > 1:
+        if len(self.companies_list) >= 1:
             return True
         else:
             self.mailman.write('Companies list length fail, please check the logs')
             logging.error("Companies list length fail")
             logging.debug("Current url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return False
 
     def digesture_companies_list(self):
@@ -377,11 +386,13 @@ cra.baklazanas.lt, sleeping')
                 else:
                     logging.error("Ticker target price list fail")
                     logging.debug("Current url: " + self.current_url)
+                    logging.debug("Current login: %s " % self.login_username)
             else:
                 """
                 API said it's ok, go on to the next one
                 """
                 logging.debug("Ticker %s does not exist or is very confidential with data" % company['ticker'])
+                logging.debug("Current login: %s " % self.login_username)
 
         return False
 
@@ -401,6 +412,7 @@ cra.baklazanas.lt, sleeping')
             logging.debug("Continue with the next letter from the big list")
             self.shuffle_letter()  # Shuffle the random letter
             logging.debug("Next letter: " + self.letter)
+            logging.debug("Current login: %s " % self.login_username)
         else:
             """If no companies data was sent -- switch to the next page if available"""
             logging.debug("No companies data was send, consider to go to the\
@@ -408,6 +420,7 @@ cra.baklazanas.lt, sleeping')
             if self.companies_next_page_available:  # If there is any more pages
                 self.page_number = self.page_number + 1  # Add next page
                 logging.debug("Moving to the next page: " + str(self.page_number))
+                logging.debug("Current login: %s " % self.login_username)
             else:
                 self.shuffle_letter()  # Shuffle the next letter
             return  # Return to main
@@ -426,6 +439,7 @@ cra.baklazanas.lt, sleeping')
         except:
             self.mailman.write('Login form find fail, please check the logs')
             logging.error("Login form find fail")
+            logging.debug("Current login: %s " % self.login_username)
             return False
 
         login_form.action = self.url + '/' + login_form.action
@@ -448,12 +462,16 @@ cra.baklazanas.lt, sleeping')
         self.go("my-account")
 
         if len(self.html.xpath('//a[@href="/login?mode=logout"]')) == 0:
-            logging.debug('User is not logged in')
+            logging.debug('User %s is not logged in' % self.login_username)
             return False
         else:
-            logging.debug('User is logged in')
+            logging.debug('User %s is logged in' % self.login_username)
             return True
 
 if __name__ == '__main__':
-    cra = crawler()  # Define the crawler
-    cra.main()  # Launch the main guy into the wild
+    cra1 = crawler('arvydas.tamulis@gmail.com', 'liko789')  # Define the crawler
+    # cra1.setDaemon(True)
+    cra1.start()  # Launch the main guy into the wild
+    cra2 = crawler('trialseoproject@gmail.com', 'saras86')
+    # cra2.setDaemon(True)
+    cra2.start()

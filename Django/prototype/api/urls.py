@@ -1,7 +1,14 @@
-from apikey.auth import ApiKeyAuthentication
 from django.conf.urls.defaults import *
 from piston.resource import Resource
-from api.handlers import AnalyticHandler, TickerHandler, TargetPriceHandler, FeatureHandler, FeatureAnalyticTickerHandler, ApiKeyHandler, UnitHandler
+from api.handlers import AnalyticHandler
+from api.handlers import TickerHandler
+from api.handlers import TargetPriceHandler
+from api.handlers import FeatureHandler
+from api.handlers import FeatureAnalyticTickerHandler
+from api.handlers import ApiKeyHandler
+from api.handlers import UnitHandler
+from api.handlers import TargetPriceNumberAnalyticTickerHandler
+from api.handlers import VolatilityHandler
 
 # feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler, authentication=ApiKeyAuthentication())
 feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler)
@@ -15,6 +22,8 @@ target_price_handler = Resource(TargetPriceHandler)
 feature_handler = Resource(FeatureHandler)
 # unit_handler = Resource(UnitHandler, authentication=ApiKeyAuthentication())
 unit_handler = Resource(UnitHandler)
+tpnat_handler = Resource(TargetPriceNumberAnalyticTickerHandler)
+volatility_handler = Resource(VolatilityHandler)
 apikey_handler = Resource(ApiKeyHandler)
 
 urlpatterns = patterns(
@@ -29,5 +38,9 @@ urlpatterns = patterns(
     url(r'^features/$', feature_handler),
     url(r'^features/(?P<feature_id>\d+)/$', feature_handler),
     url(r'^units/$', unit_handler),
-    url(r'^apikeys/', apikey_handler)
+    url(r'^apikeys/', apikey_handler),
+    url(r'^volatilities/$', volatility_handler),
+    url(r'^volatilities/(?P<analytic_slug>[^/]+)/(?P<ticker_slug>)[^/]+)/$', volatility_handler),
+    url(r'^target_price_numbers/$', volatility_handler),
+    url(r'^target_price_numbers/(?P<analytic_slug>[^/]+)/(?P<ticker_slug>[^/]+)/$', volatility_handler),
 )

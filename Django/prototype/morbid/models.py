@@ -14,14 +14,11 @@ signals.post_syncdb.disconnect(
 
 
 class Unit(models.Model):
-    """ The units of the feature """
-
+    """
+    The units of the feature
+    """
     name = models.CharField(max_length=200)
-    """ Name of the unit of measure
-        @type: C{str}"""
     value = models.CharField(max_length=200)
-    """ The value (sign) of the measure (days, percent)
-        @type: C{str}"""
 
     def __unicode__(self):
         """
@@ -34,22 +31,11 @@ class Feature(models.Model):
     """
     The feature of the measure
     """
-
     name = models.CharField(max_length=200)
-    """ Name of the measure
-        @type: C{str}"""
     unit = models.ForeignKey(Unit)
-    """ The units of the measure
-        @type: L{Unit}"""
     display_in_frontpage = models.BooleanField()
-    """ Boolean to display in frontpage
-        @type: C{boolean}"""
     description = models.TextField()
-    """ Description of the feature
-        @type: C{text}"""
     slug = models.SlugField(max_length=200, unique=True)
-    """ Slug of the feature
-        @type: C{str}"""
 
     def __unicode__(self):
         """
@@ -62,19 +48,13 @@ class Analytic(models.Model):
     """
     Analysing analytic
     """
-
     name = models.CharField(max_length=200)
-    """ Name of analytic
-        @type: C{str}"""
-    last_target_price = models.FloatField()
-    """ Last target price analytic released
-        @type: C{float}"""
-
     slug = models.SlugField()
-    """ Slug to reach the page of analytic
-        @type: C{str}"""
 
     def get_absolute_url(self):
+        """
+        Generating absolute url to reach analytic
+        """
         return "/analytic/%s/" % self.slug
 
     def natural_key(self):
@@ -83,6 +63,22 @@ class Analytic(models.Model):
         @return: C{string}
         """
         return self.name
+
+    def last_target_price(self, _ticker=None):
+        """
+        Returning last target price
+        """
+        if _ticker:
+            target_price = TargetPrice
+            try:
+                target_price = TargetPrice.objects.filter(
+                    ticker=_ticker,
+                    analytic=self).order_by('-date')[0]
+                return target_price
+            except target_price.DoesNotExist:
+                return None
+        else:
+            return None
 
     def __unicode__(self):
         """
@@ -95,31 +91,18 @@ class Ticker(models.Model):
     """
     The Ticker (or more precise to call it a company) name
     """
-
     name = models.CharField(max_length=200)
-    """ Name of the Ticker (AAPL, GOOG)
-        @type: C{str}"""
     long_name = models.CharField(max_length=200)
-    """ Full name of the Ticker (Apple Inc, Google Inc)
-        @type: C{str}"""
     last_stock_price = models.FloatField()
-    """ Last stock price of the Ticker (live update maybe)
-        @type: C{float}"""
     consensus_min = models.FloatField()
-    """ Minimum value for the consensus measure
-        @type: C{float}"""
     consensus_avg = models.FloatField()
-    """ Average value for the consensus measure
-        @type: C{float}"""
     consensus_max = models.FloatField()
-    """ Maximum value for the consensus measure
-        @type: C{float}"""
-
     slug = models.SlugField()
-    """ The slug to reach the page
-        @type: C{str}"""
 
     def get_absolute_url(self):
+        """
+        Generating absolute url
+        """
         return "/ticker/%s/" % self.slug
 
     def natural_key(self):
@@ -173,21 +156,15 @@ class FeatureAnalyticTicker(models.Model):
     """
     The place where analytic, Ticker and feature meets
     """
-
     value = models.FloatField()
-    """ The value of the feature
-        @type: C{float}"""
     feature = models.ForeignKey(Feature)
-    """ Defines the type of the feature (how near, fixation, ...)
-        @type: L{Feature}"""
     analytic = models.ForeignKey(Analytic)
-    """ The analytic for which the feature was calculated
-        @type: L{Analytic}"""
     ticker = models.ForeignKey(Ticker)
-    """ The Ticker on which the feature was calculated
-        @type: L{Ticker}"""
 
     def hash(self):
+        """
+        Unique identification of feature for Analytic-Ticker relation
+        """
         all_letters = string.lowercase
         id_hash = "".join([all_letters[int(letter)] for letter in str(self.id)])
         return self.feature.slug + self.analytic.slug + self.ticker.slug + id_hash
@@ -202,6 +179,9 @@ class FeatureAnalyticTicker(models.Model):
 
 
 class TargetPriceManager(models.Manager):
+    """
+    Custom Target Price Manager
+    """
     def with_count(self):
         """
         Return the target prices with more than repeatable number defined
@@ -220,26 +200,18 @@ class TargetPrice(models.Model):
     """
     The list of all the target prices to show to people
     """
-
     date = models.DateField()
-    """ The date of released target price
-        @type: C{Date}"""
     price = models.FloatField()
-    """ The price of the target price
-        @type: C{Float}"""
     change = models.FloatField()
-    """ The price change over the last price
-        @type: C{Float}"""
     ticker = models.ForeignKey(Ticker)
-    """ The Ticker on which target price was released
-        @type: L{Ticker}"""
     analytic = models.ForeignKey(Analytic)
-    """ The analytic, which published the target price
-        @type: L{Analytic}"""
 
     objects = TargetPriceManager()
 
     def hash(self):
+        """
+        Unique identification of particular targe price
+        """
         all_letters = string.lowercase
         id_hash = "".join([all_letters[int(letter)] for letter in str(self.date).replace("-", "")])
         price_hash = "".join([all_letters[int(letter)] for letter in str(self.price).replace(".", "")])
@@ -253,6 +225,9 @@ class TargetPrice(models.Model):
 
 
 class ApiKey(models.Model):
+    """
+    ApiKey things
+    """
     user = models.ForeignKey(User, related_name='keys', unique=True)
     key = models.CharField(max_length=255, null=True, blank=True)
 
@@ -269,7 +244,9 @@ class ApiKey(models.Model):
 
 
 def create_testuser(app, created_models, verbosity, **kwargs):
-    """Create fast user automatically"""
+    """
+    Create fast user automatically
+    """
     if not settings.DEBUG:
         return
     try:
