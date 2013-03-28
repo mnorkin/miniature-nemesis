@@ -90,7 +90,7 @@ def upload_tar_from_git(path):
     """
     require('release', provided_by=[environment])
     require('whole_path', provided_by=[environment])
-    local('git archive --format=tar master | gzip > %s.tar.gz' % env.release)
+    local('git archive --format=tar slave | gzip > %s.tar.gz' % env.release)
     run('mkdir -p %s' % path)
     put('%s.tar.gz' % env.release, '/tmp', mode=0755)
     run('mv /tmp/%s.tar.gz %s/packages/' % (env.release, env.code_root))
