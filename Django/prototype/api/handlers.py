@@ -191,7 +191,6 @@ class AnalyticHandler(BaseHandler):
             except analytic.DoesNotExist:
                 em = self.model(
                     name=data['name'],
-                    last_target_price=data['last_target_price'],
                     slug=data['slug']
                 )
                 em.save()
@@ -206,7 +205,6 @@ class AnalyticHandler(BaseHandler):
             em = self.model.objects.get(slug=data['slug'])
 
             em.name = data['name']
-            em.last_target_price = data['last_target_price']
 
             em.save()
 
@@ -460,6 +458,7 @@ class FeatureHandler(BaseHandler):
                     unit=unit,
                     display_in_frontpage=data['display_in_frontpage'],
                     description=data['description'],
+                    position=data['position'],
                     slug=data['feature_slug']
                 )
 
@@ -493,6 +492,7 @@ class FeatureHandler(BaseHandler):
             feature.unit = unit
             feature.display_in_frontpage = data['display_in_frontpage']
             feature.description = data['description']
+            feature.position = data['position']
 
             feature.save()
 

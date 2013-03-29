@@ -35,6 +35,7 @@ class Feature(models.Model):
     unit = models.ForeignKey(Unit)
     display_in_frontpage = models.BooleanField()
     description = models.TextField()
+    position = models.IntegerField()
     slug = models.SlugField(max_length=200, unique=True)
 
     def __unicode__(self):

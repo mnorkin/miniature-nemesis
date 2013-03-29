@@ -3,7 +3,7 @@ from django.contrib import admin
 
 
 class AnalyticAdmin(admin.ModelAdmin):
-    list_display = ('name', 'number_of_companies', 'last_target_price')
+    list_display = ('name', 'last_target_price')
 
 
 class FeatureAnalyticTickerAdmin(admin.ModelAdmin):
@@ -19,7 +19,8 @@ class TickerAdmin(admin.ModelAdmin):
 
 
 class FeatureAdmin(admin.ModelAdmin):
-    list_display = ('name', 'unit', 'display_in_frontpage')
+    list_display = ('name', 'unit', 'display_in_frontpage', 'position')
+    ordering = ['position']
 
 admin.site.register(Unit)
 admin.site.register(Feature, FeatureAdmin)
