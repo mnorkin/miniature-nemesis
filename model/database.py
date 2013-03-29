@@ -347,6 +347,41 @@ class database:
         else:
             return None
 
+    def get_volatility(self, analytic=None, ticker=None):
+        """
+        Volatility measure
+
+        Volatility defines how many target prices where not hold 1 YEAR
+        """
+        number = 0
+        if analytic and ticker:
+            query = "SELECT `date` \
+                FROM `entries` \
+                WHERE `analytic`='%s' AND `ticket`='%s' AND (`price0` != 0 OR `price1` != 0) \
+                AND `date` + INTERVAL + 1 YEAR < NOW() \
+                ORDER BY `date` ASC" % (
+                    re.escape(analytic), re.escape(ticker))
+            self.cursor.execute(query)
+
+            # return self.cursor.fetchall()
+
+            dates = [x[0] for x in self.cursor.fetchall()]
+            dates_length = len(dates)
+
+            for index, date in enumerate(dates):
+                if index < dates_length - 1:
+                    if (dates[index+1] - dates[index]).days > 365:
+                        number += 1
+
+            item = {
+                'number': number,
+                'total': dates_length
+            }
+
+            return item
+        else:
+            return None
+
     def get_consensus(self, ticker=None):
         """
         All the active target prices min/avg/max
