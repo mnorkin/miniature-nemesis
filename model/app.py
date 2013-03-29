@@ -5,14 +5,14 @@ Main application
 
 import datetime
 from datetime import date
-import stock_quote
+from stock_quote import stock_quote
 import utils
 from features import Features
 from analytics import Analytics
 from tickers import Tickers
 from targetprices import TargetPrices
 from featureanalytictickers import FeatureAnalyticTickers
-import database
+from database import database
 import rest
 import logging
 import os
@@ -33,6 +33,9 @@ class App():
         logging.basicConfig(
             filename=self.logging_file,
             level=self.logging_level, format='%(asctime)s %(message)s')
+
+        self.database = database()
+        self.stock_quote
 
         logging.debug('Starting up...')
 
@@ -55,7 +58,7 @@ class App():
         Fetching all the features to the server
         """
         feature = Features()
-        for feature_index, feature_slug in enumerate(feature.features):
+        for feature_slug in feature.features:
 
             data = {
                 'feature_slug': feature_slug,
@@ -104,7 +107,7 @@ class App():
 
         logging.debug('Getting the target prices')
 
-        for target_price in database.get_targetprices():
+        for target_price in self.database.get_targetprices():
             """
             Get the most recent target prices
             """
@@ -116,7 +119,7 @@ class App():
             analytics.collect_and_send(target_price['analytic'])
             tickers.collect_and_send(target_price['ticker'])
 
-            target_data = database.get_targetprices(
+            target_data = self.database.return_targetprices(
                 target_price['analytic'],
                 target_price['ticker']
             )
@@ -125,8 +128,8 @@ class App():
                     "Enough data for %s ticker, analytic %s" %
                     (target_price['ticker'], target_price['analytic'])
                 )
-                stock_data = stock_quote.get_data(target_price['ticker'])
-                beta = stock_quote.get_beta(target_price['ticker'])
+                stock_data = self.stock_quote.get_data(target_price['ticker'])
+                beta = self.stock_quote.get_beta(target_price['ticker'])
                 if stock_data and beta:
 
                     features = Features(
@@ -168,4 +171,6 @@ analytic ticker update')
 
 if __name__ == '__main__':
     app = App()
+    app.fetch_units()
+    app.fetch_features()
     app.main()

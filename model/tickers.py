@@ -1,7 +1,10 @@
 import utils
-import database
+from database import database
 import rest
-import stock_quote
+from stock_quote import stock_quote
+import os
+import logging
+from datetime import date
 
 
 class Tickers:
@@ -9,12 +12,22 @@ class Tickers:
     Ticker object
     """
 
+    def __init__(self):
+        self.database = database()
+        self.stock_quote = stock_quote()
+        self.absolute_path = os.path.dirname(os.path.realpath(__file__))
+        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
+        self.logging_level = logging.DEBUG
+        logging.basicConfig(
+            filename=self.logging_file,
+            level=self.logging_level, format='%(asctime)s %(message)s')
+
     def collect_and_send(self, ticker=None):
         """
         Fetching ticker information to the server
         """
         if not ticker:
-            for ticker in database.get_all_tickers():
+            for ticker in self.database.get_all_tickers():
                 ticker_data = self.collect(ticker)
                 if ticker_data and not self.send(ticker_data):
                     return False
@@ -31,8 +44,8 @@ class Tickers:
         Collecting ticker data
         """
         if ticker:
-            ticker_consensus = database.get_consensus(ticker)
-            ticker_yahoo = stock_quote.get_ticker_data(ticker)
+            ticker_consensus = self.database.get_consensus(ticker)
+            ticker_yahoo = self.stock_quote.get_ticker_data(ticker)
             name = ticker
             long_name = ticker_yahoo['long_name']
             last_stock_price = ticker_yahoo['last_stock_price']
@@ -50,8 +63,6 @@ class Tickers:
                 'consensus_max': consensus_max,
                 'slug': slug
             }
-
-            print data
             return data
         else:
             return None
@@ -64,19 +75,16 @@ class Tickers:
         if data:
             if rest.send("POST", "/api/tickers/", data):
                 """Trying to send POST"""
-                if utils.DEBUG:
-                    print "Ticker data create"
+                logging.debug("Ticker data create")
                 return True
             else:
                 if rest.send("PUT", "/api/tickers/", data):
                     """Trying to send PUT"""
-                    if utils.DEBUG:
-                        print "Ticker data update"
+                    logging.debug("Ticker data update")
                     return True
                 else:
                     # Literally, something would be wrong on the front-end side, if this does not work
-                    if utils.DEBUG:
-                        print "Ticker data update fail, nothing else to try"
+                    logging.error("Ticker data update fail, nothing else to try")
                     return False
         else:
             return False

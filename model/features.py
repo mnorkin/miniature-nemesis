@@ -46,7 +46,6 @@ class Features:
     features = {
         'accuracy':
         {
-            'id': 1,
             'name': 'Accuracy',
             'display_in_frontpage': 1,
             'unit_id': 1,
@@ -54,31 +53,27 @@ class Features:
         },
         'closeness':
         {
-            'id': 2,
             'name': 'Proximity',
             'display_in_frontpage': 0,
             'unit_id': 1,
             'position': 2
         },
-        'difference':
+        'profitability':
         {
-            'id': 3,
-            'name': 'Aggressiveness',
-            'display_in_frontpage': 0,
+            'name': 'Profitability',
+            'display_in_frontpage': 1,
             'unit_id': 1,
             'position': 3
         },
-        'profitability':
+        'difference':
         {
-            'id': 4,
-            'name': 'Profitability',
-            'display_in_frontpage': 1,
+            'name': 'Aggressiveness',
+            'display_in_frontpage': 0,
             'unit_id': 1,
             'position': 4
         },
         'reach_time':
         {
-            'id': 7,
             'name': 'Reach time',
             'display_in_frontpage': 1,
             'unit_id': 2,
@@ -86,7 +81,6 @@ class Features:
         },
         'impact_to_market':
         {
-            'id': 6,
             'name': 'Impact to market',
             'display_in_frontpage': 0,
             'unit_id': 1,

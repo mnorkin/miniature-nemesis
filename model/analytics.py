@@ -1,12 +1,18 @@
-import database
+from database import database
 import rest
 import utils
 
 
-class Analytics:
+class Analytics():
     """
     Analytic object
     """
+
+    def __init__(self):
+        """
+        Initialization of analytics
+        """
+        self.database = database()
 
     def collect_and_send(self, analytic=None):
         """
@@ -16,7 +22,7 @@ class Analytics:
         """
 
         if not analytic:
-            for analytic in database.get_analytics():
+            for analytic in self.database.get_analytics():
                 analytic_data = self.collect(analytic)
                 if analytic_data and not self.send(analytic_data):
                     return False
