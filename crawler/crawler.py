@@ -51,7 +51,7 @@ class crawler(threading.Thread):
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
         self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 22  # Then the crawler starts its job
+        self.start_hour = 1  # Then the crawler starts its job
         self.len_hour = 7  # How long in hours the crawler works
         self.mailman = mailman(
             'AKIAJKFJFUKWVJSBYA5Q',
@@ -417,6 +417,9 @@ cra.baklazanas.lt, sleeping')
             """If no companies data was sent -- switch to the next page if available"""
             logging.debug("No companies data was send, consider to go to the\
                 next page or switch to the next letter")
+            self.go(
+                self.companies_page
+                + '/' + self.letter + '/' + str(self.page_number))
             if self.companies_next_page_available:  # If there is any more pages
                 self.page_number = self.page_number + 1  # Add next page
                 logging.debug("Moving to the next page: " + str(self.page_number))
