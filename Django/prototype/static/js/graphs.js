@@ -77,12 +77,6 @@ var graphs = (function () {
             $('.in_graph .sear li[name='+name+']').trigger('click');
         },
 
-        center_element: function(){
-            var obj = $('#chart path[name=rbc-capital-markets]');
-            console.log(obj);
-            return obj;
-        },
-
         populate: function (json) {
             var tmp_obj, f_data = [];
 
@@ -624,22 +618,16 @@ var graphs = (function () {
             line_angle_scale = d3.scale.linear().domain([-w / 14, w / 14]).range([0, 1 / 2 * pi]);
 
             var dragCircle = d3.behavior.drag()
-                .on('dragstart', function () {
-                //d3.event.sourceEvent.stopPropagation();
+            .on('dragstart', function () {
+                d3.event.sourceEvent.stopPropagation();
             })
-                .on('dragend', function (d, i) {
-                //d3.select(this).attr('cx', d.cx);
-                //d3.select(this).attr("transform", "translate(" + d.cx + ", 0)");
-            })
-                .on('drag', function (d, i) {
-                console.log(d,i)
+            .on('drag', function (d, i) {
+                d.cx = parseInt(d3.select(this).attr('cx'));
                 d.cx += d3.event.dx;
-                if (d.cx > w / 14) {
-                    d.cx = w / 14;
-                }
-                if (d.cx < -w / 14) {
-                    d.cx = -w / 14;
-                }
+
+                d.cx = Math.min(d.cx, w / 14);
+                d.cx = Math.max(d.cx, -w / 14);
+    
                 d3.select(this).attr('cx', d.cx);
                 d3.select(this).attr("transform", "translate(" + d.cx + ", 0)");
                 phase = line_angle_scale(d.cx);
@@ -650,15 +638,17 @@ var graphs = (function () {
             });
 
 
-            $('.in_graph .sear li').click(function(){
+            $('.in_graph .sear li').click(function(e){
                 /* Scroll to selected circle element */
-                /* TODO: make it work good. */
-                return; /* turn off */
 
-                if($(this).hasClass('active') == false) { return; }
-                //var name = $(this).attr('name');
-                //var obj = $('#chart svg path[name='+name+']');
-                d = {cx:  25};
+                if($(this).hasClass('active') == false || e.isTrigger == true) { return; }
+                var name = $(this).attr('name');
+                var obj = $('#chart svg path[name='+name+']');
+                var nr = parseInt(obj.attr('enumerator'));
+                
+                /* TODO: make it work better. */
+                var invert_line_angle_scale = d3.scale.linear().domain([0, _data.length-1]).range([-w / 14, w / 14]);
+                d = { cx: invert_line_angle_scale(nr) };
 
                 d3.select('.scroller')
                     .transition().duration(700).ease('linear')
@@ -986,26 +976,18 @@ var graphs = (function () {
             line_angle_scale = d3.scale.linear().domain([-w / 14, w / 14]).range([0, 1 / 2 * pi]);
 
             var dragCircle = d3.behavior.drag()
-                .on('dragstart', function () {
+            .on('dragstart', function () {
                 d3.event.sourceEvent.stopPropagation();
-                //console.log('Start Dragging Circle');
-                //console.log(d3.event)
             })
-                .on('dragend', function (d, i) {
-                //console.log("Drag end", d.cx)
-                d3.select(this).attr('cx', d.cx);
-                d3.select(this).attr('transform', 'translate(' + d.cx + ',0)');
-            })
-                .on('drag', function (d, i) {
+            .on('drag', function (d, i) {
+                d.cx = parseInt(d3.select(this).attr('cx'));
                 d.cx += d3.event.dx;
-                if (d.cx > w / 14) {
-                    d.cx = w / 14;
-                }
-                if (d.cx < -w / 14) {
-                    d.cx = -w / 14;
-                }
-                d3.select(this).attr('cx', d.cx);
-                d3.select(this).attr('transform', 'translate(' + d.cx + ',0)');
+
+                d.cx = Math.min(d.cx, w / 14);
+                d.cx = Math.max(d.cx, -w / 14);
+
+                d3.select(this).attr('cx', d.cx).attr('transform', 'translate(' + d.cx + ',0)');
+
                 phase = line_angle_scale(d.cx);
                 angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-pi / 2 - phase, pi - phase]);
                 sun.selectAll("path.data")
@@ -1013,6 +995,43 @@ var graphs = (function () {
                     .attr("d", data_arc);
                 sun.selectAll("path.data2")
                     .data(_data)
+                    .attr("d", data_arc2);
+
+                console.log('scroll', d.cx);
+            });
+
+            $('.in_graph .sear li').click(function(e){
+                /* Scroll to selected circle element */
+
+                if($(this).hasClass('active') == false || e.isTrigger == true) { return; }
+                var name = $(this).attr('name');
+                var obj = $('#chart svg path[name='+name+']');
+                var nr = parseInt(obj.attr('enumerator'));
+                
+                /* TODO: make it work better. */
+                var invert_line_angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-w / 14, w / 14]);
+                var subtotal = 0;
+                for (var i = 0; i < _data.length ; i++) {
+                    if(i >= nr) { break; }
+                    subtotal += _data[i];
+                }
+                if(nr >= _data.length -2) { subtotal = d3.sum(_data); }
+
+                d = { cx: invert_line_angle_scale(subtotal) };
+
+                d3.select('.scroller')
+                    .transition().duration(700).ease('linear')
+                    .attr('cx', d.cx).attr("transform", "translate(" + d.cx + ", 0)");
+
+                phase = line_angle_scale(d.cx);
+                angle_scale = d3.scale.linear().domain([0, d3.sum(_data)]).range([-pi / 2 - phase, pi - phase]);
+                sun.selectAll("path.data")
+                    .data(_data)
+                    .transition().duration(700).ease('linear')
+                    .attr("d", data_arc);
+                sun.selectAll("path.data2")
+                    .data(_data)
+                    .transition().duration(700).ease('linear')
                     .attr("d", data_arc2);
             });
 
@@ -1135,6 +1154,7 @@ var graphs = (function () {
                     .attr('d', 'm 0.0389418,0.0432822 9.9610575,0 -0.06029,5.0188999 0,5.2846009 -5.2480518,4.6774 -0.01414,-0.038 L 0,10.005182 0.049611,0.0241822')
                     .attr('fill', '#df5401')
                     .call(dragCircle)
+                    .attr('class', 'scroller')
                     .attr('cx', function (d) {
                     return d.cx;
                 })
