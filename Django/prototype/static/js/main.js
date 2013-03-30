@@ -13,9 +13,11 @@ function generate_grid_element(id, dataset, posName) {
 
     if (id !== null && dataset > 1) {
         dataset = [dataset];
+        //dataset = [10];
 
         var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
-        var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'};
+        //var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'};
+        var gradiends = {'accuracy': '#8dc3b2', 'profitability': '#aa8dc3', 'reach_time': '#6189b8'};
 
         var max_value = null;
 
@@ -43,7 +45,7 @@ function generate_grid_element(id, dataset, posName) {
         chart.selectAll('rect')
             .data(dataset)
             .enter().append('rect')
-            .attr('height', 13)
+            .attr('height', 11)
             .attr('y', 0)
             .attr('fill', gradiends[posName])
             .attr('rx',4)
@@ -54,13 +56,83 @@ function generate_grid_element(id, dataset, posName) {
             .transition().duration(500).attr('width', x)
             .text( String );
 
+        // small circle
+        if((dataset[0] >= 5 && width == 356) || dataset[0] >= 10 ){
+            chart.append('circle')
+                .attr('fill', '#000')
+                .style('opacity', '0.3')
+                .data(dataset)
+                .transition().duration(500)
+                .attr('cx', function(d,i){ return x(d)-6.5; })
+                .attr('cy', 5.5)
+                .attr('r', 3.5);
+        }
+
     } else {
         return;
     }
 }
 
-
 function generate_pie(id, value) {
+    if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
+
+    var percent = Math.abs(value);
+    percent = Math.min(percent, 100);
+    var dataset = [percent,(100-percent)];
+
+    var width = 81,
+    height = 81,
+    radius = Math.min(width, height) / 2;
+
+    var fill_color = "#b9d240";
+
+    if (value < 0) {
+        fill_color = "#e72727";
+    }
+
+    var colors = [fill_color, 'transparent'];
+
+    var pie = d3.layout.pie()
+    .sort(null);
+
+    var arc = d3.svg.arc()
+    .innerRadius(35)
+    .outerRadius(35);
+
+    var svg = d3.select("#" + id + ' .circle').append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    var path = svg.selectAll("path")
+    .data(pie(dataset))
+    .enter().append("path")
+    .attr("stroke", function(d, i) { console.log(d); return colors[i]; })
+    .attr('fill', function(d, i) { return colors[i]; } )
+    .attr('style', 'stroke-width:10; stroke-linejoin:round;')
+    .attr("d", arc);
+
+    // small circle
+    /*d3.select("#" + id + ' .circle svg')
+        .append('circle')
+        .attr('fill', '#000')
+        .attr('style', 'opacity:0.3;')
+        .data(dataset)
+        .attr('cx', function(d, i){  return d; } )
+        .attr('cy', function(d, i){ return d; } )
+        .attr('r', 3.5); */
+
+    // TODO: make circle point on d3js
+    if(percent != 0 && Math.abs(percent) != 1){
+        var deg = 360 * percent / 100;
+        $("#" + id + ' .circle').append('<div class="point"></div>');
+        $("#" + id + ' .circle .point').css({ transform: 'rotate('+deg+'deg)'});
+    }
+
+}
+
+function generate_pie_OLDVERSION(id, value) {
 
     if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
 
