@@ -393,13 +393,17 @@ li{ list-style: none; }
 }
 .title.grid .chart .circle strong{
     color:#b9d240;
-    font-size:18px;
-    padding-top: 29px;
-    padding-left: 2px;
+    font-size:17px;
+    padding-top: 31px;
+    text-align: center;
+    width: 81px;
+    position: absolute;
+    left:1px;
     display: inline-block;
 }
 .title.grid .chart .circle.down strong{
     color:#da1e1e;
+    padding-top: 30px;
 }
 .title.grid .chart .circle.up strong:before{
     position:absolute;
@@ -407,8 +411,8 @@ li{ list-style: none; }
     border-bottom: 6px solid #b7ce44;
     border-right: 6px solid transparent;
     border-left: 6px solid transparent;
-    top:22px;
-    left:33px;
+    top:23px;
+    left:34px;
 }
 .title.grid .chart .circle.down strong:after{
     position:absolute;

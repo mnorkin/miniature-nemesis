@@ -125,7 +125,7 @@ function generate_pie(id, value) {
 
     // TODO: make circle point on d3js
     if(percent != 0 && Math.abs(percent) != 1){
-        var deg = 360 * percent / 100;
+        var deg = 360 * percent / 100 -2;
         $("#" + id + ' .circle').append('<div class="point"></div>');
         $("#" + id + ' .circle .point').css({ transform: 'rotate('+deg+'deg)'});
     }
