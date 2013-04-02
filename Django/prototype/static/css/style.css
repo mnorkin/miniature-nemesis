@@ -430,17 +430,6 @@ li{ list-style: none; }
     left:1px;
     z-index: 5;
 }
-.title.grid .chart .circle .point{
-    display: block;
-    position: absolute;
-    top:0;
-    left:39px;
-    width: 7px;
-    height: 81px;
-    background: url('../images/point_1.png') 0 2px no-repeat;
-    z-index: 5;
-}
-
 
 .title.list .entry{
     height: 48px;

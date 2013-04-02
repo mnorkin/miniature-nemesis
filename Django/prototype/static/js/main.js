@@ -82,7 +82,8 @@ function generate_pie(id, value) {
 
     var width = 81,
     height = 81,
-    radius = Math.min(width, height) / 2;
+    radius = Math.min(width, height) / 2,
+    angle = 360 * percent / 100;
 
     var fill_color = "#b9d240";
 
@@ -113,21 +114,21 @@ function generate_pie(id, value) {
     .attr('style', 'stroke-width:10; stroke-linejoin:round;')
     .attr("d", arc);
 
-    // small circle
-    /*d3.select("#" + id + ' .circle svg')
-        .append('circle')
-        .attr('fill', '#000')
-        .attr('style', 'opacity:0.3;')
-        .data(dataset)
-        .attr('cx', function(d, i){  return d; } )
-        .attr('cy', function(d, i){ return d; } )
-        .attr('r', 3.5); */
-
-    // TODO: make circle point on d3js
-    if(percent != 0 && Math.abs(percent) != 1){
-        var deg = 360 * percent / 100 -2;
-        $("#" + id + ' .circle').append('<div class="point"></div>');
-        $("#" + id + ' .circle .point').css({ transform: 'rotate('+deg+'deg)'});
+    var get_circle_points = function (radius, angle){
+        var x = radius*Math.sin(angle*Math.PI/180);
+        var y = radius*-Math.cos(angle*Math.PI/180);
+        return [x,y];
+    }
+    // small circle point
+    if(percent > 1){
+        d3.select("#" + id + ' .circle svg')
+            .append('circle')
+            .attr('fill', '#000')
+            .attr('style', 'opacity:0.3;')
+            .attr('cx', function(){ return get_circle_points(35, angle-2)[0]; } )
+            .attr('cy', function(){ return get_circle_points(35, angle-2)[1]; } )
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+            .attr('r', 3.5); 
     }
 
 }
