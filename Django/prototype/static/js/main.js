@@ -13,7 +13,7 @@ function generate_grid_element(id, dataset, posName) {
 
     if (id !== null && dataset > 1) {
         dataset = [dataset];
-        //dataset = [10];
+        //dataset = [99];
 
         var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
         //var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'};
@@ -48,12 +48,12 @@ function generate_grid_element(id, dataset, posName) {
             .attr('height', 11)
             .attr('y', 0)
             .attr('fill', gradiends[posName])
-            .attr('rx',4)
-            .attr('ry',4)
+            .attr('rx',5)
+            .attr('ry',5)
             .attr('txt', function(d,i){
                 return (posName == 'reach_time') ? d+' days':  d+'%';
             })
-            .transition().duration(500).attr('width', x)
+            .transition().duration(900).attr('width', x)
             .text( String );
 
         // small circle
@@ -62,8 +62,8 @@ function generate_grid_element(id, dataset, posName) {
                 .attr('fill', '#000')
                 .style('opacity', '0.3')
                 .data(dataset)
-                .transition().duration(500)
-                .attr('cx', function(d,i){ return x(d)-6.5; })
+                .transition().duration(900)
+                .attr('cx', function(d,i){ return x(d)-6; })
                 .attr('cy', 5.5)
                 .attr('r', 3.5);
         }
@@ -109,10 +109,9 @@ function generate_pie(id, value) {
     var path = svg.selectAll("path")
     .data(pie(dataset))
     .enter().append("path")
-    .attr("stroke", function(d, i) { console.log(d); return colors[i]; })
-    .attr('fill', function(d, i) { return colors[i]; } )
+    .attr("stroke", function(d, i) { return colors[i]; } )
     .attr('style', 'stroke-width:10; stroke-linejoin:round;')
-    .attr("d", arc);
+    .attr("d", function(d, i) { return arc(d,i)});
 
     var get_circle_points = function (radius, angle){
         var x = radius*Math.sin(angle*Math.PI/180);
@@ -581,7 +580,7 @@ function process_search(dom_obj, e){
             resp_html += '<li class="inf"><a onclick="return process_search_page(\'tickers\')" href="">Companies <span>See all</span></a></li>';
             for(i=0; i < resp.tickers.length ; i++){
                 if(i >= 5) { break; }
-                resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+'</a></li>';
+                resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+' ('+resp.tickers[i].ticker+')</a></li>';
             }
         }
 
@@ -853,19 +852,26 @@ function binds_for_target_price_list(){
         var obj = $(this);
         var chart = obj.closest('.chart');
         var tooltip = chart.children('.bar_tooltip');
-        tooltip.text(obj.attr('txt'));
+
+        tooltip.text(obj.attr('txt')).css({display:'block', opacity: 0, width:'auto'});
+        var width = tooltip.width();
 
         var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
 
-        var top = obj.offset().top - chart.offset().top - 3;
-        var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - tooltip.width(),
-            obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -4);
+        var top = obj.offset().top - chart.offset().top - 3.8;
+        var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - width,
+                            obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7);
+    
+        var speed = (parseInt(tooltip.css('top'), 10) == parseInt(top,10) && parseInt(tooltip.css('left'),10) == parseInt(left,10)) ? 0 : 200;
 
-        tooltip.fadeIn(100);
-        tooltip.css({top:top,left:left});
+        tooltip.css({top:top, left:left, width:0, opacity:1}).animate({width: width}, speed);
+        
+        if(chart.children('.tooltip_point').length == 0){ chart.append('<span class="tooltip_point"></span>'); }
+        chart.children('.tooltip_point').css({left:(left-4), top:(top+5), display:'block'});
+
     }, function(){});
 
-    $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); });
+    $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); $('.tooltip_point').fadeOut(150); });
 
     // long company names moving
     $('.title .entry').hover(
@@ -893,6 +899,8 @@ function binds_for_target_price_list(){
             obj.find('.analytic').text(obj.find('.date').text());
         });
     }
+    // to see last target price date
+    $('.target_price_list').css('padding-bottom', $(window).height() - $('.title .entry').outerHeight() -77);
 }
 
 function calculate_minavgmax_block(){
@@ -1211,8 +1219,15 @@ function update_ticker_stock( ticker ) {
         $.getJSON('/get_ticker_data/' + ticker + '/', function(data) {
             /* data.change_direction apraso i kuria puse reikia sukti arrow */
             $('.price').text( data.last_stock_price );
-            format_text = data.change + " ( " + data.change_percent + "%)";
-            $('.price_detail').text( format_text );
+            var triangle = (data.change_percent > 0) ? '<i class="up"></i>' : '<i class="down"></i>';
+            format_text = data.change + " (" + triangle + data.change_percent + "%)";
+            $('.price_detail').html( format_text );
         });
     }
 }
+
+
+$(document).bind('mousewheel', function(e,v){
+    console.log('scroll', e, v);
+    //return false;
+})
