@@ -1,24 +1,16 @@
 from database import database
 import rest
 import utils
-import os
-import logging
-from datetime import date
+from logger import logger
 
 
-class volatilities():
+class Volatilities():
     """
     Volatility calculations
     """
-    def __init__(self, arg):
-        super(volatilities, self).__init__()
+    def __init__(self):
         self.database = database()
-        self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
-        self.logging_level = logging.DEBUG
-        logging.basicConfig(
-            filename=self.logging_file,
-            level=self.logging_level, format='%(asctime)s %(message)s')
+        self.logger = logger('Volatilities')
 
     def collect_and_send(self, analytic=None, ticker=None):
         """
@@ -33,10 +25,10 @@ class volatilities():
                 'total': volatility_data['total']
             }
             if item and self.send(item):
-                logging.debug('Volatility data send')
+                self.logger.debug('Volatility data send')
                 return True
             else:
-                logging.error('Volatility data fail')
+                self.logger.error('Volatility data fail')
                 return False
         else:
             return False

@@ -7,9 +7,7 @@ import time
 import utils
 import re
 from database import database
-import logging
-import os
-from datetime import date
+from logger import logger
 from HTMLParser import HTMLParser
 
 
@@ -32,12 +30,7 @@ class stock_quote():
 
     def __init__(self):
         self.database = database()
-        self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
-        self.logging_level = logging.DEBUG
-        logging.basicConfig(
-            filename=self.logging_file,
-            level=self.logging_level, format='%(asctime)s %(message)s')
+        self.logger = logger('Stock_Quete')
 
     def strip_tags(self, html):
         """
@@ -47,7 +40,7 @@ class stock_quote():
         s.feed(html)
         return s.get_data()
 
-    def get_data(self, ticker):
+    def get_data(self, ticker=None):
         """
         Getting stock data
         """
@@ -74,12 +67,12 @@ class stock_quote():
                 data.append(item)
                 if utils.DEBUG:
                     if data.__len__() == 2:
-                        logging.debug("Stock data: %s", data)
+                        self.logger.debug("Stock data: %s" % data)
             except ValueError:
                 """
                 This happens, then the ticker does not exists in the stock (somehow)
                 """
-                logging.debug("Value error, skipping ticker")
+                self.logger.debug("Value error, skipping ticker")
                 return None
 
         data.reverse()
@@ -98,7 +91,7 @@ class stock_quote():
         r = PATTERN.split(r[:-2])[1::2]
         """Remove the `\r\n` and split by comma"""
         if (not isinstance(r[2], int)) or (not isinstance(r[2], float)):
-            logging.debug("Data not available")
+            self.logger.debug("Data not available")
             """Not available"""
             r[2] = None
             r[1] = 0

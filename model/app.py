@@ -11,11 +11,12 @@ from features import Features
 from analytics import Analytics
 from tickers import Tickers
 from targetprices import TargetPrices
+from volatilities import Volatilities
+from targetpricenumbers import Targetpricenumbers
 from featureanalytictickers import FeatureAnalyticTickers
 from database import database
 import rest
-import logging
-import os
+from logger import logger
 
 
 class App():
@@ -27,17 +28,12 @@ class App():
         """
         Initialization of the class
         """
-        self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
-        self.logging_level = logging.DEBUG
-        logging.basicConfig(
-            filename=self.logging_file,
-            level=self.logging_level, format='%(asctime)s %(message)s')
+        self.logger = logger('app')
 
         self.database = database()
-        self.stock_quote
+        self.stock_quote = stock_quote()
 
-        logging.debug('Starting up...')
+        self.logger.debug('Starting up...')
 
     def fetch_units(self):
         """
@@ -49,9 +45,9 @@ class App():
             data = features.units[unit]
 
             if rest.send("POST", "/api/units/", data):
-                logging.debug('Unit data sent')
+                self.logger.debug('Unit data sent')
             else:
-                logging.debug('Unit data sent fail')
+                self.logger.debug('Unit data sent fail')
 
     def fetch_features(self):
         """
@@ -71,12 +67,12 @@ class App():
             }
 
             if rest.send("POST", "/api/features/", data):
-                logging.debug('Feature data create')
+                self.logger.debug('Feature data create')
             else:
                 if rest.send("PUT", "/api/features/", data):
-                    logging.debug('Feature data update')
+                    self.logger.debug('Feature data update')
                 else:
-                    logging.error('Feature date update fail')
+                    self.logger.error('Feature date update fail')
 
     def main(self):
         """
@@ -104,14 +100,16 @@ class App():
         tickers = Tickers()
         feature_analytic_tickers = FeatureAnalyticTickers()
         targetprices = TargetPrices()
+        targetpricenumbers = Targetpricenumbers()
+        volatilities = Volatilities()
 
-        logging.debug('Getting the target prices')
+        self.logger.debug('Getting the target prices')
 
         for target_price in self.database.get_targetprices():
             """
             Get the most recent target prices
             """
-            logging.debug('Target price %s of %s' % (
+            self.logger.debug('Target price %s of %s' % (
                 target_price['ticker'], target_price['analytic']))
             ticker_slug = utils.slugify(target_price['ticker'])
             analytic_slug = utils.slugify(target_price['analytic'])
@@ -124,10 +122,19 @@ class App():
                 target_price['ticker']
             )
             if target_data.__len__() > 1:
-                logging.debug(
+                self.logger.debug(
                     "Enough data for %s ticker, analytic %s" %
                     (target_price['ticker'], target_price['analytic'])
                 )
+                # Sending volatility measure
+                volatilities.collect_and_send(
+                    analytic=target_price['analytic'],
+                    ticker=target_price['ticker'])
+                # Sending target price numbers data
+                targetpricenumbers.collect_and_send(
+                    analytic=target_price['analytic'],
+                    ticker=target_price['ticker'])
+                # Getting stock data
                 stock_data = self.stock_quote.get_data(target_price['ticker'])
                 beta = self.stock_quote.get_beta(target_price['ticker'])
                 if stock_data and beta:
@@ -147,8 +154,21 @@ class App():
 
                     if features_values:
                         if not feature_analytic_tickers.send(features_values):
-                            logging.error('Something went wrong with feature\
+                            self.logger.error('Something went wrong with feature\
 analytic ticker update')
+
+                    self.logger.debug("date %s " % target_price['date'])
+                    target_price_date_timestamp = date.fromtimestamp(target_price['date']).timetuple()
+
+                    matches = (x for x in stock_data if x['date'] == target_price_date_timestamp)
+
+                    try:
+                        stock_entry = matches.next()
+                        target_price['change'] = (target_price['price'] - stock_entry['close'])/stock_entry['close']
+                        target_price['change'] = target_price['change'] * 100
+                    except StopIteration:
+                        target_price['change'] = 0
+
                     _date = datetime.datetime.fromtimestamp(
                         target_price['date']
                     )
@@ -163,7 +183,7 @@ analytic ticker update')
                     targetprices.send(data)
 
             else:
-                logging.debug(
+                self.logger.debug(
                     "Not enought data for %s on %s, skipping" %
                     (target_price['ticker'], target_price['analytic'])
                 )

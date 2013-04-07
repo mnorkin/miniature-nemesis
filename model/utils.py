@@ -13,26 +13,17 @@ from datetime import timedelta
 DEBUG = True
 
 
-def log(str):
-    """
-    Logging method
-    """
-
-    print str
-
-
-def slugify(str):
+def slugify(name):
     """
     Slugify the string
     """
-    str = unidecode.unidecode(str.encode('utf-8')).lower()
-    str = re.sub(r'\W+', '-', str)
+    name = unidecode.unidecode(name.lower())
+    name = re.sub(r'\W+', '-', name)
 
     # Just to be on the safe side
-    if str[str.__len__()-1] == '-':
-        str = str[:-1]
-
-    return str
+    if name[name.__len__()-1] == '-':
+        name = name[:-1]
+    return name
 
 
 def workdaysub(start_date, end_date, whichdays=(MON, TUE, WED, THU, FRI)):

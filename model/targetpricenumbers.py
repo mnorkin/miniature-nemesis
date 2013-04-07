@@ -1,24 +1,17 @@
 from database import database
 import rest
 import utils
-import os
-import logging
-from datetime import date
+from logger import logger
 
 
-class targetpricenumbers():
+class Targetpricenumbers():
 
     def __init__(self):
         """
         Target price numbers
         """
         self.database = database()
-        self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
-        self.logging_level = logging.DEBUG
-        logging.basicConfig(
-            filename=self.logging_file,
-            level=self.logging_level, format='%(asctime)s %(message)s')
+        self.logger = logger('Targetpricenumbers')
 
     def collect_and_send(self, analytic=None, ticker=None):
         """
@@ -27,10 +20,10 @@ class targetpricenumbers():
         if analytic and ticker:
             number_of_tp_data = self.collect(analytic, ticker)
             if number_of_tp_data and self.send(number_of_tp_data):
-                logging.debug('Target price numbers sent ok')
+                self.logger.debug('Target price numbers sent ok')
                 return True
             else:
-                logging.error('Target price numbers sent fail')
+                self.logger.error('Target price numbers sent fail')
                 return False
         else:
             return False
@@ -38,7 +31,8 @@ class targetpricenumbers():
     def collect(self, analytic=None, ticker=None):
         if analytic and ticker:
             number_of_tp = self.database.get_number_of_target_prices(
-                analytic, ticker)
+                analytic,
+                ticker)
             data = {
                 'number': number_of_tp,
                 'analytic_slug': utils.slugify(analytic),

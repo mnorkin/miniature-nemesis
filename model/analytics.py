@@ -22,7 +22,7 @@ class Analytics():
         """
 
         if not analytic:
-            for analytic in self.database.get_analytics():
+            for analytic in self.database.get_analytic_names():
                 analytic_data = self.collect(analytic)
                 if analytic_data and not self.send(analytic_data):
                     return False

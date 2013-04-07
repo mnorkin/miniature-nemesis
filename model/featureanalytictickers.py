@@ -3,10 +3,13 @@ The Feature Analytic Tickers
 """
 
 import rest
-import utils
+from logger import logger
 
 
 class FeatureAnalyticTickers:
+
+    def __init__(self):
+        self.logger = logger('FeatureAnalyticTicker')
 
     def send(self, big_data=None):
         """
@@ -19,20 +22,15 @@ class FeatureAnalyticTickers:
 
             for data in big_data:
                 if rest.send("POST", "/api/feature_analytic_tickers/", data):
-                    """Trying to send POST"""
-                    if utils.DEBUG:
-                        print "FeatureAnalyticTicker data create"
+                    self.logger.debug('FeatureAnalyticTicker data create')
                 else:
                     if rest.send("PUT", "/api/feature_analytic_tickers/", data):
-                        """Trying to send PUT"""
-                        if utils.DEBUG:
-                            print "FeatureAnalyticTicker data update"
+                        self.logger.debug('FeatureAnalyticTicker data update')
                     else:
                         all_data_sent = False
                         # Literally, something should be wrong on front-end side, if this does not work
                         # Although at this point can be lack of unit definition, make a unit update and try again
-                        if utils.DEBUG:
-                            print "FeatureAnalyticTicker data update fail, nothing else to try"
+                        self.logger.error("FeatureAnalyticTicker data update fail, nothing to try")
 
             return all_data_sent
         else:
