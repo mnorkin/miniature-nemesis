@@ -284,7 +284,7 @@ li{ list-style: none; }
     height: 24px;
     line-height: 24px;
     color:#fff;
-    background: url('../images/compare_1.png') 0 0 no-repeat;
+    background: url('../images/compare_2.png') 0 0 no-repeat;
     display:inline-block;
     position: relative;
     top:13px;
@@ -295,11 +295,11 @@ li{ list-style: none; }
     font-size:12px;
     cursor: pointer;
 }
-.title.list .toggle:hover{
-    background-position: 0px 0px;
-}
-.title.list .toggle, .title.grid .toggle:hover{
+.title.list .toggle{
     background-position: 0 -26px;
+}
+.title .toggle:hover{
+    background-position: 0 -51px;
 }
 .title .toggle, .title .now{
     top:32px;
@@ -362,7 +362,6 @@ li{ list-style: none; }
     background: #fff;
     padding: 0px 4px;
     font-size: 12px;
-    line-height: 15px;
     white-space: nowrap;
 }
 .title .chart .tooltip_point{
@@ -854,6 +853,12 @@ li{ list-style: none; }
     right: -38px;
     top:0;
     cursor:pointer;
+}
+.analyse_menu div.can_compare span:hover{
+    background-color: #ebe4dd;
+}
+.analyse_menu div.can_compare span:active{
+    background-color: #d6b899;
 }
 .analyse_menu a:before{
     content: "";

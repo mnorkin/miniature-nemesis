@@ -747,7 +747,7 @@ var graphs = (function () {
             if (_data.length > number_of_data_for_full_graph) {
 
                 sun.append('svg:rect')
-                    .attr("x", w / 2 - w / 14)
+                    .attr("x", w / 2 - w / 14 - 6)
                     .attr("y", h - h / 32)
                     .attr('width', (w / 2 + w / 14) - (w / 2 - w / 14) + 10)
                     .attr("height", 5)
@@ -756,7 +756,7 @@ var graphs = (function () {
                     .attr('fill', "#ccb5a5")
                     .attr('stroke', "#baa08b");
 
-                var path = sun.append("g").attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
+                var path = sun.append("g").attr("transform", "translate(" + (w / 2 -6) + "," + (h - h / 32 * 2) + ")");
 
                 path.append('path')
                     .data([{
@@ -778,9 +778,9 @@ var graphs = (function () {
                 .data(sun_data).enter()
                 .append('svg:path')
                 .attr("d", angle_arc)
-                .attr('stroke-width', 0.5)
+                .attr('stroke-width', 1)
                 .attr('fill', 'transparent')
-                .attr("stroke", "#ded1c6")
+                .attr("stroke", "#e6dbd2")
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
 
             sun.selectAll("#" + _element_id)
@@ -819,8 +819,9 @@ var graphs = (function () {
             sun.selectAll('#' + _element_id)
                 .data(sun_data).enter()
                 .append('svg:rect')
-                .attr('width', 0.5)
+                .attr('width', 0.1)
                 .attr('height', 6)
+                .attr('fill', '#ded1c6')
                 .attr('y', 0)
                 .attr('x', function (d, i) {
                 return d / 100 * rhw + r;
@@ -832,21 +833,19 @@ var graphs = (function () {
             sun.selectAll("#" + _element_id)
                 .data(sun_data).enter()
                 .append("svg:text")
-                .style("text-anchor", "middle")
+                .style("text-anchor", "left")
                 .style("width", "10px")
                 .style("height", "10px")
                 .style("font-size", "10px")
-                .style("fill", "#dec7b5")
+                .style("fill", "#ded1c6")
                 .attr("dy", 18)
                 .attr("dx", function (d, i) {
-                return d / 100 * rhw + r;
+                return d / 100 * rhw + r - (-0.8 + new String(d).length*3.3);
             })
                 .text(function (d) {
                 return d;
             })
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
-
-            console.log(10 / 100 * rhw + r);
 
             return graphs;
         },
@@ -886,14 +885,14 @@ var graphs = (function () {
 
             linear.selectAll("#" + _element_id).data(linear_data).enter()
                 .append("svg:text")
-                .style("text-anchor", "middle")
-                .style("width", "10px")
-                .style("height", "10px")
+                .attr("text-anchor", "left")
+                .attr("width", "10px")
+                .attr("height", "10px")
                 .style("font-size", "10px")
                 .style("fill", "#dec7b5")
                 .attr("dy", -10)
                 .attr("dx", function (d, i) {
-                return d * rhw + 1;
+                return d * rhw - (-0.7 + new String(d).length*2.9); // can't center with text-anchor, because of firefox and opera bug 
             })
                 .text(function (d) {
                 return d;

@@ -3,6 +3,7 @@ var tmp_target_price = {};
 var target_price_sort_info = {};
 var list_type;
 var page_number = Number();
+var loading_target_prices = false;
 
 var horizontal_slider_top_offset = 0;
 var bottom_of_page = false;
@@ -93,8 +94,7 @@ function generate_pie(id, value) {
 
     var colors = [fill_color, 'transparent'];
 
-    var pie = d3.layout.pie()
-    .sort(null);
+    var pie = d3.layout.pie().sort(null);
 
     var arc = d3.svg.arc()
     .innerRadius(35)
@@ -106,30 +106,44 @@ function generate_pie(id, value) {
     .append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
+    // draw circle with 0,100 values
     var path = svg.selectAll("path")
-    .data(pie(dataset))
+    .data(pie([0,100]))
     .enter().append("path")
     .attr("stroke", function(d, i) { return colors[i]; } )
     .attr('style', 'stroke-width:10; stroke-linejoin:round;')
-    .attr("d", function(d, i) { return arc(d,i)});
+    .attr("d", function(d, i) { return arc(d,i)})
+    .each(function(d) { this._current = d; }); // store the initial values;
+
+    // animate circle with real values
+    path = path.data(pie(dataset))
+    .transition().duration(900).attrTween("d", function(a) {
+         var i = d3.interpolate(this._current, a),
+             k = d3.interpolate(arc.outerRadius()(), 35);
+         this._current = i(0);
+         return function(t) {
+             return arc.innerRadius(35).outerRadius(k(t))(i(t));
+         };
+    }); 
 
     var get_circle_points = function (radius, angle){
         var x = radius*Math.sin(angle*Math.PI/180);
         var y = radius*-Math.cos(angle*Math.PI/180);
         return [x,y];
     }
+
     // small circle point
     if(percent > 1){
         d3.select("#" + id + ' .circle svg')
             .append('circle')
             .attr('fill', '#000')
             .attr('style', 'opacity:0.3;')
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
             .attr('cx', function(){ return get_circle_points(35, angle-2)[0]; } )
             .attr('cy', function(){ return get_circle_points(35, angle-2)[1]; } )
-            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-            .attr('r', 3.5); 
+            .transition().duration(900)
+            .attr('r', 3.5);
     }
-
 }
 
 function generate_pie_OLDVERSION(id, value) {
@@ -856,11 +870,12 @@ function binds_for_target_price_list(){
         tooltip.text(obj.attr('txt')).css({display:'block', opacity: 0, width:'auto'});
         var width = tooltip.width();
 
-        var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
+        /*var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
+        var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - width +,
+                            obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7); */
 
         var top = obj.offset().top - chart.offset().top - 3.8;
-        var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - width,
-                            obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7);
+        var left = obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7;
     
         var speed = (parseInt(tooltip.css('top'), 10) == parseInt(top,10) && parseInt(tooltip.css('left'),10) == parseInt(left,10)) ? 0 : 200;
 
@@ -956,6 +971,7 @@ $(function(){
     $('.in_graph').click(in_graph_click);
     $('.in_graph .sear li').click(in_graph_entry_click);
     $('.in_graph .sear li').hover(in_graph_entry_hover);
+    $('.in_graph .sear input').keyup(in_graph_search);
     // to clear search proposals
     $('body').click(function () { $('.search_res').html(''); });
     $('.analyse_menu a').click(open_graph);
@@ -1102,6 +1118,21 @@ function in_graph_select_active_elements(){
     });
 }
 
+function in_graph_search(){
+    var list = $('.in_graph ul li');
+    var search_for = new RegExp($(this).val(), 'i');
+
+    list.each(function(){
+        var item = $(this);
+        if(item.text().search(search_for) == -1){
+            item.hide();
+        }else{
+            item.show();
+        }
+    })
+}
+
+
 /**
 * Scroll
 ***/
@@ -1167,9 +1198,13 @@ function load_more_target_prices(){
 
     /* Give it a bigger offset, for better experience */
 
-    if ($(window).scrollTop() + $(window).height() >= $(document).height() &&
-        bottom_of_page === false) {
+    var last_offset = $('.target_price_list > li:nth-last-of-type(1)').offset().top
+
+    if ($(window).scrollTop() + $(window).height() >= last_offset + 310  &&
+        bottom_of_page === false && loading_target_prices == false) { 
         page_number +=1;
+        loading_target_prices = true;
+
         /* Make a query */
         _url = "/page/" + page_number + "/";
         // TODO: set target price sorting from {target_price_sort_info} variable
@@ -1178,6 +1213,7 @@ function load_more_target_prices(){
            context: $("#target-price-list")
        }).done(function(data){
             $("#target-price-list").append(data);
+            loading_target_prices = false;
             // if one loaded page is not enough, bind and process if no more to load.
             if(load_more_target_prices() === false){
                 process_target_prices_blocks();
@@ -1226,8 +1262,3 @@ function update_ticker_stock( ticker ) {
     }
 }
 
-
-$(document).bind('mousewheel', function(e,v){
-    console.log('scroll', e, v);
-    //return false;
-})
