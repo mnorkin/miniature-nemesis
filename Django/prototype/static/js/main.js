@@ -1,3 +1,6 @@
+/* Target Price */
+var tp = (function () {
+
 var target_prices_list = [];
 var tmp_target_price = {};
 var target_price_sort_info = {};
@@ -9,6 +12,183 @@ var horizontal_slider_top_offset = 0;
 var bottom_of_page = false;
 var search_result = {};
 
+
+/* Global access functions */
+return {
+
+    append_target_price_list: function(target_price){
+        target_prices_list.push(target_price);
+    },
+
+    /* jQuery document ready */
+    document_ready: function(){
+
+        $('body').click(in_graph_click);
+        $('.in_graph').click(in_graph_click);
+        $('.in_graph .sear li').click(in_graph_entry_click);
+        $('.in_graph .sear li').hover(in_graph_entry_hover);
+        $('.in_graph .sear input').keyup(in_graph_search);
+        // to clear search proposals
+        $('body').click(function () { $('.search_res').html(''); });
+        $('.analyse_menu a').click(open_graph);
+
+        $('.inner_buttons a').click(load_target_prices);
+
+        // In analyse page, on document ready, load first property or take from hash!
+        var feature = hash_get('feature');
+        if(feature == 'target_prices'){
+            $('.inner_buttons a.ta').trigger('click');
+        }else if(feature.length){
+            $('.analyse_menu div[name='+feature+'] a').trigger('click');
+        }else{
+            $('.analyse_menu div:first-child a').trigger('click');
+        }
+
+        // long company names moving
+        $('.corp_info, .bank .corp').hover(
+            function() {
+               var obj = $(this);
+               obj.find('.goust').text(obj.find('.text .slid').text());
+               var left = Math.min(0, (obj.find('.text').width() - 5 - obj.find('.goust').width()) );
+               obj.find('.text .slid').animate({'left': left}, (left * -15) );
+           },
+           function(){ $(this).find('.text .slid').stop().css({'left': 0});}
+        );
+
+        // s&p500 index popup
+        $('.sp500').click(function(){
+            var list = $('#popup .list'), elem;
+            $.ajax({
+               url: '/tickers/',
+               dataType: 'json',
+            }).done(function(data){
+                $('body').css('overflow', 'hidden');
+                $('#popup').show();
+                $('#popup .list').height( $('#popup .content').height() - 68);
+                for (var i = 0; i < data.length; i++) {
+                    elem = '<a href="'+data[i].url+'">'+data[i].long_name+' ('+data[i].name+')</a>';
+                    list.append(elem);
+                    if(i % 2) { list.append('<span></span>'); }
+                };
+                list.append('<br class="clear" />');
+            });
+            return false;
+        });
+        $('#popup .close, #popup .overlay').click(function(){
+            $('body').css('overflow', 'auto');
+            $('#popup').hide();
+            $('#popup .list').html('');
+        });
+
+        process_target_prices_blocks();
+        binds_for_target_price_list();
+        calculate_minavgmax_block();
+        load_more_target_prices();
+        scroll_style_elements();
+        show_compare_graph_buttons();
+
+        if ($('.horizontal_slider').length !== 0) {
+            horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
+        }
+    },
+
+
+    /* jQuery window scroll */
+    window_scroll: function(){
+        if ($('.horizontal_slider').length !== 0 && horizontal_slider_top_offset === 0) {
+            horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
+        }
+        load_more_target_prices();
+        scroll_style_elements();
+    },
+
+    /** jQuery window resize **/
+    window_resize: function(){
+        $('#popup .list').height( $('#popup .content').height() - 68);
+    },
+
+
+    process_search: function (dom_obj, e){
+        e.preventDefault();
+        var key = e.keyCode ? e.keyCode : e.charCode;
+        var obj = $('#search_inp');
+        var url = '/search/'+ obj.val()+'/';
+
+        if (key == 40 || key == 38){ process_search_nav(key); return; }
+        if($(dom_obj).attr('type') == "submit"){ 
+            if($('#search_inp').attr('href') != undefined){ location.href = $('#search_inp').attr('href'); }  
+            return false;
+        }
+
+        if(obj.val().length < 1) {
+            $('.search_res').html(''); return;
+        }
+
+        $.ajax({
+            url: url,
+            dataType: "json"
+        }).done(function(resp) {
+            var resp_html = '';
+            search_result = resp;
+
+            if(resp.tickers.length){
+                resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'tickers\')" href="">Companies <span>See all</span></a></li>';
+                for(i=0; i < resp.tickers.length ; i++){
+                    if(i >= 5) { break; }
+                    resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+' ('+resp.tickers[i].ticker+')</a></li>';
+                }
+            }
+
+            if(resp.analytics.length) {
+                resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'analytics\')" href="">Analytics<span>See all</span></a></li>';
+                for(i=0; i < resp.analytics.length ; i++){
+                    if(i >= 5) { break; }
+                    resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
+                }
+            }
+
+            $('.search_res').html(resp_html);
+        });
+    },
+
+    process_search_page: function (type){
+        var response = '', elem, name, search_resul = search_result[type];
+
+        for (var i = 0; i < search_resul.length; i++) {
+            name = (type == 'tickers') ? search_resul[i].name + ' ('+search_resul[i].ticker+')' : search_resul[i].name;
+            elem = '<a href="'+search_resul[i].url+'">'+name+'</a>';
+            response += elem;
+            if(i % 2) { response += '<span></span>'; }
+        };
+        
+        $('#content').html('<div class="search_result"></div>');
+        $('#content .search_result').append(response);
+        $('#content .search_result').append('<br class="clear" />');
+        return false;
+    },
+
+    in_graph_select_active_elements: function(){
+        in_graph_select_active_elements();
+    },
+
+    update_ticker_stock: function ( ticker ) {
+        if ($(".price_detail") !== undefined) {
+            var format_text = '';
+            $.getJSON('/get_ticker_data/' + ticker + '/', function(data) {
+                /* data.change_direction apraso i kuria puse reikia sukti arrow */
+                $('.price').text( data.last_stock_price );
+                var triangle = (data.change_percent > 0) ? '<i class="up"></i>' : '<i class="down"></i>';
+                format_text = data.change + " (" + triangle + data.change_percent + "%)";
+                $('.price_detail').html( format_text );
+            });
+        }
+    }
+
+} 
+
+
+
+/* Local access tp (target price) function */
 
 function generate_grid_element(id, dataset, posName) {
 
@@ -54,7 +234,7 @@ function generate_grid_element(id, dataset, posName) {
             .attr('txt', function(d,i){
                 return (posName == 'reach_time') ? d+' days':  d+'%';
             })
-            .transition().duration(900).attr('width', x)
+            .transition().duration(1500).attr('width', x)
             .text( String );
 
         // small circle
@@ -63,7 +243,7 @@ function generate_grid_element(id, dataset, posName) {
                 .attr('fill', '#000')
                 .style('opacity', '0.3')
                 .data(dataset)
-                .transition().duration(900)
+                .transition().duration(1500)
                 .attr('cx', function(d,i){ return x(d)-6; })
                 .attr('cy', 5.5)
                 .attr('r', 3.5);
@@ -117,7 +297,7 @@ function generate_pie(id, value) {
 
     // animate circle with real values
     path = path.data(pie(dataset))
-    .transition().duration(900).attrTween("d", function(a) {
+    .transition().duration(1500).attrTween("d", function(a) {
          var i = d3.interpolate(this._current, a),
              k = d3.interpolate(arc.outerRadius()(), 35);
          this._current = i(0);
@@ -141,7 +321,7 @@ function generate_pie(id, value) {
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
             .attr('cx', function(){ return get_circle_points(35, angle-2)[0]; } )
             .attr('cy', function(){ return get_circle_points(35, angle-2)[1]; } )
-            .transition().duration(900)
+            .transition().duration(1500)
             .attr('r', 3.5);
     }
 }
@@ -566,50 +746,6 @@ function process_target_prices_blocks(){
 }
 
 
-function process_search(dom_obj, e){
-    e.preventDefault();
-    var key = e.keyCode ? e.keyCode : e.charCode;
-    var obj = $('#search_inp');
-    var url = '/search/'+ obj.val()+'/';
-
-    if (key == 40 || key == 38){ process_search_nav(key); return; }
-    if($(dom_obj).attr('type') == "submit"){ 
-        if($('#search_inp').attr('href') != undefined){ location.href = $('#search_inp').attr('href'); }  
-        return false;
-    }
-
-    if(obj.val().length < 1) {
-        $('.search_res').html('');
-        return;
-    }
-
-    $.ajax({
-        url: url,
-        dataType: "json"
-    }).done(function(resp) {
-        var resp_html = '';
-        search_result = resp;
-
-        if(resp.tickers.length){
-            resp_html += '<li class="inf"><a onclick="return process_search_page(\'tickers\')" href="">Companies <span>See all</span></a></li>';
-            for(i=0; i < resp.tickers.length ; i++){
-                if(i >= 5) { break; }
-                resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+' ('+resp.tickers[i].ticker+')</a></li>';
-            }
-        }
-
-        if(resp.analytics.length) {
-            resp_html += '<li class="inf"><a onclick="return process_search_page(\'analytics\')" href="">Analytics<span>See all</span><a/></li>';
-            for(i=0; i < resp.analytics.length ; i++){
-                if(i >= 5) { break; }
-                resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
-            }
-        }
-
-        $('.search_res').html(resp_html);
-    });
-}
-
 function process_search_nav(key){
 
     var list = null;
@@ -671,21 +807,6 @@ function process_search_nav(key){
     }
 }
 
-function process_search_page(type){
-    var response = '', elem, name, search_resul = search_result[type];
-
-    for (var i = 0; i < search_resul.length; i++) {
-        name = (type == 'tickers') ? search_resul[i].name + ' ('+search_resul[i].ticker+')' : search_resul[i].name;
-        elem = '<a href="'+search_resul[i].url+'">'+name+'</a>';
-        response += elem;
-        if(i % 2) { response += '<span></span>'; }
-    };
-    
-    $('#content').html('<div class="search_result"></div>');
-    $('#content .search_result').append(response);
-    $('#content .search_result').append('<br class="clear" />');
-    return false;
-}
 
 /**
 * Click on property in inner Analyse 
@@ -770,7 +891,11 @@ function show_compare_graph_buttons(){
         break;
     }
 
+    $('.analyse_menu .can_compare > span').removeClass('active');
+
     $('.analyse_menu .can_compare > span').unbind('click').click(function(){
+        $('.analyse_menu .can_compare > span').removeClass('active');
+        $(this).addClass('active');
         var slug = $(this).parent('div').attr('name');
         var url = $(this).siblings('a').attr('href');
         var name = $(this).siblings('a').text();
@@ -889,8 +1014,7 @@ function binds_for_target_price_list(){
     $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); $('.tooltip_point').fadeOut(150); });
 
     // long company names moving
-    $('.title .entry').hover(
-        function() {
+    $('.title .entry').hover(function() {
            var obj = $(this);
            obj.find('.goust').text(obj.find('.text .slid').text());
            var left = Math.min(0, (165 - obj.find('.goust').width()) );
@@ -962,79 +1086,6 @@ function get_sorted_target_prices(list, sort_info){
     }
     return new_list;
 }
-
-
-/* DOM ready */
-$(function(){
-
-    $('body').click(in_graph_click);
-    $('.in_graph').click(in_graph_click);
-    $('.in_graph .sear li').click(in_graph_entry_click);
-    $('.in_graph .sear li').hover(in_graph_entry_hover);
-    $('.in_graph .sear input').keyup(in_graph_search);
-    // to clear search proposals
-    $('body').click(function () { $('.search_res').html(''); });
-    $('.analyse_menu a').click(open_graph);
-
-    $('.inner_buttons a').click(load_target_prices);
-
-    // In analyse page, on document ready, load first property or take from hash!
-    var feature = hash_get('feature');
-    if(feature == 'target_prices'){
-        $('.inner_buttons a.ta').trigger('click');
-    }else if(feature.length){
-        $('.analyse_menu div[name='+feature+'] a').trigger('click');
-    }else{
-        $('.analyse_menu div:first-child a').trigger('click');
-    }
-
-    // long company names moving
-    $('.corp_info, .bank .corp').hover(
-        function() {
-           var obj = $(this);
-           obj.find('.goust').text(obj.find('.text .slid').text());
-           var left = Math.min(0, (obj.find('.text').width() - 5 - obj.find('.goust').width()) );
-           obj.find('.text .slid').animate({'left': left}, (left * -15) );
-       },
-       function(){ $(this).find('.text .slid').stop().css({'left': 0});}
-    );
-
-    // s&p500 index popup
-    $('.sp500').click(function(){
-        var list = $('#popup .list'), elem;
-        $.ajax({
-           url: '/tickers/',
-           dataType: 'json',
-        }).done(function(data){
-            $('body').css('overflow', 'hidden');
-            $('#popup').show();
-            $('#popup .list').height( $('#popup .content').height() - 68);
-            for (var i = 0; i < data.length; i++) {
-                elem = '<a href="'+data[i].url+'">'+data[i].long_name+' ('+data[i].name+')</a>';
-                list.append(elem);
-                if(i % 2) { list.append('<span></span>'); }
-            };
-            list.append('<br class="clear" />');
-        });
-        return false;
-    });
-    $('#popup .close, #popup .overlay').click(function(){
-        $('body').css('overflow', 'auto');
-        $('#popup').hide();
-        $('#popup .list').html('');
-    });
-
-    process_target_prices_blocks();
-    binds_for_target_price_list();
-    calculate_minavgmax_block();
-    load_more_target_prices();
-    scroll_style_elements();
-    show_compare_graph_buttons();
-
-    if ($('.horizontal_slider').length !== 0) {
-        horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
-    }
-});
 
 
 function in_graph_click(){
@@ -1175,20 +1226,6 @@ function scroll_style_elements() {
 
     });
 
-    /*
-    $('.target_price_list').each(function(index, entry) {
-        card_group_position = $(entry).position();
-        card_group_height = $(entry).height();
-        console.log('Index: ', index);
-        console.log('Window scroll: ', window_scroll - horizontal_slider_top_offset + 20);
-        console.log('Card group top: ', card_group_position.top);
-        console.log('card group top+height: ', card_group_position.top + card_group_height);
-        if ( window_scroll - horizontal_slider_top_offset + 50 > card_group_position.top &&
-        window_scroll - horizontal_slider_top_offset + 50 < card_group_position.top + card_group_height ) {
-            $('.now').text($(entry).attr('name'));
-        }
-    });
-    */
 
 }
 
@@ -1228,37 +1265,14 @@ function load_more_target_prices(){
     }
 }
 
-/**
-* Scroll
-***/
-$(window).scroll(function() {
-    if ($('.horizontal_slider').length !== 0 && horizontal_slider_top_offset === 0) {
-        horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
-    }
-    load_more_target_prices();
-    scroll_style_elements();
-});
 
-/** window resize **/
-$(window).resize(function(){
-    $('#popup .list').height( $('#popup .content').height() - 68);
-});
+})();
 
 
-/** Internet Explorer save console.log() */
+/* Bind main functions execution */
+$(document).ready(tp.document_ready);
+$(window).scroll(tp.window_scroll);
+$(window).resize(tp.window_resize);
+
+/* Internet Explorer save console.log() */
 if(typeof(console)=="undefined"){var console={log:function(){}};}
-
-function update_ticker_stock( ticker ) {
-
-    if ($(".price_detail") !== undefined) {
-        var format_text = '';
-        $.getJSON('/get_ticker_data/' + ticker + '/', function(data) {
-            /* data.change_direction apraso i kuria puse reikia sukti arrow */
-            $('.price').text( data.last_stock_price );
-            var triangle = (data.change_percent > 0) ? '<i class="up"></i>' : '<i class="down"></i>';
-            format_text = data.change + " (" + triangle + data.change_percent + "%)";
-            $('.price_detail').html( format_text );
-        });
-    }
-}
-

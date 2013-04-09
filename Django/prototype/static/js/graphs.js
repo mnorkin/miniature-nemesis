@@ -164,7 +164,7 @@ var graphs = (function () {
                     });
                     _data = graphs.get__data(full_data);
                     graphs.draw_aggressiveness();
-                    in_graph_select_active_elements();
+                    tp.in_graph_select_active_elements();
 
                 } else {
                     console.log("Error on fetch data: ", error.status);
@@ -186,7 +186,7 @@ var graphs = (function () {
                     });
                     _data = graphs.get__data(full_data);
                     graphs.draw_profitability();
-                    in_graph_select_active_elements();
+                    tp.in_graph_select_active_elements();
 
                 } else {
                     console.log("Error on fetch data: ", error.status);
@@ -207,7 +207,7 @@ var graphs = (function () {
                     });
                     _data = graphs.get__data(full_data);
                     graphs.draw_accuracy();
-                    in_graph_select_active_elements();
+                    tp.in_graph_select_active_elements();
                 } else {
                     console.log("Error on fetch data: ", error.status);
                 }
@@ -227,7 +227,7 @@ var graphs = (function () {
                     });
                     _data = graphs.get__data(full_data);
                     graphs.draw_reach_time();
-                    in_graph_select_active_elements();
+                    tp.in_graph_select_active_elements();
 
                 } else {
                     console.log("Error on fetch data: ", error.status);
@@ -249,7 +249,7 @@ var graphs = (function () {
                     });
                     _data = graphs.get__data(full_data);
                     graphs.draw_impact_to_market();
-                    in_graph_select_active_elements();
+                    tp.in_graph_select_active_elements();
 
                 } else {
                     console.log("Error on fetch data: ", error.status);
@@ -272,7 +272,7 @@ var graphs = (function () {
                     });
                     _data = graphs.get__data(full_data);
                     graphs.draw_proximity();
-                    in_graph_select_active_elements();
+                    tp.in_graph_select_active_elements();
                 } else {
                     console.log("Error on fetch data: ", error.status);
                 }
@@ -639,6 +639,8 @@ var graphs = (function () {
 
 
             $('.in_graph .sear li').click(function(e){
+                return; // disable till better implementation.
+                
                 /* Scroll to selected circle element */
 
                 if($(this).hasClass('active') == false || e.isTrigger == true) { return; }
@@ -664,7 +666,8 @@ var graphs = (function () {
 
             var angle_arc = d3.svg.arc()
                 .innerRadius(function (d, i) {
-                return r;
+                return d / 100 * rhw + r;
+                //return r;
             })
                 .outerRadius(function (d, i) {
                 return d / 100 * rhw + r;
@@ -777,10 +780,9 @@ var graphs = (function () {
             sun.selectAll('#' + _element_id)
                 .data(sun_data).enter()
                 .append('svg:path')
-                .attr("d", angle_arc)
+                .attr("d", function(d, i){ if(i==0){d = -0.5;} return angle_arc(d,i) } )
                 .attr('stroke-width', 1)
-                .attr('fill', 'transparent')
-                .attr("stroke", "#e6dbd2")
+                .attr("stroke", "#f1ebe7")
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
 
             sun.selectAll("#" + _element_id)
@@ -788,8 +790,8 @@ var graphs = (function () {
                 .append('svg:path')
                 .attr('class', 'data')
                 .attr("d", data_arc)
+                .attr('stroke', '#FEFAF7')
                 .attr('stroke-width', 1)
-                .attr("stroke", "#fff")
                 .attr('fill', '#8dc6b3')
                 .attr('origin_fill', '#8dc6b3')
                 .attr('selectd', 0)
@@ -824,7 +826,8 @@ var graphs = (function () {
                 .attr('fill', '#ded1c6')
                 .attr('y', 0)
                 .attr('x', function (d, i) {
-                return d / 100 * rhw + r;
+                    if(i==0){d = -0.5;}
+                    return d / 100 * rhw + r;
             })
                 .attr("stroke", "#ded1c6")
                 .attr('stroke-width', 0.5)
@@ -840,11 +843,22 @@ var graphs = (function () {
                 .style("fill", "#ded1c6")
                 .attr("dy", 18)
                 .attr("dx", function (d, i) {
-                return d / 100 * rhw + r - (-0.8 + new String(d).length*3.3);
-            })
+                    if(i==0){d = 1.7;}
+                    return d / 100 * rhw + r - (-0.8 + new String(d).length*3.3);
+                })
                 .text(function (d) {
                 return d;
             })
+                .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
+
+            sun.selectAll('#' + _element_id)
+                .data([1, -1]).enter().append("svg:line")
+                .attr('x1', function(d,i){ return (1 / 100 * rhw + r - 4) * d } )
+                .attr('x2', function(d,i){ return (rhw + r) * d } )
+                .attr('y1', 0)
+                .attr('y2', 0)
+                .attr('stroke', '#f1ebe7')
+                .attr('stroke-width', 1)
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
 
             return graphs;
@@ -1237,7 +1251,7 @@ var graphs = (function () {
                         }
                     }
                     graphs.draw_compare_graphs(graphs.current_name, name, _data2);
-                    in_graph_select_active_elements();
+                    tp.in_graph_select_active_elements();
 
                 } else {
                     console.log("Error on fetch data: ", error.status);

@@ -99,14 +99,10 @@ li{ list-style: none; }
     z-index: 30;
 }
 .inner .search_res {
-    top:68px;
+    top:52px;
     width: 232px;
 }
 .search_res li{
-    padding-top: 10px;
-    padding-left:10px;
-    height: 25px;
-    width: 375px;
     background: #fff;
     border-bottom:1px solid #ede7e1;
     font-weight: bold;
@@ -116,13 +112,12 @@ li{ list-style: none; }
 #header .search_res li a{
     display: block;
     margin-right: 10px;
+    padding: 10px 0 10px 10px;
 }
 .search_res li:hover{
     background: #f3ede8;
 }
-.inner .search_res li{
-    width: 222px;
-}
+
 .search_res li.inf{
     background: #d1c1b0;
     color:#fff;
@@ -239,13 +234,13 @@ li{ list-style: none; }
 
 .title.grid .entry .price{
     color:#e95200;
-    font-size: 22px;
+    font-size: 24px;
     width: 85px;
     text-align: right;
     font-weight: bold;
     position: absolute;
-    top:41px;
-    left:200px;
+    top:31px;
+    left:188px;
 }
 
 /* A little bit of fixing part */
@@ -857,7 +852,7 @@ li{ list-style: none; }
 .analyse_menu div.can_compare span:hover{
     background-color: #ebe4dd;
 }
-.analyse_menu div.can_compare span:active{
+.analyse_menu div.can_compare span.active{
     background-color: #d6b899;
 }
 .analyse_menu a:before{
@@ -971,7 +966,7 @@ li{ list-style: none; }
 
 .in_graph .sear input{
     width:158px;
-    padding:11px 0 10px 17px;
+    padding:12px 0 12px 17px;
     border: 1px solid #e7ded5;
     border-bottom: 0;
 }

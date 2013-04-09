@@ -15,12 +15,12 @@
   </span>
 
   <script type="text/javascript">
-    tmp_target_price = {'hash': "{{ target.hash }}01", 'name': "{{target.ticker}}", 'processed' : false};
+    var tmp_target_price = {'hash': "{{ target.hash }}01", 'name': "{{target.ticker}}", 'processed' : false};
     tmp_target_price['change'] = "{{target.change}}";
     {% for fap in target.fap %}
       tmp_target_price['{{fap.feature.slug}}'] = "{{fap.value}}";
     {% endfor %}
-    target_prices_list.push(tmp_target_price)
+    tp.append_target_price_list(tmp_target_price);
   </script>
   
   <ul class="bar">
