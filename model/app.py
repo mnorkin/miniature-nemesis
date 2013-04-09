@@ -157,7 +157,7 @@ class App():
                             self.logger.error('Something went wrong with feature\
 analytic ticker update')
 
-                    self.logger.debug("date %s " % target_price['date'])
+                    self.logger.debug("Date %s " % target_price['date'])
                     target_price_date_timestamp = date.fromtimestamp(target_price['date']).timetuple()
 
                     matches = (x for x in stock_data if x['date'] == target_price_date_timestamp)
@@ -166,7 +166,13 @@ analytic ticker update')
                         stock_entry = matches.next()
                         target_price['change'] = (target_price['price'] - stock_entry['close'])/stock_entry['close']
                         target_price['change'] = target_price['change'] * 100
+                        self.logger.debug('Stock entry close price %s' % stock_entry['close'])
+                        self.logger.debug('Target price %s' % target_price['price'])
+                        self.logger.debug('Change %s' % target_price['change'])
                     except StopIteration:
+                        self.logger.debug('Date %s' % target_price['date'])
+                        self.logger.debug('Ticker %s' % ticker_slug)
+                        self.logger.error('No target price stock date found')
                         target_price['change'] = 0
 
                     _date = datetime.datetime.fromtimestamp(

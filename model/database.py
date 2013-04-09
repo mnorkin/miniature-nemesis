@@ -153,16 +153,19 @@ class database:
     def return_targetprices(self, analytic=None, ticker=None):
         """
         Complete return of target prices, specified by analytic and ticker
+
+        The returned target prices must be older, than a year, in order to
+        participate in the calculations of features
+
+        The method is only used by the feature calculations
         """
         if analytic and ticker:
             results = []
             query = "SELECT DISTINCT ON (pub_date) pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
-                AND pub_date < (SELECT max(pub_date) FROM entries WHERE analytic=E'%s' AND ticker='%s') \
+                AND pub_date < NOW() - interval '1 year' \
                 ORDER BY pub_date" % (
-                    re.escape(analytic),
-                    re.escape(ticker),
                     re.escape(analytic),
                     re.escape(ticker))
             """Query for the target prices, which are older than the maximum date

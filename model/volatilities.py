@@ -47,10 +47,10 @@ class Volatilities():
         Making send happen
         """
         if data:
-            if rest.send("POST", "/api/volatility/", data):
+            if rest.send("POST", "/api/volatilities/", data):
                 return True
             else:
-                if rest.send("PUT", "/api/volatility/", data):
+                if rest.send("PUT", "/api/volatilities/", data):
                     return True
                 else:
                     return False

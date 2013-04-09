@@ -62,7 +62,7 @@ class TargetPriceNumberAnalyticTickerHandler(BaseHandler):
             data = request.data
             tpnat = TargetPriceNumberAnalyticTicker
             try:
-                tpnat = self.mmodel.objects.get(
+                tpnat = self.model.objects.get(
                     analytic=Analytic.objects.get(slug=data['analytic_slug']),
                     ticker=Ticker.objects.get(slug=data['ticker_slug']))
                 return rc.DUPLICATE_ENTRY
@@ -225,6 +225,41 @@ class AnalyticHandler(BaseHandler):
             super(Analytic, self).create(request)
 
 
+class StockPriceHandler(BaseHandler):
+    """
+    Stock price handler
+    """
+
+    allowed_methods = ('PUT')
+    model = Ticker
+
+    def read(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def create(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def update(self, request):
+        if request.content_type:
+            data = request.data
+            ticker = Ticker
+            try:
+                ticker = Ticker.objects.get(ticker=data['ticker'])
+            except ticker.DoesNotExist:
+                return rc.NOT_FOUND
+
+            ticker.last_stock_price = data['last_stock_price']
+
+            ticker.save()
+
+            return rc.ALL_OK
+        else:
+            super(Ticker, self).create(request)
+
+    def delete(self, request):
+        return rc.NOT_IMPLEMENTED
+
+
 class TickerHandler(BaseHandler):
     """
     Ticker data handler
@@ -256,6 +291,7 @@ class TickerHandler(BaseHandler):
                     name=data['name'],
                     long_name=data['long_name'],
                     last_stock_price=data['last_stock_price'],
+                    last_stock_change=0,
                     consensus_min=data['consensus_min'],
                     consensus_avg=data['consensus_avg'],
                     consensus_max=data['consensus_max'],

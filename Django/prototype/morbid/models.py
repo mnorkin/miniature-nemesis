@@ -94,7 +94,10 @@ class Ticker(models.Model):
     """
     name = models.CharField(max_length=200)
     long_name = models.CharField(max_length=200)
+    # Last stock group gives information on
+    # stock market price change
     last_stock_price = models.FloatField()
+    last_stock_change = models.FloatField()
     consensus_min = models.FloatField()
     consensus_avg = models.FloatField()
     consensus_max = models.FloatField()

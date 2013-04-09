@@ -109,7 +109,7 @@ class TargetPriceHandler(BaseHandler):
 
     def read(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TargetPrice, self).create(request)
 
@@ -128,11 +128,23 @@ class TargetPriceHandler(BaseHandler):
                 em.save()
                 analytic = Analytic.objects.get(name=data['analytic'])
 
-            try:
-                ticker = Ticker.objects.get(ticker=data['ticker'])
-            except ticker.DoesNotExist:
-                return rc.NOT_FOUND
+            # Daily Crawler has only company name information,
+            # no ticker information is provided
+            if 'company_name' in data:
+                try:
+                    ticker = Ticker.objects.get(name=data['company_name'])
+                except ticker.DoesNotExist:
+                    return rc.NOT_FOUND
 
+            # Big ticker browser has the information in ticker information
+            # so, the ticker in the database is identified by `ticker`
+            if 'ticker' in data:
+                try:
+                    ticker = Ticker.objects.get(ticker=data['ticker'])
+                except ticker.DoesNotExist:
+                    return rc.NOT_FOUND
+
+            # Saving the entry
             em = self.model(
                 action=data['action'],
                 analytic=analytic,
@@ -140,7 +152,7 @@ class TargetPriceHandler(BaseHandler):
                 price0=data['price0'],
                 price1=data['price1'],
                 ticker=ticker,
-                date=data['date']
+                date=data['pub_date']
             )
 
             em.save()
@@ -151,13 +163,13 @@ class TargetPriceHandler(BaseHandler):
 
     def update(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TargetPrice, self).create(request)
 
     def delete(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TargetPrice, self).create(request)
 
@@ -171,24 +183,24 @@ class TickerChangeHandler(BaseHandler):
 
     def read(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)
 
     def create(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)
 
     def update(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)
 
     def delete(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)

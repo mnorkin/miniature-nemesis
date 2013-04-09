@@ -45,7 +45,7 @@ class Targetpricenumbers():
             if rest.send("POST", "/api/target_price_numbers/", data):
                 return True
             else:
-                if rest.send("PUT", "/api/target_price_numbers", data):
+                if rest.send("PUT", "/api/target_price_numbers/", data):
                     return True
                 else:
                     return False

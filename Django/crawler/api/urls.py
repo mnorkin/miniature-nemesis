@@ -1,6 +1,8 @@
 from django.conf.urls.defaults import *
 from piston.resource import Resource
-from api.handlers import TickerHandler, TargetPriceHandler, TickerChangeHandler
+from api.handlers import TickerHandler
+from api.handlers import TargetPriceHandler
+from api.handlers import TickerChangeHandler
 
 ticker_handler = Resource(TickerHandler)
 target_price_handler = Resource(TargetPriceHandler)

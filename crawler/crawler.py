@@ -166,13 +166,17 @@ class crawler(threading.Thread):
         response = conn.getresponse()
         conn.close()
         if response.status != 502:
-            if response.status == 200 and request.upper() == 'GET':  # ALL_OK
+            # ALL_OK
+            if response.status == 200 and request.upper() == 'GET':
                 return True
-            elif response.status == 201 and request.upper() == 'POST':  # CREATED
+            # CREATED
+            elif response.status == 201 and request.upper() == 'POST':
                 return True
-            elif response.status == 200 and request.upper() == 'PUT':  # ALL_OK
+            # ALL_OK
+            elif response.status == 200 and request.upper() == 'PUT':
                 return True
-            elif response.status == 204 and request.upper() == 'DELETE':  # DELETED
+            # DELETED
+            elif response.status == 204 and request.upper() == 'DELETE':
                 return True
             else:
                 return None
@@ -302,7 +306,10 @@ cra.baklazanas.lt, sleeping')
 
             # logging.debug('Plain data: ' + entry.text_content().strip())
             # Month-Day-Year (stupid Americans)
-            date = datetime.strptime(items[-1].text_content().strip(), "%m/%d/%y")
+            date = datetime.strptime(
+                items[-1].text_content().strip(),
+                "%m/%d/%y"  # Stupid America
+            )
 
             item = {
                 'action': items[0].text_content().strip(),
