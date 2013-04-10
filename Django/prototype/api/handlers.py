@@ -8,7 +8,8 @@ from morbid.models import Unit
 from morbid.models import Volatility
 from morbid.models import TargetPriceNumberAnalyticTicker
 from piston.handler import BaseHandler
-from piston.utils import rc, validate
+from piston.utils import rc
+from piston.utils import validate
 from django.http import HttpResponse, Http404
 
 
@@ -244,11 +245,12 @@ class StockPriceHandler(BaseHandler):
             data = request.data
             ticker = Ticker
             try:
-                ticker = Ticker.objects.get(ticker=data['ticker'])
+                ticker = Ticker.objects.get(name=data['ticker'])
             except ticker.DoesNotExist:
                 return rc.NOT_FOUND
 
             ticker.last_stock_price = data['last_stock_price']
+            ticker.last_stock_change = data['last_stock_change']
 
             ticker.save()
 

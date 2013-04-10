@@ -30,7 +30,7 @@ stock_price_handler = Resource(StockPriceHandler)
 
 urlpatterns = patterns(
     '',
-    url(r'^stock_target_prices/$', stock_price_handler),
+    url(r'^stock_prices/$', stock_price_handler),
     url(r'^feature_analytic_tickers/$', feature_analytic_ticker_handler),
     url(r'^analytics/$', analytic_handler),
     url(r'^analytics/(?P<analytic_slug>[\w-]+)/$', analytic_handler),

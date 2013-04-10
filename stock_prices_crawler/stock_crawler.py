@@ -39,7 +39,11 @@ class stock_crawler():
         """
         The main guy in the field
         """
-        pass
+        for item in self.get_data():
+            if self.rest("/api/stock_prices/", "PUT", item):
+                print item['ticker'], ' send'
+            else:
+                print item['ticker'], ' fail'
 
     def get_tickers(self):
         """
@@ -51,52 +55,53 @@ class stock_crawler():
         if response_data:
             return "+".join((ticker['name'] for ticker in response_data))
 
-    def get_data(self, ticker=None):
+    def get_data(self):
         PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
-        url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b3c6p&e=.csv' % (
-            ticker.upper())
+        url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b2c6s&e=.csv' % (
+            self.get_tickers())
         f = u.urlopen(url, proxies={})
         rows = f.readlines()
-        r = rows[0]
-        # return HttpResponse(r)
-        """Get the first entry"""
-        r = PATTERN.split(r[:-2])[1::2]
-        """Remove the `\r\n` and split by comma"""
+        for row in rows:
+            try:
+                # return HttpResponse(r)
+                """Get the first entry"""
+                row = PATTERN.split(row[:-2])[1::2]
+                """Remove the `\r\n` and split by comma"""
 
-        r[1].replace('"', '')
-        change = r[1]
-        last_stock_price = float(r[0])
-        change_percent = 0
-        change_direction = 'up'
+                row[1].replace('"', '')
+                change = row[1]
+                last_stock_price = float(row[0])
+                # change_percent = 0
 
-        if (change[1] == '+'):
-            """Positive change"""
-            change = change[2:-1]
-            """Drop the sign"""
-            change_direction = 'up'
-        else:
-            """Negative change"""
-            change = change[2:-1]
-            """Drop the sign"""
-            change_direction = 'down'
+                if (change[1] == '+'):
+                    """Positive change"""
+                    change = change[2:-1]
+                    """Drop the sign"""
+                else:
+                    """Negative change"""
+                    change = change[2:-1]
+                    """Drop the sign"""
+                    change = "-" + change
 
-        change = float(change)
+                change = float(change)
 
-        if change == 0:
-            last_stock_price = r[2]
-
-        if change != 0:
-            change_percent = round(change / (last_stock_price - change) * 100, 2)
-        else:
-            change_percent = 0
-
-        item = {
-            "last_stock_price": last_stock_price,
-            "change": change,
-            "change_percent": change_percent,
-            "change_direction": change_direction
-        }
-        return item
+                item = {
+                    "ticker": row[2].replace('"', ''),
+                    "last_stock_price": last_stock_price,
+                    "last_stock_change": change
+                }
+                yield item
+            except ValueError:
+                """
+                Do nothing if the value error was returned
+                """
+                pass
+                # item = {
+                #     'ticker': row[3],
+                #     'last_stock_price': 0,
+                #     'last_stock_change': 0
+                # }
+                # yield item
 
     def rest(self, url, request, data=None, cycle=1):
         """
