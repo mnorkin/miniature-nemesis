@@ -243,10 +243,10 @@ function generate_grid_element(id, dataset, posName) {
                 .attr('fill', '#000')
                 .style('opacity', '0.3')
                 .data(dataset)
-                .transition().duration(1500)
-                .attr('cx', function(d,i){ return x(d)-6; })
                 .attr('cy', 5.5)
-                .attr('r', 3.5);
+                .transition().duration(1500)
+                .attr('r', 3.5)
+                .attr('cx', function(d,i){ return x(d)-6; });
         }
 
     } else {
@@ -321,7 +321,7 @@ function generate_pie(id, value) {
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
             .attr('cx', function(){ return get_circle_points(35, angle-2)[0]; } )
             .attr('cy', function(){ return get_circle_points(35, angle-2)[1]; } )
-            .transition().duration(1500)
+            .transition().delay(1000).duration(500)
             .attr('r', 3.5);
     }
 }
