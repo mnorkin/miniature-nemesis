@@ -20,7 +20,7 @@ def environment():
     env.version = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     env.release = env.version
     # Virtualenv path root
-    env.code_root = '/var/www/dev_targetprice'
+    env.code_root = '/var/www/dev2_targetprice'
     # Activation of virtual env
     env.activate = 'source %s/bin/activate' % env.code_root
     env.code_root_parent = '/var/www'

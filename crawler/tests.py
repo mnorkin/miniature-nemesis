@@ -25,7 +25,8 @@ class crawler_test(unittest.TestCase):
     def test_shuffle(self):
         self.assertNotEqual(
             self.crawler_one.shuffle_letter().letter,
-            self.crawler_one.shuffle_letter().letter, "Shuffle fail")
+            self.crawler_one.shuffle_letter().letter,
+            "Shuffle fail")
 
     def test_login(self):
         """

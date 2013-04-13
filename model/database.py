@@ -273,17 +273,13 @@ class database:
                     SELECT DISTINCT pub_date FROM entries \
                     WHERE analytic=E'%s' AND ticker='%s' \
                     AND price0 != 0 \
-                    AND pub_date < ( \
-                            SELECT max(pub_date) FROM entries \
-                            WHERE analytic = E'%s' AND ticker='%s' \
-                            AND price0 != 0 \
-                        ) \
-                    ORDER BY pub_date \
+                    AND pub_date + INTERVAL '1 year' < NOW() \
+                    ORDER BY pub_date ASC \
                     ) p" % (
-                    re.escape(analytic),
-                    re.escape(ticker),
-                    re.escape(analytic),
-                    re.escape(ticker))
+                re.escape(analytic),
+                re.escape(ticker),
+                re.escape(analytic),
+                re.escape(ticker))
 
             self.cursor.execute(query)
             return self.cursor.fetchone()[0]
