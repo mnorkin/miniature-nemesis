@@ -1,6 +1,6 @@
 # Django settings for prototype project.
 import os
-import django
+# import django
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -14,10 +14,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'morbid',                      # Or path to database file if using sqlite3.
+        'NAME': 'fp2-morbid',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',                      # Not used with sqlite3.
         'PASSWORD': 'fupHU8Ut',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }

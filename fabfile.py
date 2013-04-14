@@ -10,7 +10,6 @@ from cuisine import mode_sudo
 env.project_name = 'target_price'
 env.private_hosts = ['109.235.69.232']
 env.public_hosts = ['185.5.55.178']
-env.hosts = env.private_hosts
 env.directory = ''
 env.deploy_group = 'square_wheel'
 env.deploy_user = 'agurkas'
@@ -51,6 +50,22 @@ def virtualenv(command):
             env.activate + ' && ' + command,
             user=env.deploy_user
         )
+
+
+def public():
+    """
+    Environment for public
+    """
+    env.user = env.deploy_user
+    env.hosts = env.public_hosts
+
+
+def private():
+    """
+    Environment for private
+    """
+    env.user = env.deploy_user
+    env.hosts = env.private_hosts
 
 
 def set_root_user():
@@ -211,7 +226,8 @@ def configure_postgres():
         '#track_counts = on',
         use_sudo=True
     )
-    files.sed(conf_dir_prefix + 'main/postgresql.conf',
+    files.sed(
+        conf_dir_prefix + 'main/postgresql.conf',
         "#listen_addresses",
         "listen_addresses",
         use_sudo=True)
@@ -344,11 +360,12 @@ def install_requirements(opts):
 
 
 def restart_deamon(opts):
-    deamon_root = '%(deploy_path)s/releases/%(release)s/deamon.py' % opts
+    env.activate = 'source %(deploy_path)s/bin/activate' % opts
+    deamon_root = '%(deploy_path)s/releases/current/deamon.py' % opts
     if files.exists(deamon_root):
-        run('%(deploy_path)s/releases/%(release)s/deamon.py stop; \
+        virtualenv('%(deploy_path)s/releases/current/deamon.py stop; \
             sleep 2' % opts)
-        run('%(deploy_path)s/releases/%(release)s/deamon.py start; \
+        virtualenv('%(deploy_path)s/releases/current/deamon.py start; \
             sleep 2' % opts)
 
 
@@ -368,7 +385,7 @@ def model_configuration(opts):
         # Create
         sudo('-u postgres createdb tp2-morbid')
         # Populate
-        sudo('-u postgres pg_restore %(deploy_path)/releases/current/database.sql' % opts)
+        sudo('-u postgres pg_restore %(deploy_path)s/releases/current/database.sql' % opts)
 
 
 def model_update():
@@ -399,30 +416,83 @@ def model_deploy():
     restart_deamon(opts)
 
 
+def django_production_configuration(opts):
+    """
+    Django production configuration
+    """
+    env.activate = 'source %(deploy_path)s/bin/activate' % opts
+    # Update settings
+    run('mv %(deploy_path)s/releases/current/prototype/settings.py \
+        %(deploy_path)s/releases/current/prototype/settings_dev.py' % opts)
+    run('mv %(deploy_path)s/releases/current/prototype/settings_prod.py \
+        %(deploy_path)s/releases/current/prototype/settings.py' % opts)
+    sudo('chmod +x %(deploy_path)s/releases/current/deamon.py' % opts)
+    # Create the database
+    if opts['createdb']:
+        with settings(warn_only=True):
+            # Backup if there was anything
+            sudo('pg_dump fp2-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            # Clean
+            sudo('dropdb fp2-morbid', user='postgres')
+        # Create
+        sudo('createdb fp2-morbid', user='postgres')
+
+    virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
+
+
 def django_production_update():
-    env.hosts = env.public_hosts
     opts = dict(
         what_to_send_path=env.django_production_path,
         release=env.release_django_production,
-        deploy_path=env.deploy_django_production_path
+        deploy_path=env.deploy_django_production_path,
+        createdb=False
     )
     archive_git_and_put(opts)
+    django_production_configuration(opts)
     restart_deamon(opts)
 
 
 def django_production_deploy():
-    env.hosts = env.public_hosts
     opts = dict(
         what_to_send_path=env.django_production_path,
         release=env.release_django_production,
-        deploy_path=env.deploy_django_production_path
+        deploy_path=env.deploy_django_production_path,
+        createdb=True
     )
     archive_git_and_put(opts)
     install_requirements(opts)
+    django_production_configuration(opts)
     restart_deamon(opts)
 
 
+def django_sink_configuration(opts):
+    """
+    Django sink configuration
+    """
+    env.activate = 'source %(deploy_path)s/bin/activate' % opts
+    # Update settings
+    run('mv %(deploy_path)s/releases/current/crawler/settings.py \
+        %(deploy_path)s/releases/current/crawler/settings_dev.py')
+    run('mv %(deploy_path)s/releases/current/crawler/setting_prod.py \
+        %(deploy_path)s/releases/current/crawler/settings.py')
+    sudo('chmod +x %(deploy_path)s/releases/current/deamon.py' % opts)
+    # Create the database
+    if opts['createdb']:
+        with settings(warn_only=True):
+            # Backup if there was anything
+            sudo('pg_dump tp2-sink > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            # Clean
+            sudo('dropdb tp2-sink', user='postgres')
+        # Create
+        sudo('createdb tp2-sink', user='postgres')
+
+    virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
+
+
 def django_sink_update():
+    env.user = env.deploy_user
     env.hosts = env.public_hosts
     opts = dict(
         what_to_send_path=env.django_sink_path,
@@ -430,6 +500,20 @@ def django_sink_update():
         deploy_path=env.deploy_django_sink_path
     )
     archive_git_and_put(opts)
+    django_sink_configuration(opts)
+    restart_deamon(opts)
+
+
+def django_sink_deploy():
+    env.user = env.deploy_user
+    env.hosts = env.public_hosts
+    opts = dict(
+        what_to_send_path=env.django_sink_path,
+        release=env.release_django_sink,
+        deploy_path=env.deploy_django_sink_path
+    )
+    archive_git_and_put(opts)
+    django_sink_configuration(opts)
     restart_deamon(opts)
 
 
