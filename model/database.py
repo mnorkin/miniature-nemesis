@@ -211,14 +211,11 @@ class database:
         On of the ideas is to use the yeild operator to speed things up
         """
         if analytic and ticker:
-            query = "SELECT DISTINCT ON (analytic) pub_date, price0 analytic, ticker \
+            query = "SELECT DISTINCT ON (pub_date) pub_date, price0, analytic, ticker \
                 FROM entries \
-                WHERE analytic=E'%s' AND ticker='%s' \
-                AND price0 != 0 \
-                AND pub_date < (SELECT max(pub_date) FROM entries WHERE analytic=E'%s' AND ticker='%s') \
+                WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
+                AND pub_date < NOW() - interval '1 year' \
                 ORDER BY pub_date" % (
-                    re.escape(analytic),
-                    re.escape(ticker),
                     re.escape(analytic),
                     re.escape(ticker))
             """Query for the target prices, which are older than the maximum date
