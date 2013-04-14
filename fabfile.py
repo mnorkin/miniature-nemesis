@@ -1,11 +1,16 @@
 from datetime import datetime
 from fabric.api import *
+from fabric.contrib import *
+from fabric.operations import *
+from cuisine import dir_ensure
+from cuisine import mode_sudo
 
 # One single fabric to rule them all
 
 env.project_name = 'target_price'
 env.private_hosts = ['109.235.69.232']
 env.public_hosts = ['185.5.55.178']
+env.hosts = env.private_hosts
 env.directory = ''
 env.deploy_group = 'square_wheel'
 env.deploy_user = 'agurkas'
@@ -19,15 +24,9 @@ env.django_production_path = 'Django/prototype'
 env.django_sink_path = 'Django/crawler'
 
 # Remote directory part
-env.deploy_model_path = '/home/%(deploy_user)/model' % (
-    dict(deploy_user=env.deploy_user)
-)
-env.deploy_crawler_path = '/home/%(deploy_user)/crawler' % (
-    dict(deploy_user=env.deploy_user)
-)
-env.deploy_crawler_daily_path = '/home/%(deploy_user)/crawler_daily' % (
-    dict(deploy_user=env.deploy_user)
-)
+env.deploy_model_path = '/home/%s/model' % env.deploy_user
+env.deploy_crawler_path = '/home/%s/crawler' % env.deploy_user
+env.deploy_crawler_daily_path = '/home/%s/crawler_daily' % env.deploy_user
 env.deploy_django_production_path = '/var/www/dev2_targetprice'
 env.deploy_django_sink_path = '/var/www/cra_targetprice'
 
@@ -38,6 +37,9 @@ env.release_crawler = 'crawler_' + env.release
 env.release_crawler_daily = 'crawler_daily_' + env.release
 env.release_django_production = 'django_production_' + env.release
 env.release_django_sink = 'django_sink_' + env.release
+
+# Password configuration part
+env.postgresql_pass = 'fupHU8Ut'
 
 
 def virtualenv(command):
@@ -73,18 +75,24 @@ def setup_deploy_user():
         deploy_user=env.deploy_user,
         deploy_password=env.deploy_pass
     )
+    opts['local_user'] = local('whoami', capture=True)
     # Create user
-    sudo('egrep %(deploy_user)s /etc/passwd || adduser %(deploy_user)s --disable-password --gecos ""' % opts)
+    sudo('egrep %(deploy_user)s /etc/passwd || adduser %(deploy_user)s --disabled-password --gecos ""' % opts)
 
     # Add public key for ssh access
-    if not exists('/home/%(deploy_user)s/.ssh' % opts):
+    if not files.exists('/home/%(deploy_user)s/.ssh' % opts):
         sudo('mkdir /home/%(deploy_user)s/.ssh' % opts)
 
-    opts['pub'] = prompt("Enter %(deploy_user)s's publ;ic key: " % opts)
+    opts['pub'] = local(
+        "cat /home/%(local_user)s/.ssh/id_rsa.pub" % opts,
+        capture=True)
     sudo("echo '%(pub)s' > /home/%(deploy_user)s/.ssh/authorized_keys" % opts)
+    # put(
+        # '/home/%(local_user)s/.ssh/id_rsa.pub' % opts,
+        # '/home/%(deploy_user)s/.ssh/authorized_keys2' % opts, mode=0400)
 
     # Allow this user in sshd_config
-    append(
+    files.append(
         '/etc/ssh/sshd_config',
         'AllowUsers %(deploy_user)s@*' % opts,
         use_sudo=True)
@@ -100,8 +108,8 @@ def private_setup_deploy_user():
     """
     Settup up private hosts deploy user
     """
-    set_root_user()
     env.hosts = env.private_hosts
+    set_root_user()
     setup_deploy_user()
 
 
@@ -179,31 +187,31 @@ def configure_postgres():
     conf_dir_prefix = "/etc/postgresql/%s/" % version
 
     # pg_hba.conf
-    comment('/etc/postgresql/%s/main/pg_hba.conf' % version,
+    files.comment('/etc/postgresql/%s/main/pg_hba.conf' % version,
             'local   all         postgres                          ident',
             use_sudo=True)
-    sed('/etc/postgresql/%s/main/pg_hba.conf' % version,
+    files.sed('/etc/postgresql/%s/main/pg_hba.conf' % version,
         'local   all         all                               ident',
         'local   all         all                               md5',
         use_sudo=True)
 
     # postgres.conf
-    uncomment(
+    files.uncomment(
         conf_dir_prefix + 'main/postgresql.conf',
         '#autovacuum = on',
         use_sudo=True
     )
-    uncomment(
+    files.uncomment(
         conf_dir_prefix + 'main/postgresql.conf',
         '#track_activities = on',
         use_sudo=True
     )
-    uncomment(
+    files.uncomment(
         conf_dir_prefix + 'main/postgresql.conf',
         '#track_counts = on',
         use_sudo=True
     )
-    sed(conf_dir_prefix + 'main/postgresql.conf',
+    files.sed(conf_dir_prefix + 'main/postgresql.conf',
         "#listen_addresses",
         "listen_addresses",
         use_sudo=True)
@@ -221,7 +229,7 @@ def initialize_postgres():
     """
 
     version = sudo("psql --version | grep -ro '[8-9].[0-9]'")
-    conf_dir_prefix = "/etc/postgresql/%s/" % version
+    # conf_dir_prefix = "/etc/postgresql/%s/" % version
 
     # temporarily allow root access from localhost
     sudo('mv /etc/postgresql/%s/main/pg_hba.conf /etc/postgresql/%s/main/pg_hba.conf.bak' % (version, version))
@@ -230,7 +238,8 @@ def initialize_postgres():
     sudo('service postgresql-%s restart || /etc/init.d/postgresql restart ' % (version))
 
     # set password
-    password = prompt('Enter a new database password for user `postgres`:')
+    # password = prompt('Enter a new database password for user `postgres`:')
+    password = env.postgresql_pass
     sudo('psql template1 -c "ALTER USER postgres with encrypted password \'%s\';"' % password, user='postgres')
 
     # configure daily dumps of all databases
@@ -241,7 +250,7 @@ def initialize_postgres():
     sudo("echo '0 7 * * * pg_dumpall --username postgres --file /var/backups/postgresql/postgresql_$(date +%%Y-%%m-%%d).dump' > /etc/cron.d/pg_dump")
 
     # remove temporary root access
-    comment(
+    files.comment(
         '/etc/postgresql/%s/main/pg_hba.conf' % version,
         'local all postgres ident', use_sudo=True)
     sudo('service postgresql%s restart \
@@ -249,7 +258,11 @@ def initialize_postgres():
 
 
 def private_install_postgresql():
-    env.hosts = private_hosts
+    """
+    Installing postgresql on private server
+    """
+    env.user = env.deploy_user
+    env.hosts = env.private_hosts
     install_postgres()
 
 
@@ -259,23 +272,19 @@ def install_python():
     """
     # Python 2.6 is already installed by default, we just add compile headers
     sudo('apt-get -yq install python python-setuptools')
-
-    # install Distribute
-    sudo('curl -O http://python-distribute.org/distribute_setup.py')
-    sudo('python2.7 distribute_setup.py')
-    sudo('rm -f distribute*')
-
-    # install virtualenv
-    sudo('easy_install-2.7 virtualenv')
+    sudo('easy_install pip')
+    sudo('pip install virtualenv')
 
 
 def private_install_python():
-    env.hosts = private_hosts
+    env.user = env.deploy_user
+    env.hosts = env.private_hosts
     install_python()
 
 
 def install_system_libs():
-    sudo('apt-get update')
+    sudo('apt-get upgrade')
+    sudo('apt-get -y update')
     sudo('apt-get -yq install curl \
         python-software-properties \
         tar \
@@ -283,7 +292,9 @@ def install_system_libs():
 
 
 def private_install_system_libs():
-    env.hosts = private_hosts
+    env.user = env.deploy_user
+    env.hosts = env.private_hosts
+    install_system_libs()
 
 
 def private_setup():
@@ -295,25 +306,35 @@ def private_setup():
     private_setup_deploy_user()
     # Disable root ssh login
     # private_disable_root_login()
-    private_install_python()
+    private_install_system_libs()
     private_install_postgresql()
+    private_install_python()
 
 
 def archive_git_and_put(opts):
     """
     Git archive matters
+
+    Also, does some houseworking on linking the current release
     """
+    if not files.exists(opts['deploy_path']):
+        run('mkdir -p %(deploy_path)s/{releases,shared,packages}' % opts)
     local('cd %(what_to_send_path)s && \
         git archive --format=tar master | gzip > %(release)s.tar.gz' % opts)
-    opts['deploy_path'] = '%(deploy_path)s/releases/%(release)s' % opts
-    run('mkdir -p %(deploy_path)s' % opts)
-    put('%(release)s.tar.gz' % opts, '/tmp', mode=0755)
+    opts['full_deploy_path'] = '%(deploy_path)s/releases/%(release)s' % opts
+    run('mkdir -p %(full_deploy_path)s' % opts)
+    put('%(what_to_send_path)s/%(release)s.tar.gz' % opts, '/tmp', mode=0755)
     run('mv /tmp/%(release)s.tar.gz %(deploy_path)s/packages/' % opts)
-    run('cd %(deploy_path)s/releases/%(release)s/ \
+    run('cd %(full_deploy_path)s/ \
         && tar zxf ../../packages/%(release)s.tar.gz' % opts)
     local('rm %(what_to_send_path)s/%(release)s.tar.gz' % opts)
     # Updating or creating the current release
-
+    opts['symlink_path'] = '%(deploy_path)s/releases/current' % opts
+    dir_ensure(opts['symlink_path'])
+    if not files.exists(opts['symlink_path']):
+        run('ln -s %(full_deploy_path)s/* %(symlink_path)s/' % opts)
+    else:
+        run('ln -nsf %(full_deploy_path)s/* %(symlink_path)s/' % opts)
 
 
 def install_requirements(opts):
@@ -331,26 +352,50 @@ def restart_deamon(opts):
             sleep 2' % opts)
 
 
+def model_configuration(opts):
+    """
+    Configuiration steps for the model deployment / update
+    """
+    # Update settings
+    run('mv %(deploy_path)s/releases/current/settings.py \
+        %(deploy_path)s/releases/current/settings_development.py')
+    run('mv %(deploy_path)s/releases/current/setting_production.py \
+        %(deploy_path)s/releases/current/settings.py')
+    # Create the database
+    if opts['createdb']:
+        # Clean
+        sudo('-u postgres dropdb tp2-morbid')
+        # Create
+        sudo('-u postgres createdb tp2-morbid')
+        # Populate
+        sudo('-u postgres pg_restore %(deploy_path)/releases/current/database.sql' % opts)
+
+
 def model_update():
     opts = dict(
         what_to_send_path=env.model_path,
         release=env.release_model,
-        deploy_path=env.deploy_model_path
+        deploy_path=env.deploy_model_path,
+        createdb=False
     )
     env.hosts = env.private_hosts
     archive_git_and_put(opts)
+    model_configuration(opts)
     restart_deamon(opts)
 
 
 def model_deploy():
+    env.user = env.deploy_user
     env.hosts = env.private_hosts
     opts = dict(
         what_to_send_path=env.model_path,
         release=env.release_model,
-        deploy_path=env.deploy_model_path
+        deploy_path=env.deploy_model_path,
+        createdb=True
     )
     archive_git_and_put(opts)
     install_requirements(opts)
+    model_configuration(opts)
     restart_deamon(opts)
 
 
@@ -386,3 +431,12 @@ def django_sink_update():
     )
     archive_git_and_put(opts)
     restart_deamon(opts)
+
+
+def clean():
+    """
+    Cleaning
+    """
+    local('rm %s*.pyc' % env.model_path)
+    local('rm %s*.pyc' % env.crawler_path)
+    local('rm %s*.pyc' % env.crawler_daily_path)

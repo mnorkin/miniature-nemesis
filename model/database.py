@@ -6,16 +6,22 @@ import psycopg2
 import re
 import time
 from logger import logger
+import settings
 
 
 class database:
 
     def __init__(self):
-        # TODO: tests
         self.cursor = self.connect_to_postgres()
         self.db = self.connect_to_postgres_db()
         self.logger = logger('database')
         self.logger.debug('Starting')
+        self.db_config = dict(
+            db_name=settings.database['db_name'],
+            db_username=settings.database['username'],
+            db_password=settings.database['password'],
+            db_host=settings.database['host']
+        )
 
     # def connect_to_mysql_db(self):
     #     """
@@ -50,7 +56,10 @@ class database:
         Connecting to postgresql
         Returning database object
         """
-        c_l = "dbname=tp-morbid user=postgres password=sWAgu4e7 host=localhost"
+        c_l = "dbname=%(db_name)s \
+        user=%(db_username)s \
+        password=%(db_password)s \
+        host=%(db_host)s" % self.db_config
         db = psycopg2.connect(c_l)
         return db
 
@@ -59,7 +68,10 @@ class database:
         Connecting to postgres
         Returning database cursor
         """
-        c_l = "dbname=tp-morbid user=postgres password=sWAgu4e7 host=localhost"
+        c_l = "dbname=%(db_name)s \
+        user=%(db_username)s \
+        password=%(db_password)s \
+        host=%(db_host)s" % self.db_config
         db = psycopg2.connect(c_l)
         return db.cursor()
 
