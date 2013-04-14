@@ -656,7 +656,11 @@ class Features:
                 ))
                 # results.append(float(0))
 
-        result = float(sum(results)/len(results))
+        try:
+            result = float(sum(results)/len(results))
+        except ZeroDivisionError:
+            result = 0
+        
 
         self.logger.debug("\n\nReach time measure\n")
         self.logger.debug("Results: %s" % results)
