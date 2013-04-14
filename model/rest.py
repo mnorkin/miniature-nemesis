@@ -5,6 +5,7 @@ import httplib
 import json
 import utils
 from logger import logger
+from settings import rest_url
 
 list_of_requests = ['GET', 'POST', 'PUT', 'DELETE']
 
@@ -19,7 +20,7 @@ def send(request, url, data):
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("185.5.55.178")
-        conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection(rest_url)
         logger.debug("Request: %s" % request)
         logger.debug("Params: %s" % params)
         logger.debug("Headers: %s " % headers)

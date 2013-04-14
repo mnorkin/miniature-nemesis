@@ -1,7 +1,9 @@
 # Database configuration
-database = {
+db_config = {
     'db_name': 'tp-morbid',
-    'username': 'postgres',
-    'password': 'sWAgu4e7',
-    'host': 'localhost'
+    'db_username': 'postgres',
+    'db_password': 'sWAgu4e7',
+    'db_host': 'localhost'
 }
+
+rest_url = 'localhost:8000'
