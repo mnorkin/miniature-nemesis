@@ -1,7 +1,7 @@
 """
 The Feature
 """
-from plot import Plot
+# from plot import Plot
 import datetime
 import utils
 import inspect

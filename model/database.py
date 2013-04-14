@@ -1,7 +1,7 @@
 """
 The Database
 """
-import MySQLdb
+# import MySQLdb
 import psycopg2
 import re
 import time
@@ -17,33 +17,33 @@ class database:
         self.logger = logger('database')
         self.logger.debug('Starting')
 
-    def connect_to_mysql_db(self):
-        """
-        Connecting to mysql and return database
-        """
+    # def connect_to_mysql_db(self):
+    #     """
+    #     Connecting to mysql and return database
+    #     """
 
-        db = MySQLdb.connect(
-            host="localhost",
-            user="root",
-            passwd="classic",
-            db="morbid"
-        )
+    #     db = MySQLdb.connect(
+    #         host="localhost",
+    #         user="root",
+    #         passwd="classic",
+    #         db="morbid"
+    #     )
 
-        return db
+    #     return db
 
-    def connect_to_mysql(self):
-        """
-        Connecting to the database
-        """
+    # def connect_to_mysql(self):
+    #     """
+    #     Connecting to the database
+    #     """
 
-        db = MySQLdb.connect(
-            host="localhost",
-            user="root",
-            passwd="classic",
-            db="morbid"
-        )
+    #     db = MySQLdb.connect(
+    #         host="localhost",
+    #         user="root",
+    #         passwd="classic",
+    #         db="morbid"
+    #     )
 
-        return db.cursor()
+    #     return db.cursor()
 
     def connect_to_postgres_db(self):
         """
