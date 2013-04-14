@@ -144,7 +144,7 @@ class Daemon:
 class guniron_daemon(Daemon):
     def run(self):
         # Development version binds on 9000 port
-        os.system('cd /var/www/dev2_targetprice/releases/current; \
+        os.system('cd /var/www/dev2_targetprice/releases/current/; \
             gunicorn --bind=127.0.0.1:9080 prototype.wsgi')
 
 if __name__ == '__main__':

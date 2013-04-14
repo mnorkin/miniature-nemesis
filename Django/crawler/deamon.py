@@ -143,12 +143,11 @@ class Daemon:
 class guniron_daemon(Daemon):
     def run(self):
         # Crawler binds on 9050 port
-        os.system('cd /var/www/cra_targetprice/releases/current/crawler; gunicorn  --bind=127.0.0.1:9050 crawler.wsgi')
+        os.system('cd /var/www/cra_targetprice/releases/current/crawler; \
+            gunicorn  --bind=127.0.0.1:9050 crawler.wsgi')
 
 if __name__ == '__main__':
     """
-    TODO:
-    * A better logging solution, by date for example
     """
     log_date = datetime.datetime.now().strftime('%Y-%m-%d')
     log_path = "/var/log/cra_gunicorn_everything_" + log_date + ".log"

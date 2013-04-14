@@ -68,20 +68,6 @@ def private():
     env.hosts = env.private_hosts
 
 
-def set_root_user():
-    """
-    Setting up as root user
-    """
-    env.user = 'root'
-
-
-def set_deploy_user():
-    """
-    Setting up as deploy user
-    """
-    env.user = env.deploy_user
-
-
 def setup_deploy_user():
     """
     Create an account for an deploy user to access the server
@@ -119,24 +105,6 @@ def setup_deploy_user():
     sudo('echo "%(deploy_user)s:%(deploy_password)s" | chpasswd' % opts)
 
 
-def private_setup_deploy_user():
-    """
-    Settup up private hosts deploy user
-    """
-    env.hosts = env.private_hosts
-    set_root_user()
-    setup_deploy_user()
-
-
-def public_setup_deploy_user():
-    """
-    Setting up public hosts deploy user
-    """
-    set_root_user()
-    env.hosts = env.public_hosts
-    setup_deploy_user()
-
-
 def disable_root_login():
     """
     Securing
@@ -154,24 +122,6 @@ def disable_root_login():
     sudo('passwd --lock root')
 
 
-def private_disable_root_login():
-    """
-    Private hosts disable root
-    """
-    set_root_user()
-    env.hosts = env.private_hosts
-    disable_root_login()
-
-
-def public_disable_root_login():
-    """
-    Public hosts disable root
-    """
-    set_root_user()
-    env.hosts = env.private_hosts
-    disable_root_login()
-
-
 def install_nginx():
     """
     Installing nginx server
@@ -179,11 +129,6 @@ def install_nginx():
     sudo('add-apt-repository ppa:nginx/stable')
     sudo('apt-get update')
     sudo('apt-get -yq install nginx')
-
-
-def public_install_nginx():
-    env.hosts = env.public_hosts
-    install_nginx()
 
 
 def install_postgres():
@@ -273,15 +218,6 @@ def initialize_postgres():
         || /etc/init.d/postgresql restart' % version)
 
 
-def private_install_postgresql():
-    """
-    Installing postgresql on private server
-    """
-    env.user = env.deploy_user
-    env.hosts = env.private_hosts
-    install_postgres()
-
-
 def install_python():
     """
     Setting up all the python 2.7
@@ -292,39 +228,30 @@ def install_python():
     sudo('pip install virtualenv')
 
 
-def private_install_python():
-    env.user = env.deploy_user
-    env.hosts = env.private_hosts
-    install_python()
-
-
 def install_system_libs():
     sudo('apt-get upgrade')
     sudo('apt-get -y update')
     sudo('apt-get -yq install curl \
         python-software-properties \
         tar \
-        build-essential')
+        build-essential \
+        libpq-dev \
+        python-dev')
+    # A little anoying things
+    sudo('chmod 777 /var/logs')
 
 
-def private_install_system_libs():
-    env.user = env.deploy_user
-    env.hosts = env.private_hosts
-    install_system_libs()
-
-
-def private_setup():
+def full_setup():
     """
     Full setup for the private server
     """
-    # set_root_user()
     # Firstly, create a user
-    private_setup_deploy_user()
+    deploy_user()
     # Disable root ssh login
-    # private_disable_root_login()
-    private_install_system_libs()
-    private_install_postgresql()
-    private_install_python()
+    disable_root_login()
+    install_system_libs()
+    install_postgresql()
+    install_python()
 
 
 def archive_git_and_put(opts):
@@ -336,14 +263,14 @@ def archive_git_and_put(opts):
     if not files.exists(opts['deploy_path']):
         run('mkdir -p %(deploy_path)s/{releases,shared,packages}' % opts)
     local('cd %(what_to_send_path)s && \
-        git archive --format=tar master | gzip > %(release)s.tar.gz' % opts)
+        git archive --format=tar slave | gzip > %(release)s.tar.gz' % opts)
     opts['full_deploy_path'] = '%(deploy_path)s/releases/%(release)s' % opts
     run('mkdir -p %(full_deploy_path)s' % opts)
     put('%(what_to_send_path)s/%(release)s.tar.gz' % opts, '/tmp', mode=0755)
     run('mv /tmp/%(release)s.tar.gz %(deploy_path)s/packages/' % opts)
     run('cd %(full_deploy_path)s/ \
         && tar zxf ../../packages/%(release)s.tar.gz' % opts)
-    local('rm %(what_to_send_path)s/%(release)s.tar.gz' % opts)
+    local('rm %(what_to_send_path)s%(release)s.tar.gz' % opts)
     # Updating or creating the current release
     opts['symlink_path'] = '%(deploy_path)s/releases/current' % opts
     dir_ensure(opts['symlink_path'])
@@ -375,17 +302,21 @@ def model_configuration(opts):
     """
     # Update settings
     run('mv %(deploy_path)s/releases/current/settings.py \
-        %(deploy_path)s/releases/current/settings_development.py')
-    run('mv %(deploy_path)s/releases/current/setting_production.py \
-        %(deploy_path)s/releases/current/settings.py')
+        %(deploy_path)s/releases/current/settings_development.py' % opts)
+    run('mv %(deploy_path)s/releases/current/settings_production.py \
+        %(deploy_path)s/releases/current/settings.py' % opts)
+    run('mkdir -p %(deploy_path)s/releases/%(release)s/logs' % opts)
     # Create the database
     if opts['createdb']:
-        # Clean
-        sudo('-u postgres dropdb tp2-morbid')
+        with settings(warn_only=True):
+            # Backup
+            sudo('pg_dump tp2-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            # Clean
+            sudo('dropdb tp2-morbid', user='postgres')
         # Create
-        sudo('-u postgres createdb tp2-morbid')
+        sudo('createdb tp2-morbid', user='postgres')
         # Populate
-        sudo('-u postgres pg_restore %(deploy_path)s/releases/current/database.sql' % opts)
+        sudo('cat %(deploy_path)s/releases/current/database.sql | psql tp2-morbid' % opts, user='postgres')
 
 
 def model_update():
