@@ -18,6 +18,7 @@ class Targetpricenumbers():
         Collecting and sending target price number information
         """
         if analytic and ticker:
+            self.logger.debug('Ticker %s, analytic %s' % (ticker, analytic))
             number_of_tp_data = self.collect(analytic, ticker)
             if number_of_tp_data and self.send(number_of_tp_data):
                 self.logger.debug('Target price numbers sent ok')

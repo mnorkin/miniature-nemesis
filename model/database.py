@@ -283,8 +283,6 @@ class database:
                     ORDER BY pub_date ASC \
                     ) p" % (
                 re.escape(analytic),
-                re.escape(ticker),
-                re.escape(analytic),
                 re.escape(ticker))
 
             self.cursor.execute(query)

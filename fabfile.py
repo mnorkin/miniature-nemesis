@@ -301,10 +301,10 @@ def model_configuration(opts):
     Configuiration steps for the model deployment / update
     """
     # Update settings
-    run('mv %(deploy_path)s/releases/current/settings.py \
-        %(deploy_path)s/releases/current/settings_development.py' % opts)
-    run('mv %(deploy_path)s/releases/current/settings_production.py \
-        %(deploy_path)s/releases/current/settings.py' % opts)
+    run('mv %(deploy_path)s/releases/%(release)s/settings.py \
+        %(deploy_path)s/releases/%(release)s/settings_development.py' % opts)
+    run('mv %(deploy_path)s/releases/%(release)s/settings_production.py \
+        %(deploy_path)s/releases/%(release)s/settings.py' % opts)
     run('mkdir -p %(deploy_path)s/releases/%(release)s/logs' % opts)
     # Create the database
     if opts['createdb']:
