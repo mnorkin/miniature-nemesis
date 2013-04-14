@@ -167,7 +167,7 @@ class database:
         """
         if analytic and ticker:
             results = []
-            query = "SELECT DISTINCT ON (pub_date) pub_date, price0, analytic, ticker \
+            query = "SELECT pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
                 AND pub_date < NOW() - interval '1 year' \
@@ -211,7 +211,7 @@ class database:
         On of the ideas is to use the yeild operator to speed things up
         """
         if analytic and ticker:
-            query = "SELECT DISTINCT ON (pub_date) pub_date, price0, analytic, ticker \
+            query = "SELECT pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
                 AND pub_date < NOW() - interval '1 year' \
@@ -222,20 +222,20 @@ class database:
                 (getting rid of the most recent one, because of model requires
                 old data)"""
         elif not analytic and ticker:
-            query = "SELECT DISTINCT ON (pub_date) pub_date, price0, analytic, ticker \
+            query = "SELECT pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE ticker='%s' AND price0 != 0 \
                 ORDER BY pub_date ASC" % (re.escape(ticker))
             """Query for the target prices, which belongs only to ticker"""
         elif analytic and not ticker:
-            query = "SELECT DISTINCT ON (pub_date) pub_date, price0, analytic, ticker \
+            query = "SELECT pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE analytic=E'%s' AND price0 != 0 \
                 ORDER BY pub_date" % (re.escape(analytic))
             """Query for the target prices, which belongs only to analytic"""
         else:
             # Query to retrieve the most recent target prices of analytic
-            query = "SELECT DISTINCT ON (pub_date) pub_date, price0, analytic, ticker \
+            query = "SELECT pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE pub_date >= NOW() - interval '1 year' AND price0 != 0 \
                 ORDER BY pub_date"
