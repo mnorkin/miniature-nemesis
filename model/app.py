@@ -91,9 +91,6 @@ class App():
             the front-end
             * Calculate all the features and fetch them to the front-end
             * Finally, fetch the target price data to the front-end
-        TODO:
-        * Send the feature analytic ticker data
-        * Modify API to digest multiple data input
         """
 
         analytics = Analytics()

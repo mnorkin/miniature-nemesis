@@ -401,7 +401,7 @@ class Features:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]], 'b')
 
                 start_close_price = self.stock_closes[start_index]
-                end_close_price = self.stock_closes[end_index+1]
+                end_close_price = self.stock_closes[end_index]
                 if target_price > start_close_price:
                     """Long"""
                     measure = (end_close_price - start_close_price)/start_close_price
