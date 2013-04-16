@@ -845,6 +845,7 @@ function set_active_analytic(){
         var name = hash_get('company');
         if(name.length == 0){
             name = graphs.get_best_analytic().slug;
+            console.log('best analytic: '+name);
             hash_set_company(name);
         }
         $('#bank li[name='+name+']').addClass('active').removeClass('passive');

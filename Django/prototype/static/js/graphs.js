@@ -390,7 +390,7 @@ var graphs = (function () {
 
             sun.append('circle')
                 .style('stroke', 'grey')
-                .style('fill', 'transparent')
+                .style('fill', 'none')
                 .attr('stroke-width', 0.5)
                 .attr('cx', w / 2)
                 .attr('cy', h / 2)
@@ -422,7 +422,7 @@ var graphs = (function () {
             sun.selectAll("#" + _element_id)
                 .data(sun_data).enter().append('circle')
                 .style('stroke', '#ece7e3')
-                .style('fill', 'transparent')
+                .style('fill', 'none')
                 .attr('cx', w / 2)
                 .attr('cy', h / 2)
                 .attr('r', function (d, i) {
@@ -915,11 +915,11 @@ var graphs = (function () {
 
             linear.selectAll("#" + _element_id).data(_data).enter()
                 .append("svg:rect")
-                .attr("fill", "#dfc8b6")
+                .attr("fill", "#e7d9cd")
                 .attr('width', function (d, i) {
                 return d * rhw;
             })
-                .attr('height', 0.5)
+                .attr('height', 1)
                 .attr('y', function (d, i) {
                 return -graph_height / (_data.length + 1) * (i + 1);
             })
@@ -1218,7 +1218,7 @@ var graphs = (function () {
                 .attr('class', 'data2')
                 .attr("d", data_arc2)
                 .attr('stroke-width', 1)
-                .attr('fill', 'transparent')
+                .attr('fill', 'none')
                 .attr("stroke", "#bab8a9")
                 .attr('enumerator', function (d, i) {
                 return i;
