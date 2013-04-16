@@ -16,8 +16,8 @@ env.deploy_user = 'agurkas'
 env.deploy_pass = 'Tutatru3'
 
 # Local directory part
-env.model_path = 'model/'
-env.crawler_path = 'crawler/'
+env.model_path = 'model'
+env.crawler_path = 'crawler'
 env.crawler_daily_path = 'crawler_daily'
 env.django_production_path = 'Django/prototype'
 env.django_sink_path = 'Django/crawler'
@@ -270,7 +270,7 @@ def archive_git_and_put(opts):
     run('mv /tmp/%(release)s.tar.gz %(deploy_path)s/packages/' % opts)
     run('cd %(full_deploy_path)s/ \
         && tar zxf ../../packages/%(release)s.tar.gz' % opts)
-    local('rm %(what_to_send_path)s%(release)s.tar.gz' % opts)
+    local('rm %(what_to_send_path)s/%(release)s.tar.gz' % opts)
     # Updating or creating the current release
     opts['symlink_path'] = '%(deploy_path)s/releases/current' % opts
     dir_ensure(opts['symlink_path'])
@@ -294,6 +294,27 @@ def restart_deamon(opts):
             sleep 2' % opts)
         virtualenv('%(deploy_path)s/releases/current/deamon.py start; \
             sleep 2' % opts)
+
+
+def crawler_daily_deploy():
+    opts = dict(
+        what_to_send_path=env.crawler_daily_path,
+        release=env.release_crawler_daily,
+        deploy_path=env.deploy_crawler_daily_path,
+        createdb=False
+    )
+    archive_git_and_put(opts)
+    install_requirements(opts)
+
+
+def crawler_daily_update():
+    opts = dict(
+        what_to_send_path=env.crawler_daily_path,
+        release=env.release_crawler_daily,
+        deploy_path=env.deploy_crawler_daily_path,
+        createdb=False
+    )
+    archive_git_and_put(opts)
 
 
 def model_configuration(opts):
@@ -326,7 +347,6 @@ def model_update():
         deploy_path=env.deploy_model_path,
         createdb=False
     )
-    env.hosts = env.private_hosts
     archive_git_and_put(opts)
     model_configuration(opts)
     restart_deamon(opts)
