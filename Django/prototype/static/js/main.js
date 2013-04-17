@@ -140,7 +140,7 @@ return {
             }
 
             if(resp.analytics.length) {
-                resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'analytics\')" href="">Analytics<span>See all</span></a></li>';
+                resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'analytics\')" href="">Analysts<span>See all</span></a></li>';
                 for(i=0; i < resp.analytics.length ; i++){
                     if(i >= 5) { break; }
                     resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
@@ -196,7 +196,7 @@ function generate_grid_element(id, dataset, posName) {
         dataset = [dataset];
         //dataset = [99];
 
-        var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 143 : 356;
+        var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 135 : 356;
         //var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'};
         var gradiends = {'accuracy': '#8dc3b2', 'profitability': '#aa8dc3', 'reach_time': '#6189b8'};
 
@@ -291,7 +291,9 @@ function generate_pie(id, value) {
     .data(pie([0,100]))
     .enter().append("path")
     .attr("stroke", function(d, i) { return colors[i]; } )
-    .attr('style', 'stroke-width:10; stroke-linejoin:round;')
+    .attr("fill", function(d, i) { return colors[i]; } )
+    .attr('stroke-width', 10)
+    .attr('stroke-linejoin', 'round')
     .attr("d", function(d, i) { return arc(d,i)})
     .each(function(d) { this._current = d; }); // store the initial values;
 

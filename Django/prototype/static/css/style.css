@@ -677,10 +677,10 @@ li{ list-style: none; }
     font-size: 22px;
     font-weight: bolder;    
     padding-top: 11px;
-    padding: 11px 0px 0px 40px;
+    padding: 11px 0px 0px 35px;
 }
 .corp_info .number.n2{
-    padding: 11px 40px 0px 20px;
+    padding: 11px 30px 0px 35px;
 }
 .corp_info .number span{
     display: block;

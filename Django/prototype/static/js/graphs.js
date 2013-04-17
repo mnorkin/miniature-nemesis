@@ -1289,8 +1289,8 @@ var graphs = (function () {
                 .style("font-size", "12px")
                 .style("font-weight", "bold")
                 .style("fill", "#bd9267")
-                .attr("dy", -graph_height + 10)
-                .attr("dx", 6)
+                .attr("y", -graph_height + 10)
+                .attr("x", 6)
                 .text(title2)
                 .attr("transform", translate);
 
@@ -1308,9 +1308,9 @@ var graphs = (function () {
                 .style("font-size", "12px")
                 .style("font-weight", "bold")
                 .style("fill", "#bd9267")
-                .attr("dy", -30)
+                .attr("y", -30)
                 .text(title1)
-                .attr("dx", function () {
+                .attr("x", function () {
                 return 100 * rhw;
             })
                 .attr("transform", translate);
