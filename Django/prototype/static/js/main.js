@@ -258,48 +258,37 @@ function generate_pie(id, value) {
     if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
 
     var percent = Math.abs(value);
-    percent = Math.min(percent, 100);
-    var dataset = [percent,(100-percent)];
-
+        percent = Math.min(percent, 100);
     var width = 81,
-    height = 81,
-    radius = Math.min(width, height) / 2,
-    angle = 360 * percent / 100;
-
-    var fill_color = "#b9d240";
-
-    if (value < 0) {
-        fill_color = "#e72727";
-    }
-
-    var colors = [fill_color, 'transparent'];
-
-    var pie = d3.layout.pie().sort(null);
+        height = 81,
+        radius = Math.min(width, height) / 2,
+        angle = 360 * percent / 100;
+    var fill_color = (value > 0) ? "#b9d240" : "#e72727";
 
     var arc = d3.svg.arc()
-    .innerRadius(35)
-    .outerRadius(35);
+        .innerRadius(35)
+        .outerRadius(35)
+        .startAngle(0)
+        .endAngle(function(d) {return d * (Math.PI/180); });
 
     var svg = d3.select("#" + id + ' .circle').append("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    // draw circle with 0,100 values
-    var path = svg.selectAll("path")
-    .data(pie([0,100]))
-    .enter().append("path")
-    .attr("stroke", function(d, i) { return colors[i]; } )
-    .attr("fill", function(d, i) { return colors[i]; } )
-    .attr('stroke-width', 10)
-    .attr('stroke-linejoin', 'round')
-    .attr("d", function(d, i) { return arc(d,i)})
-    .each(function(d) { this._current = d; }); // store the initial values;
+    // draw arc with 0 value
+    var path = svg.append('path')
+        .data([0])
+        .attr("stroke", fill_color)
+        .attr("fill", fill_color)
+        .attr('stroke-width', 10)
+        .attr('stroke-linejoin', 'round')
+        .attr("d", arc)
+        .each(function(d) { this._current = d; }); // store the initial values;
 
-    // animate circle with real values
-    path = path.data(pie(dataset))
-    .transition().duration(1500).attrTween("d", function(a) {
+    // animate arc with real values
+    path = path.data([angle]).transition().duration(1500).attrTween("d", function(a) {
          var i = d3.interpolate(this._current, a),
              k = d3.interpolate(arc.outerRadius()(), 35);
          this._current = i(0);
@@ -314,7 +303,18 @@ function generate_pie(id, value) {
         return [x,y];
     }
 
-    // small circle point
+    // circle at start and in the end, for safari and mac's stroke-linejoint bug (roundness).
+    d3.select("#" + id + ' .circle svg').append('g').selectAll('circle')
+        .data([0, angle -1.2]).enter()
+        .append('circle')
+        .attr('fill', fill_color)
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+        .attr('cx', function(d,i){ return get_circle_points(35, d)[0]; } )
+        .attr('cy', function(d,i){ return get_circle_points(35, d)[1]; } )
+        .transition().delay(function(d,i){ return i * 1000; })
+        .attr('r', 4.6); 
+
+    // small dark circle point
     if(percent > 1){
         d3.select("#" + id + ' .circle svg')
             .append('circle')
