@@ -59,6 +59,18 @@ class TargetPrice(models.Model):
         return self.ticker.name
 
 
+class Stock(models.Model):
+    """
+    The stock guy
+    """
+    ticker = models.ForeignKey(Ticker)
+    date = models.DateField()
+    price_open = models.FloatField()
+    price_high = models.FloatField()
+    price_low = models.FloatField()
+    price_close = models.FloatField()
+
+
 class TickerChange(models.Model):
     """
     Ticker change model

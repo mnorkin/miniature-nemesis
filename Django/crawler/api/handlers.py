@@ -1,8 +1,54 @@
-from sink.models import Ticker, TargetPrice, TickerChange, Market, Analytic
+from sink.models import Ticker
+from sink.models import TargetPrice
+from sink.models import TickerChange
+from sink.models import Market
+from sink.models import Analytic
+from sink.models import Stock
 from piston.handler import BaseHandler
 from piston.utils import require_mime
-from piston.utils import rc, validate
-from django.http import HttpResponse, Http404
+from piston.utils import rc
+from django.http import Http404
+
+
+class StockHandler(BaseHandler):
+
+    model = Stock
+
+    def read(self, request):
+        """
+        Returning the stock list, which is required
+        """
+        return Ticker.objects.all()
+
+    @require_mime('json')
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+
+            ticker = Ticker
+            try:
+                ticker = Ticker.objects.get(ticker=data['ticker'])
+            except ticker.DoesNotExist:
+                return rc.NOT_FOUND
+            em = self.model(
+                ticker=ticker,
+                date=data['date'],
+                price_open=data['price_open'],
+                price_close=data['price_close'],
+                price_high=data['price_high'],
+                price_low=data['price_low']
+            )
+            em.save()
+
+            return rc.CREATED
+        else:
+            super(Stock, self).create(request)
+
+    def update(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def delete(self, request):
+        return rc.NOT_IMPLEMENTED
 
 
 class TickerHandler(BaseHandler):
