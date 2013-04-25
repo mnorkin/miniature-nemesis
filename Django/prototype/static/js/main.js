@@ -304,15 +304,17 @@ function generate_pie(id, value) {
     }
 
     // circle at start and in the end, for safari and mac's stroke-linejoint bug (roundness).
-    d3.select("#" + id + ' .circle svg').append('g').selectAll('circle')
-        .data([0, angle -1.2]).enter()
-        .append('circle')
-        .attr('fill', fill_color)
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
-        .attr('cx', function(d,i){ return get_circle_points(35, d)[0]; } )
-        .attr('cy', function(d,i){ return get_circle_points(35, d)[1]; } )
-        .transition().delay(function(d,i){ return i * 1000; })
-        .attr('r', 4.6); 
+    if(percent > 1){
+        d3.select("#" + id + ' .circle svg').append('g').selectAll('circle')
+            .data([0, angle -1.2]).enter()
+            .append('circle')
+            .attr('fill', fill_color)
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+            .attr('cx', function(d,i){ return get_circle_points(35, d)[0]; } )
+            .attr('cy', function(d,i){ return get_circle_points(35, d)[1]; } )
+            .transition().delay(function(d,i){ return i * 1000; })
+            .attr('r', 4.6); 
+    }
 
     // small dark circle point
     if(percent > 1){

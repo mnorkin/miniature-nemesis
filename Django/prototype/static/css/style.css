@@ -88,6 +88,10 @@ li{ list-style: none; }
     font-size: 15px;
     float: left;
 }
+#header .title .search .sub-s:hover{
+    background-color: #ea7231;
+    border: 1px solid #ea7231;
+}
 
 .search_res {
     position:absolute;
@@ -614,6 +618,12 @@ li{ list-style: none; }
     cursor: pointer;
     color:transparent;
 }
+#header .inner .search .sub-s:hover{
+    border: 1px solid #ea7231;
+    background-color: #ea7231;
+}
+
+
 
 
 .corp_info{
@@ -952,6 +962,9 @@ li{ list-style: none; }
     right:0;
     font-weight: bold;
     cursor: pointer;
+}
+.in_graph button:hover{
+    background-color: #ea7231;
 }
 .in_graph .sear{
     display: none;
