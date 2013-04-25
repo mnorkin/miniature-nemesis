@@ -142,14 +142,17 @@ class stock_quote():
                 f = u.urlopen(url, proxies={})
                 rows = f.readlines()
                 for row in rows:
-                    row = self.strip_tags(row)
-                    position = row.find('Beta:')
-                    if position != -1:
-                        r = PATTERN.split(row[position:])[1::2]
-                        try:
-                            beta = float(r[1])
-                            """Write beta to database"""
-                            self.database.write_beta(ticker, beta)
-                        except ValueError:
-                            beta = None
+                    try:
+                        row = self.strip_tags(row)
+                        position = row.find('Beta:')
+                        if position != -1:
+                            r = PATTERN.split(row[position:])[1::2]
+                            try:
+                                beta = float(r[1])
+                                """Write beta to database"""
+                                self.database.write_beta(ticker, beta)
+                            except ValueError:
+                                beta = None
+                    except UnicodeDecodeError:
+                        beta = None
         return beta
