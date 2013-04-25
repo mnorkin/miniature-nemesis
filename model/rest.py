@@ -24,6 +24,7 @@ def send(request, url, data):
         logger.debug("Request: %s" % request)
         logger.debug("Params: %s" % params)
         logger.debug("Headers: %s " % headers)
+        logger.debug("Url: %s" % url)
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         logger.debug("Response status: %s" % response.status)

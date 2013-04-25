@@ -7,3 +7,5 @@ db_config = {
 }
 
 rest_url = 'localhost:8000'
+
+data_dir = '/home/maksim/Work/Morbid/data/'

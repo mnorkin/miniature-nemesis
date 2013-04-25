@@ -17,6 +17,7 @@ from featureanalytictickers import FeatureAnalyticTickers
 from database import database
 import rest
 from logger import logger
+import time
 
 
 class App():
@@ -118,7 +119,7 @@ class App():
                 target_price['analytic'],
                 target_price['ticker']
             )
-            if target_data.__len__() > 1:
+            if target_data:
                 self.logger.debug(
                     "Enough data for %s ticker, analytic %s" %
                     (target_price['ticker'], target_price['analytic'])
@@ -157,11 +158,11 @@ analytic ticker update')
                     self.logger.debug("Date %s " % target_price['date'])
                     target_price_date_timestamp = date.fromtimestamp(target_price['date']).timetuple()
 
-                    matches = (x for x in stock_data if x['date'] == target_price_date_timestamp)
+                    matches = (x for x in stock_data if x['date'] == time.mktime(target_price_date_timestamp))
 
                     try:
                         stock_entry = matches.next()
-                        target_price['change'] = (target_price['price'] - stock_entry['close'])/stock_entry['close']
+                        target_price['change'] = float((target_price['price'] - stock_entry['close'])/stock_entry['close'])
                         target_price['change'] = target_price['change'] * 100
                         self.logger.debug('Stock entry close price %s' % stock_entry['close'])
                         self.logger.debug('Target price %s' % target_price['price'])

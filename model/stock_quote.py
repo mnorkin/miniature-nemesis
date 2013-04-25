@@ -9,6 +9,8 @@ import re
 from database import database
 from logger import logger
 from HTMLParser import HTMLParser
+import settings
+import json
 
 
 class MLStripper(HTMLParser):
@@ -31,6 +33,7 @@ class stock_quote():
     def __init__(self):
         self.database = database()
         self.logger = logger('Stock_Quete')
+        self.data_dir = settings.data_dir
 
     def strip_tags(self, html):
         """
@@ -41,6 +44,25 @@ class stock_quote():
         return s.get_data()
 
     def get_data(self, ticker=None):
+        data = []
+        try:
+            with open('%s%s.json' % (self.data_dir, ticker)):
+                f = open('%s%s.json' % (self.data_dir, ticker), 'r')
+                entries = json.loads(f.read())
+                for entry in entries:
+                    item = {
+                        'date': time.mktime(datetime.datetime.strptime(entry['date'], "%Y-%m-%d").timetuple()),
+                        'open': entry['price_open'],
+                        'close': entry['price_close'],
+                        'high': entry['price_high'],
+                        'low': entry['price_low']
+                    }
+                    data.append(item)
+                return data
+        except IOError:
+            return False
+
+    def get_data_inet(self, ticker=None):
         """
         Getting stock data
         """
@@ -114,6 +136,7 @@ class stock_quote():
             if beta:
                 return beta
             else:
+                time.sleep(2)  # Sleep for peace of sake
                 PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
                 url = 'http://finance.yahoo.com/q?s=%s' % (ticker)
                 f = u.urlopen(url, proxies={})
