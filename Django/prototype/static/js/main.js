@@ -259,8 +259,8 @@ function generate_pie(id, value) {
 
     var percent = Math.abs(value);
         percent = Math.min(percent, 100);
-    var width = 81,
-        height = 81,
+    var width = 82,
+        height = 82,
         radius = Math.min(width, height) / 2,
         angle = 360 * percent / 100;
     var fill_color = (value > 0) ? "#b9d240" : "#e72727";
@@ -282,7 +282,7 @@ function generate_pie(id, value) {
         .data([0])
         .attr("stroke", fill_color)
         .attr("fill", fill_color)
-        .attr('stroke-width', 10)
+        .attr('stroke-width', 11)
         .attr('stroke-linejoin', 'round')
         .attr("d", arc)
         .each(function(d) { this._current = d; }); // store the initial values;
@@ -313,7 +313,7 @@ function generate_pie(id, value) {
             .attr('cx', function(d,i){ return get_circle_points(35, d)[0]; } )
             .attr('cy', function(d,i){ return get_circle_points(35, d)[1]; } )
             .transition().delay(function(d,i){ return i * 1000; })
-            .attr('r', 4.6); 
+            .attr('r', 5.1); 
     }
 
     // small dark circle point
