@@ -7,7 +7,6 @@ import re
 import time
 from logger import logger
 from settings import db_config
-import rest
 
 
 class database:
@@ -262,23 +261,7 @@ class database:
                 'ticker': row[3].strip(),
                 'change': round(change, 2)
             }
-            calculations_done = rest.send(
-                'POST',
-                '/api/target_price_analytic_ticker/',
-                {
-                    'ticker': item['ticker'],
-                    'analytic': item['analytic'],
-                    'date': item['date_human']
-                }
-            )
-            self.logger.debug('Ticker %s, analytic %s, date %s' % (
-                item['ticker'], item['analytic'], item['date_human']
-            ))
-            if not calculations_done:
-                self.logger.debug('Calculations not done, going')
-                yield item
-            else:
-                self.logger.debug('Calculations done, skipping')
+            yield item
 
     def get_number_of_target_prices(self, analytic=None, ticker=None):
         """

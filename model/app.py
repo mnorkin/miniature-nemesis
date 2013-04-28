@@ -112,6 +112,8 @@ class App():
             ticker_slug = utils.slugify(target_price['ticker'])
             analytic_slug = utils.slugify(target_price['analytic'])
 
+            # Check with server if current calculations are required
+
             analytics.collect_and_send(target_price['analytic'])
             tickers.collect_and_send(target_price['ticker'])
 

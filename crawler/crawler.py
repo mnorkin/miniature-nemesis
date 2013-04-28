@@ -21,10 +21,9 @@ import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
 from mailman import mailman
-import threading
 
 
-class crawler(threading.Thread):
+class crawler():
     """
     Crawler class
     """
@@ -33,7 +32,6 @@ class crawler(threading.Thread):
         """
         Initialization of the crawler buddy
         """
-        threading.Thread.__init__(self)
         self.url = 'http://stocktargetprices.com/'
         self.current_url = self.url
         self.html = None
@@ -141,8 +139,8 @@ class crawler(threading.Thread):
             self.current_url = self.url + page
         except urllib2.URLError:
             logging.debug('Urllib2.URLError : ' + self.url + page)
-            time.sleep(1000*cycle)  # Sleeping time
-            if cycle < 10:
+            time.sleep(100*cycle)  # Sleeping time
+            if cycle < 5:
                 self.go(page, cycle + 1)
             else:
                 mailman.write('Cannot connect to the page')
@@ -479,9 +477,11 @@ cra.baklazanas.lt, sleeping')
             return True
 
 if __name__ == '__main__':
-    cra1 = crawler('arvydas.tamulis@gmail.com', 'liko789')  # Define the crawler
+    # Define the crawler
+    # cra1 = crawler('arvydas.tamulis@gmail.com', 'liko789')
     # cra1.setDaemon(True)
-    cra1.start()  # Launch the main guy into the wild
-    cra2 = crawler('trialseoproject@gmail.com', 'saras86')
+    # cra1.run()  # Launch the main guy into the wild
+    # cra2 = crawler('trialseoproject@gmail.com', 'saras86')
     # cra2.setDaemon(True)
-    cra2.start()
+    # cra2.run()
+    pass

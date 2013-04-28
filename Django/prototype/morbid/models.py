@@ -140,6 +140,16 @@ class TargetPriceNumberAnalyticTicker(models.Model):
         return str(self.number)
 
 
+class TargetPriceAnalyticTicker(models.Model):
+    """
+    This is the calculator storage, to validate the calculated features and skip
+    calculations if the data is already available
+    """
+    analytic = models.ForeignKey(Analytic)
+    ticker = models.ForeignKey(Ticker)
+    date = models.DateField()
+
+
 class Volatility(models.Model):
     """
     Volatility measure

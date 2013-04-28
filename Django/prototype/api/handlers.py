@@ -1,5 +1,6 @@
 from morbid.models import ApiKey
 from morbid.models import FeatureAnalyticTicker
+from morbid.models import TargetPriceAnalyticTicker
 from morbid.models import Feature
 from morbid.models import TargetPrice
 from morbid.models import Ticker
@@ -40,6 +41,89 @@ class ApiKeyHandler(BaseHandler):
             api_key.save()
             return api_key
         #     # return HttpResponse(api_key)
+
+
+class TargetPriceAnalyticTickerHandler(BaseHandler):
+    """
+    Keeping record of what features are stored on which target price record from
+    the crawler
+    """
+    model = TargetPriceAnalyticTicker
+
+    def read(self, request):
+        """
+        Returning all the calculated records
+        """
+        if request.content_type:
+            targetpriceanalyticticker = TargetPriceAnalyticTicker
+            analytic = Analytic
+            ticker = Ticker
+            data = request.data
+            try:
+                try:
+                    analytic = Analytic.objects.get(
+                        analytic_name=data['analytic']
+                    )
+                except analytic.DoesNotExist:
+                    return rc.NOT_FOUND
+
+                try:
+                    ticker = Ticker.objects.get(
+                        ticker_name=data['ticker']
+                    )
+                except ticker.DoesNotExist:
+                    return rc.NOT_FOUND
+
+                targetpriceanalyticticker.objects.get(
+                    analytic=analytic,
+                    ticker=ticker,
+                    date=data['date']
+                )
+                return rc.ALL_OK
+            except targetpriceanalyticticker.DoesNotExist:
+                return rc.NOT_FOUND
+        else:
+            return TargetPriceAnalyticTicker.objects.all()
+
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+            analytic = Analytic
+            ticker = Ticker
+            targetpriceanalyticticker = TargetPriceAnalyticTicker
+
+            try:
+                analytic = Analytic.objects.get(
+                    name=data['analytic']
+                )
+            except analytic.DoesNotExist:
+                return rc.NOT_FOUND
+
+            try:
+                ticker = Ticker.objects.get(
+                    name=data['ticker']
+                )
+            except ticker.DoesNotExist:
+                return rc.NOT_FOUND
+
+            try:
+                targetpriceanalyticticker = TargetPriceAnalyticTicker.objects.get(
+                    analytic=analytic,
+                    ticker=ticker,
+                    date=data['date']
+                )
+                return rc.NOT_FOUND
+            except targetpriceanalyticticker.DoesNotExist:
+                return rc.ALL_OK
+
+        else:
+            super(TargetPriceAnalyticTicker, self).create(request)
+
+    def update(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def delete(self, request):
+        return rc.NOT_IMPLEMENTED
 
 
 class TargetPriceNumberAnalyticTickerHandler(BaseHandler):

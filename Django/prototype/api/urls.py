@@ -10,6 +10,7 @@ from api.handlers import UnitHandler
 from api.handlers import TargetPriceNumberAnalyticTickerHandler
 from api.handlers import VolatilityHandler
 from api.handlers import StockPriceHandler
+from api.handlers import TargetPriceAnalyticTickerHandler
 
 # feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler, authentication=ApiKeyAuthentication())
 feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler)
@@ -27,6 +28,7 @@ tpnat_handler = Resource(TargetPriceNumberAnalyticTickerHandler)
 volatility_handler = Resource(VolatilityHandler)
 apikey_handler = Resource(ApiKeyHandler)
 stock_price_handler = Resource(StockPriceHandler)
+target_price_analytic_ticker = Resource(TargetPriceAnalyticTickerHandler)
 
 urlpatterns = patterns(
     '',
@@ -45,5 +47,6 @@ urlpatterns = patterns(
     url(r'^volatilities/$', volatility_handler),
     url(r'^volatilities/(?P<analytic_slug>[\w-]+)/(?P<ticker_slug>[\w-]+)/$', volatility_handler),
     url(r'^target_price_numbers/$', tpnat_handler),
-    url(r'^target_price_numbers/(?P<analytic_slug>[\w-]+)/(?P<ticker_slug>[\w-]+)/$', tpnat_handler)
+    url(r'^target_price_numbers/(?P<analytic_slug>[\w-]+)/(?P<ticker_slug>[\w-]+)/$', tpnat_handler),
+    url(r'^target_price_analytic_ticker/$', target_price_analytic_ticker)
 )

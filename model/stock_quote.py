@@ -136,23 +136,25 @@ class stock_quote():
             if beta:
                 return beta
             else:
-                time.sleep(2)  # Sleep for peace of sake
                 PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
                 url = 'http://finance.yahoo.com/q?s=%s' % (ticker)
-                f = u.urlopen(url, proxies={})
-                rows = f.readlines()
-                for row in rows:
-                    try:
-                        row = self.strip_tags(row)
-                        position = row.find('Beta:')
-                        if position != -1:
-                            r = PATTERN.split(row[position:])[1::2]
-                            try:
-                                beta = float(r[1])
-                                """Write beta to database"""
-                                self.database.write_beta(ticker, beta)
-                            except ValueError:
-                                beta = None
-                    except UnicodeDecodeError:
-                        beta = None
+                try:
+                    f = u.urlopen(url, proxies={})
+                    rows = f.readlines()
+                    for row in rows:
+                        try:
+                            row = self.strip_tags(row)
+                            position = row.find('Beta:')
+                            if position != -1:
+                                r = PATTERN.split(row[position:])[1::2]
+                                try:
+                                    beta = float(r[1])
+                                    """Write beta to database"""
+                                    self.database.write_beta(ticker, beta)
+                                except ValueError:
+                                    beta = None
+                        except UnicodeDecodeError:
+                            beta = None
+                except u.URLError:
+                    beta = None
         return beta

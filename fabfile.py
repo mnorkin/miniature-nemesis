@@ -275,9 +275,9 @@ def archive_git_and_put(opts):
     opts['symlink_path'] = '%(deploy_path)s/releases/current' % opts
     dir_ensure(opts['symlink_path'])
     if not files.exists(opts['symlink_path']):
-        run('ln -s %(full_deploy_path)s/* %(symlink_path)s/' % opts)
+        run('ln -s %(full_deploy_path)s %(symlink_path)s' % opts)
     else:
-        run('ln -nsf %(full_deploy_path)s/* %(symlink_path)s/' % opts)
+        run('ln -nsf %(full_deploy_path)s %(symlink_path)s' % opts)
 
 
 def install_requirements(opts):
