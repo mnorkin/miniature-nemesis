@@ -345,7 +345,7 @@ def model_update():
         what_to_send_path=env.model_path,
         release=env.release_model,
         deploy_path=env.deploy_model_path,
-        createdb=False
+        createdb=True
     )
     archive_git_and_put(opts)
     model_configuration(opts)
