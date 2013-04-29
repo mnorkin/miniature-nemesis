@@ -42,6 +42,5 @@ def send(request, url, data):
             logger.debug("Not expected response status: %s, failing" % response.status)
             return False
     else:
-        if utils.DEBUG:
-            logger.debug("Invalid request: %s" % request)
+        logger.debug("Invalid request: %s" % request)
         return False

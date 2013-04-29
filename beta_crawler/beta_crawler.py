@@ -93,6 +93,7 @@ class beta_crawler():
                         try:
                             beta = float(r[1])
                             """Write beta to database"""
+                            self.logger.debug('Writing the beta value into the database')
                             self.database.write_beta(ticker['ticker'], beta)
                         except ValueError:
                             beta = None

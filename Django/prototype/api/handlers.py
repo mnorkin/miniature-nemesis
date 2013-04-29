@@ -88,39 +88,49 @@ class TargetPriceAnalyticTickerHandler(BaseHandler):
     def create(self, request):
         if request.content_type:
             data = request.data
-            analytic = Analytic
-            ticker = Ticker
+            _analytic = Analytic
+            _ticker = Ticker
             targetpriceanalyticticker = TargetPriceAnalyticTicker
 
             try:
-                analytic = Analytic.objects.get(
+                _analytic = Analytic.objects.get(
                     name=data['analytic']
                 )
-            except analytic.DoesNotExist:
+            except _analytic.DoesNotExist:
                 return rc.NOT_FOUND
 
             try:
-                ticker = Ticker.objects.get(
+                _ticker = Ticker.objects.get(
                     name=data['ticker']
                 )
-            except ticker.DoesNotExist:
+            except _ticker.DoesNotExist:
                 return rc.NOT_FOUND
 
             try:
                 targetpriceanalyticticker = TargetPriceAnalyticTicker.objects.get(
-                    analytic=analytic,
-                    ticker=ticker,
+                    analytic=_analytic,
+                    ticker=_ticker,
                     date=data['date']
                 )
-                return rc.NOT_FOUND
+                return rc.CREATED
             except targetpriceanalyticticker.DoesNotExist:
-                return rc.ALL_OK
+                return rc.NOT_FOUND
 
         else:
             super(TargetPriceAnalyticTicker, self).create(request)
 
     def update(self, request):
-        return rc.NOT_IMPLEMENTED
+        if request.content_type:
+            data = request.data
+            targetpriceanalyticticker = TargetPriceAnalyticTicker(
+                analytic=Analytic.objects.get(name=data['analytic']),
+                ticker=Ticker.objects.get(name=data['ticker']),
+                date=data['date']
+            )
+            targetpriceanalyticticker.save()
+            return rc.ALL_OK
+        else:
+            super(TargetPriceAnalyticTicker, self).create(request)
 
     def delete(self, request):
         return rc.NOT_IMPLEMENTED

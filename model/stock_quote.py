@@ -130,31 +130,35 @@ class stock_quote():
         """
         Getting beta measure of ticker (currently only stock market is SP500 (^GSPC))
         """
-        beta = None
+        # beta = None
         if ticker:
-            beta = self.database.get_beta(ticker)
-            if beta:
-                return beta
-            else:
-                PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
-                url = 'http://finance.yahoo.com/q?s=%s' % (ticker)
-                try:
-                    f = u.urlopen(url, proxies={})
-                    rows = f.readlines()
-                    for row in rows:
-                        try:
-                            row = self.strip_tags(row)
-                            position = row.find('Beta:')
-                            if position != -1:
-                                r = PATTERN.split(row[position:])[1::2]
-                                try:
-                                    beta = float(r[1])
-                                    """Write beta to database"""
-                                    self.database.write_beta(ticker, beta)
-                                except ValueError:
-                                    beta = None
-                        except UnicodeDecodeError:
-                            beta = None
-                except u.URLError:
-                    beta = None
-        return beta
+            return self.database.get_beta(ticker)
+        return None
+        # Don't go anywhere, betas are stored locally
+        # if ticker:
+        #     beta = self.database.get_beta(ticker)
+        #     if beta:
+        #         return beta
+        #     else:
+        #         PATTERN = re.compile(r'''((?:[^;"']|"[^"]*"|'[^']*')+)''')
+        #         url = 'http://finance.yahoo.com/q?s=%s' % (ticker)
+        #         try:
+        #             f = u.urlopen(url, proxies={})
+        #             rows = f.readlines()
+        #             for row in rows:
+        #                 try:
+        #                     row = self.strip_tags(row)
+        #                     position = row.find('Beta:')
+        #                     if position != -1:
+        #                         r = PATTERN.split(row[position:])[1::2]
+        #                         try:
+        #                             beta = float(r[1])
+        #                             """Write beta to database"""
+        #                             self.database.write_beta(ticker, beta)
+        #                         except ValueError:
+        #                             beta = None
+        #                 except UnicodeDecodeError:
+        #                     beta = None
+        #         except u.URLError:
+        #             beta = None
+        # return beta

@@ -372,7 +372,7 @@ class database:
         Function to return the beta value
         """
         if ticker:
-            query = "SELECT value FROM betas WHERE name='%s' LIMIT 1" % (
+            query = "SELECT value FROM betas WHERE name=E'%s' LIMIT 1" % (
                 re.escape(ticker))
             if self.cursor.execute(query) != 0:
                 row = self.cursor.fetchone()
@@ -396,21 +396,25 @@ class database:
 
         if ticker and beta:
             self.logger.debug("Ticker and beta ok")
-            query = "SELECT count(id) FROM betas WHERE name='%s'" % re.escape(ticker)
+            query = "SELECT count(id) FROM betas WHERE name=E'%s'" % re.escape(ticker)
             cur.execute(query)
             if cur.fetchone()[0] == 0:
                 self.logger.debug("Select returned 0 length")
-                query = "INSERT INTO betas (name, value) VALUES ('%s', %d)" % (
+                query = "INSERT INTO betas (name, value) VALUES (E'%s', %f)" % (
                     re.escape(ticker),
                     beta)
                 """Write beta measure"""
-                if cur.execute(query) == 1:
-                    self.db.commit()
+                cur.execute(query)
+                self.db.commit()
+                self.logger.debug('INSERT commited')
+                # if cur.execute(query) == 1:
+                    # self.db.commit()
             else:
-                query = "UPDATE betas SET value='%s' WHERE name='%s'" % (
+                query = "UPDATE betas SET value=%f WHERE name=E'%s'" % (
                     beta,
                     re.escape(ticker))
                 """Update beta measure"""
                 cur.execute(query)
+                self.db.commit()
         else:
             return None

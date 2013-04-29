@@ -114,14 +114,15 @@ class App():
 
             # Check with server if current calculations are required
 
-            analytics.collect_and_send(target_price['analytic'])
-            tickers.collect_and_send(target_price['ticker'])
-
             target_data = self.database.return_targetprices(
                 target_price['analytic'],
                 target_price['ticker']
             )
             if target_data:
+                # Only then the data is available -- upload the analytic and
+                # ticker data to the server
+                analytics.collect_and_send(target_price['analytic'])
+                tickers.collect_and_send(target_price['ticker'])
                 self.logger.debug(
                     "Enough data for %s ticker, analytic %s" %
                     (target_price['ticker'], target_price['analytic'])
@@ -187,6 +188,18 @@ analytic ticker update')
                     }
 
                     targetprices.send(data)
+
+                    # Submitting results to the server
+                    # There are entries in the server about the ticker
+                    # and analytic, so no problems will appear
+                    rest.send(
+                        'PUT',
+                        '/api/target_price_analytic_ticker/',
+                        {
+                            'analytic': target_price['analytic'],
+                            'ticker': target_price['ticker'],
+                            'date': target_price['date_human']
+                        })
 
             else:
                 self.logger.debug(
