@@ -261,8 +261,6 @@ def create_testuser(app, created_models, verbosity, **kwargs):
     """
     Create fast user automatically
     """
-    if not settings.DEBUG:
-        return
     try:
         auth_models.User.objects.get(username='test')
     except auth_models.User.DoesNotExist:
