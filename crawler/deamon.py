@@ -144,8 +144,10 @@ class Daemon:
 class cra_daemon(Daemon):
     def run(self):
         # Crawler binds on 9050 port
-        os.system('cd /home/agurkas/crawler/releases/current/crawler;\
-            python2 crawler.py')
+        os.system('cd /home/agurkas/crawler/releases/current;\
+            python2 crawler.py -ac 1')
+        os.system('cd /home/agurkas/crawler/releases/current;\
+            python2 crawler.py -ac 2')
 
 if __name__ == '__main__':
     """

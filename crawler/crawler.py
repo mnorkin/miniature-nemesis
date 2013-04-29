@@ -21,6 +21,7 @@ import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
 from mailman import mailman
+import argparse
 
 
 class crawler():
@@ -41,6 +42,7 @@ class crawler():
         self.companies_page = 'companies'
         self.alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.letter = None
+        self.ticker = None  # This is v2 addition
         self.page_number = 1
         self.debug = True
         self.companies_list = []
@@ -75,8 +77,8 @@ class crawler():
 
         while (self.check_time()):
             self.companies()  # Go to the companies page and start the job
-            sleep_time = int(random() * 300) + 30
-            logging.debug("sleeping: " + str(sleep_time))
+            sleep_time = int(random() * 200) + 30
+            logging.debug("Sleeping: " + str(sleep_time))
             time.sleep(sleep_time)
             if not self.login_check():
                 if not self.login():
@@ -148,6 +150,47 @@ class crawler():
                 return False
         return True
 
+    def rest_with_response(self, url, request, data=None, cycle=1):
+        """
+        Rest interface for the crawler API
+
+        Then the page does not respond, returning the 502 error, added a
+        listener for that. Waiting ensures, that nothing does drop off, and
+        one can immediately respond to such a system fault, because the email
+        is deployed to the developer.
+        """
+        params = json.dumps(data)
+        headers = {"Content-type": "application/json"}
+        conn = httplib.HTTPConnection("cra.baklazanas.lt")
+        conn.request(request.upper(), url, params, headers)
+        response = conn.getresponse()
+        conn.close()
+        if response.status != 502:
+            # ALL_OK
+            if response.status == 200 and request.upper() == 'GET':
+                return json.dumps(response.read())
+            # CREATED
+            elif response.status == 201 and request.upper() == 'POST':
+                return json.dumps(response.read())
+            # ALL_OK
+            elif response.status == 200 and request.upper() == 'PUT':
+                return json.dumps(response.read())
+            # DELETED
+            elif response.status == 204 and request.upper() == 'DELETE':
+                return json.dumps(response.read())
+            else:
+                return None
+        else:
+            logging.debug('Received 502 error on connecting to\
+cra.baklazanas.lt, sleeping')
+            time.sleep(1000*cycle)  # Sleeping
+            if cycle < 10:
+                return self.rest(url, request, data, cycle + 1)
+            else:
+                mailman.write('Cannot connect to cra.baklazanas.lt, check logs')
+                logging.error('Cannot connect to cra.baklazanas.lt')
+                return False
+
     def rest(self, url, request, data=None, cycle=1):
         """
         Rest interface for the crawler API
@@ -200,8 +243,11 @@ cra.baklazanas.lt, sleeping')
         The random letters distribution is uniform, so there is equal
         probability for each letter to pop-out
         """
-        shuffle(self.alphabet)  # Randomize the list
-        self.letter = str(self.alphabet[1])  # Return the letter
+        response = self.rest_with_response('GET', '/api/tickers/')
+        # shuffle(self.alphabet)  # Randomize the list
+        logging.debug('Received ticker %s' % response['ticker'])
+        self.letter = str(response['ticker'][0])  # Return the letter
+        self.ticker = response['ticker']
         self.page_number = 1  # also reset the page numbering
 
     def companies_next_page_available(self):
@@ -374,11 +420,15 @@ cra.baklazanas.lt, sleeping')
 
         # something_was_sent = False
         for company_index, company in enumerate(self.companies_list):
-            if company['ticker'].isalpha():
-                response = self.rest(
-                    "/api/tickers/" + company['ticker'] + "/", "GET")
+            # if company['ticker'].isalpha():
+                # response = self.rest(
+                    # "/api/tickers/" + company['ticker'] + "/", "GET")
+            # else:
+                # response = None
+            if company['ticker'] is self.ticker:
+                response = True
             else:
-                response = None
+                response = False
 
             if response:
                 """
@@ -477,6 +527,19 @@ cra.baklazanas.lt, sleeping')
             return True
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--account')
+    args = parser.parse_args()
+    if args.account == '1':
+        print "Running 1 login"
+        cra = crawler('arvydas.tamulis@gmail.com', 'liko789')
+        cra.run()
+    elif args.account == '2':
+        print "Running 2 login"
+        cra = crawler('trialseoproject@gmail.com', 'saras86')
+        cra.run()
+    else:
+        print args
     # Define the crawler
     # cra1 = crawler('arvydas.tamulis@gmail.com', 'liko789')
     # cra1.setDaemon(True)
@@ -484,4 +547,4 @@ if __name__ == '__main__':
     # cra2 = crawler('trialseoproject@gmail.com', 'saras86')
     # cra2.setDaemon(True)
     # cra2.run()
-    pass
+    # pass

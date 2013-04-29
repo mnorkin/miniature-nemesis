@@ -8,6 +8,7 @@ from piston.handler import BaseHandler
 from piston.utils import require_mime
 from piston.utils import rc
 from django.http import Http404
+from django.db.models import Q
 
 
 class StockHandler(BaseHandler):
@@ -68,28 +69,33 @@ class TickerHandler(BaseHandler):
 
         ticker = Ticker
         target_price = TargetPrice
-
-        try:
-            ticker = self.model.objects.get(ticker=_ticker)
-            """
-            If ticker exists, check if we have any data
-            """
-
-            target_price = TargetPrice.objects.filter(ticker=ticker)
-
-            if len(target_price) < 10:
+        if _ticker is not None:
+            try:
+                ticker = self.model.objects.get(ticker=_ticker)
                 """
-                We have no data of this ticket, feed me
+                If ticker exists, check if we have any data
                 """
-                return rc.ALL_OK
-            else:
-                """
-                We have some data, don't need anything to send
-                """
-                return rc.CREATED
 
-        except ticker.DoesNotExist:
-            return rc.NOT_FOUND
+                target_price = TargetPrice.objects.filter(ticker=ticker)
+
+                if len(target_price) < 10:
+                    """
+                    We have no data of this ticket, feed me
+                    """
+                    return rc.ALL_OK
+                else:
+                    """
+                    We have some data, don't need anything to send
+                    """
+                    return rc.CREATED
+
+            except ticker.DoesNotExist:
+                return rc.NOT_FOUND
+        else:
+            having_tickers = TargetPrice.objects.values_list('ticker__ticker', flat=True)
+            ticker = Ticker.objects.exclude(ticker__in=having_tickers).order_by('?')[0]
+            return ticker
+        # super(Ticker, self).create(request)
 
         # else:
             # super(Ticker, self).create(request)
