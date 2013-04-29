@@ -397,7 +397,7 @@ def django_production_update():
         what_to_send_path=env.django_production_path,
         release=env.release_django_production,
         deploy_path=env.deploy_django_production_path,
-        createdb=False
+        createdb=True
     )
     archive_git_and_put(opts)
     django_production_configuration(opts)
