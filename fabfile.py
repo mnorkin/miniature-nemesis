@@ -263,7 +263,7 @@ def archive_git_and_put(opts):
     if not files.exists(opts['deploy_path']):
         run('mkdir -p %(deploy_path)s/{releases,shared,packages}' % opts)
     local('cd %(what_to_send_path)s && \
-        git archive --format=tar slave | gzip > %(release)s.tar.gz' % opts)
+        git archive --format=tar master | gzip > %(release)s.tar.gz' % opts)
     opts['full_deploy_path'] = '%(deploy_path)s/releases/%(release)s' % opts
     run('mkdir -p %(full_deploy_path)s' % opts)
     put('%(what_to_send_path)s/%(release)s.tar.gz' % opts, '/tmp', mode=0755)
