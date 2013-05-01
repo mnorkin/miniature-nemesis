@@ -7,7 +7,6 @@ App written specially for the Target Price project.
 """
 from lxml.html import fromstring  # More control
 from lxml.html import submit_form  # Form submit
-from random import shuffle
 from random import random
 from datetime import date
 from datetime import datetime
@@ -51,7 +50,7 @@ class crawler():
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
         self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 1  # Then the crawler starts its job
+        self.start_hour = 0  # Then the crawler starts its job
         self.len_hour = 7  # How long in hours the crawler works
         self.mailman = mailman(
             'AKIAJKFJFUKWVJSBYA5Q',
@@ -67,8 +66,10 @@ class crawler():
 
         Need to implement the threading right here
         """
+        sleep_for = int(random() * 100)
         logging.debug('Randomizing the start for %s ' % self.login_username)
-        time.sleep(int(random() * 100))
+        logging.debug('Delaying %s seconds' % sleep_for)
+        time.sleep(sleep_for)
         logging.debug('And here it goes')
 
         self.shuffle_letter()  # shuffle letter for initial browsing
@@ -161,23 +162,24 @@ class crawler():
         """
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
-        conn = httplib.HTTPConnection("cra.baklazanas.lt")
+        # conn = httplib.HTTPConnection("cra.baklazanas.lt")
+        conn = httplib.HTTPConnection("localhost:8000")
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         conn.close()
         if response.status != 502:
             # ALL_OK
             if response.status == 200 and request.upper() == 'GET':
-                return json.dumps(response.read())
+                return json.loads(response.read())
             # CREATED
             elif response.status == 201 and request.upper() == 'POST':
-                return json.dumps(response.read())
+                return json.loads(response.read())
             # ALL_OK
             elif response.status == 200 and request.upper() == 'PUT':
-                return json.dumps(response.read())
+                return json.loads(response.read())
             # DELETED
             elif response.status == 204 and request.upper() == 'DELETE':
-                return json.dumps(response.read())
+                return json.loads(response.read())
             else:
                 return None
         else:
@@ -243,7 +245,8 @@ cra.baklazanas.lt, sleeping')
         The random letters distribution is uniform, so there is equal
         probability for each letter to pop-out
         """
-        response = self.rest_with_response('GET', '/api/tickers/')
+        response = self.rest_with_response('/api/tickers/', 'GET')
+        # New method with v2
         # shuffle(self.alphabet)  # Randomize the list
         logging.debug('Received ticker %s' % response['ticker'])
         self.letter = str(response['ticker'][0])  # Return the letter
@@ -307,7 +310,11 @@ cra.baklazanas.lt, sleeping')
         """
         Method to visit the company page and get the list of the target prices
         """
-        self.go(self.companies_list[company_index]['link'])
+        if company_index:
+            self.go(self.companies_list[company_index]['link'])
+            ticker = self.companies_list[company_index]['ticker']
+        else:
+            ticker = self.ticker
 
         # table = self.html.xpath('//table[2]/tbody/tr[position()>1]')
         table = self.html.xpath('//table[2]/tr')
@@ -362,7 +369,7 @@ cra.baklazanas.lt, sleeping')
                 'price0': prices[0],
                 'price1': prices[1],
                 'date': date.strftime('%Y-%m-%d'),
-                'ticker': self.companies_list[company_index]['ticker']
+                'ticker': ticker
             }
             """Form a list item"""
 
@@ -380,11 +387,14 @@ cra.baklazanas.lt, sleeping')
             logging.debug("Data\n" + json.dumps(self.target_price_list))
             return False
 
-    def companies_parse_list(self):
+    def companies_parse_list(self, version=1):
         """
         Parse companies list
         """
-        links = self.html.xpath('//div[@id="company-list"]//a')
+        if version == 2:
+            links = self.html.xpath('//div[@class="block"]//a')
+        else:
+            links = self.html.xpath('//div[@id="company-list"]//a')
 
         if len(links) < 1:
             self.mailman.write('Company-list selector link fail, please check the logs')
@@ -396,6 +406,7 @@ cra.baklazanas.lt, sleeping')
         self.companies_list = []
 
         for link in links:
+            logging.debug(link.text)
             item = {
                 'name': " ".join(re.findall('\S+', link.text)[:-1]),
                 'market': re.findall('\w+', re.findall('\S+', link.text)[-1])[0],
@@ -420,11 +431,6 @@ cra.baklazanas.lt, sleeping')
 
         # something_was_sent = False
         for company_index, company in enumerate(self.companies_list):
-            # if company['ticker'].isalpha():
-                # response = self.rest(
-                    # "/api/tickers/" + company['ticker'] + "/", "GET")
-            # else:
-                # response = None
             if company['ticker'] is self.ticker:
                 response = True
             else:
@@ -446,8 +452,9 @@ cra.baklazanas.lt, sleeping')
                 """
                 API said it's ok, go on to the next one
                 """
-                logging.debug("Ticker %s does not exist or is very confidential with data" % company['ticker'])
-                logging.debug("Current login: %s " % self.login_username)
+                # logging.debug("Ticker %s does not exist or is very confidential with data" % company['ticker'])
+                # logging.debug("Current login: %s " % self.login_username)
+                logging.debug('Skip %s ' % company['ticker'])
 
         return False
 
@@ -455,33 +462,70 @@ cra.baklazanas.lt, sleeping')
         """
         Method to crawl the companies page
         """
-        self.go(
-            self.companies_page
-            + '/' + self.letter + '/' + str(self.page_number)
-        )  # Go the companies list page, with specific letter and page number
+        # self.go(
+            # self.companies_page
+            # + '/' + self.letter + '/' + str(self.page_number)
+        # )  # Go the companies list page, with specific letter and page number
 
-        self.companies_parse_list()  # Make the list of companies in the page
-        if self.digesture_companies_list():  # Scroll through every company and check with server
-            """Check if any company in the list was good for the serve"""
-            logging.debug("Some target price data was send from the list")
-            logging.debug("Continue with the next letter from the big list")
-            self.shuffle_letter()  # Shuffle the random letter
-            logging.debug("Next letter: " + self.letter)
-            logging.debug("Current login: %s " % self.login_username)
-        else:
-            """If no companies data was sent -- switch to the next page if available"""
-            logging.debug("No companies data was send, consider to go to the\
-                next page or switch to the next letter")
-            self.go(
-                self.companies_page
-                + '/' + self.letter + '/' + str(self.page_number))
-            if self.companies_next_page_available:  # If there is any more pages
-                self.page_number = self.page_number + 1  # Add next page
-                logging.debug("Moving to the next page: " + str(self.page_number))
-                logging.debug("Current login: %s " % self.login_username)
-            else:
-                self.shuffle_letter()  # Shuffle the next letter
-            return  # Return to main
+        self.search()
+
+        logging.debug('Ticker %s' % self.ticker)
+
+        # try:
+            # Try to search by the list
+        logging.debug('Try to ident the list')
+        self.companies_parse_list(version=2)
+            # If not -- parse the table
+        # except:
+        #     logging.debug('Target price list')
+        #     self.targetprice_parse_list()
+        #     if self.send_target_prices():
+        #         logging.debug('Target price sent, ticker %s' % self.ticker)
+        #         return True
+
+        self.shuffle_letter()
+
+        # self.companies_parse_list()  # Make the list of companies in the page
+        # if self.digesture_companies_list():  # Scroll through every company and check with server
+        #     """Check if any company in the list was good for the serve"""
+        #     logging.debug("Some target price data was send from the list")
+        #     logging.debug("Continue with the next letter from the big list")
+        #     self.shuffle_letter()  # Shuffle the random letter
+        #     logging.debug("Next letter: " + self.letter)
+        #     logging.debug("Current login: %s " % self.login_username)
+        # else:
+        #     """If no companies data was sent -- switch to the next page if available"""
+        #     logging.debug("No companies data was send, consider to go to the\
+        #         next page or switch to the next letter")
+        #     self.go(
+        #         self.companies_page
+        #         + '/' + self.letter + '/' + str(self.page_number))
+        #     if self.companies_next_page_available:  # If there is any more pages
+        #         self.page_number = self.page_number + 1  # Add next page
+        #         logging.debug("Moving to the next page: " + str(self.page_number))
+        #         logging.debug("Current login: %s " % self.login_username)
+        #     else:
+        #         self.shuffle_letter()  # Shuffle the next letter
+        #     return  # Return to main
+
+    def search(self):
+        """
+        Method to make a search happen
+        """
+        logging.debug('Making the search')
+        try:
+            search_form = self.html.forms[0]
+        except:
+            logging.error('Search form is not found')
+            return False
+
+        search_form.action = self.url + '/' + search_form.action
+        search_form.fields['q'] = self.ticker
+
+        submit_form(
+            search_form,
+            open_http=self.open_http
+        )
 
     def login(self):
         """
@@ -527,6 +571,7 @@ cra.baklazanas.lt, sleeping')
             return True
 
 if __name__ == '__main__':
+    # Set arguments parser
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--account')
     args = parser.parse_args()

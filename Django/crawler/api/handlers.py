@@ -8,7 +8,6 @@ from piston.handler import BaseHandler
 from piston.utils import require_mime
 from piston.utils import rc
 from django.http import Http404
-from django.db.models import Q
 
 
 class StockHandler(BaseHandler):
