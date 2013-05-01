@@ -5,17 +5,19 @@ Main application
 
 import datetime
 from datetime import date
-import stock_quote
+from stock_quote import stock_quote
 import utils
 from features import Features
 from analytics import Analytics
 from tickers import Tickers
 from targetprices import TargetPrices
+from volatilities import Volatilities
+from targetpricenumbers import Targetpricenumbers
 from featureanalytictickers import FeatureAnalyticTickers
-import database
+from database import database
 import rest
-import logging
-import os
+from logger import logger
+import time
 
 
 class App():
@@ -27,12 +29,12 @@ class App():
         """
         Initialization of the class
         """
-        self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path
-        + '/logs/' + date.today().isoformat() + '.log'
-        logging.basicConfig(
-            filename=self.logging_file,
-            level=self.logging_level, foramt='%(asctime)s %(message)s')
+        self.logger = logger('app')
+
+        self.database = database()
+        self.stock_quote = stock_quote()
+
+        self.logger.debug('Starting up...')
 
     def fetch_units(self):
         """
@@ -44,16 +46,16 @@ class App():
             data = features.units[unit]
 
             if rest.send("POST", "/api/units/", data):
-                logging.debug('Unit data sent')
+                self.logger.debug('Unit data sent')
             else:
-                logging.debug('Unit data sent fail')
+                self.logger.debug('Unit data sent fail')
 
     def fetch_features(self):
         """
         Fetching all the features to the server
         """
         feature = Features()
-        for feature_index, feature_slug in enumerate(feature.features):
+        for feature_slug in feature.features:
 
             data = {
                 'feature_slug': feature_slug,
@@ -66,12 +68,12 @@ class App():
             }
 
             if rest.send("POST", "/api/features/", data):
-                logging.debug('Feature data create')
+                self.logger.debug('Feature data create')
             else:
                 if rest.send("PUT", "/api/features/", data):
-                    logging.debug('Feature data update')
+                    self.logger.debug('Feature data update')
                 else:
-                    logging.error('Feature date update fail')
+                    self.logger.error('Feature date update fail')
 
     def main(self):
         """
@@ -90,37 +92,52 @@ class App():
             the front-end
             * Calculate all the features and fetch them to the front-end
             * Finally, fetch the target price data to the front-end
-        TODO:
-        * Send the feature analytic ticker data
-        * Modify API to digest multiple data input
         """
 
         analytics = Analytics()
         tickers = Tickers()
         feature_analytic_tickers = FeatureAnalyticTickers()
         targetprices = TargetPrices()
+        targetpricenumbers = Targetpricenumbers()
+        volatilities = Volatilities()
 
-        for target_price in database.get_targetprices():
+        self.logger.debug('Getting the target prices')
+
+        for target_price in self.database.get_targetprices():
             """
             Get the most recent target prices
             """
+            self.logger.debug('Target price %s of %s' % (
+                target_price['ticker'], target_price['analytic']))
             ticker_slug = utils.slugify(target_price['ticker'])
             analytic_slug = utils.slugify(target_price['analytic'])
 
-            analytics.collect_and_send(target_price['analytic'])
-            tickers.collect_and_send(target_price['ticker'])
+            # Check with server if current calculations are required
 
-            target_data = database.get_targetprices(
+            target_data = self.database.return_targetprices(
                 target_price['analytic'],
                 target_price['ticker']
             )
-            if target_data.__len__() > 1:
-                logging.debug(
+            if target_data:
+                # Only then the data is available -- upload the analytic and
+                # ticker data to the server
+                analytics.collect_and_send(target_price['analytic'])
+                tickers.collect_and_send(target_price['ticker'])
+                self.logger.debug(
                     "Enough data for %s ticker, analytic %s" %
                     (target_price['ticker'], target_price['analytic'])
                 )
-                stock_data = stock_quote.get_data(target_price['ticker'])
-                beta = stock_quote.get_beta(target_price['ticker'])
+                # Sending volatility measure
+                volatilities.collect_and_send(
+                    analytic=target_price['analytic'],
+                    ticker=target_price['ticker'])
+                # Sending target price numbers data
+                targetpricenumbers.collect_and_send(
+                    analytic=target_price['analytic'],
+                    ticker=target_price['ticker'])
+                # Getting stock data
+                stock_data = self.stock_quote.get_data(target_price['ticker'])
+                beta = self.stock_quote.get_beta(target_price['ticker'])
                 if stock_data and beta:
 
                     features = Features(
@@ -138,8 +155,27 @@ class App():
 
                     if features_values:
                         if not feature_analytic_tickers.send(features_values):
-                            logging.error('Something went wrong with feature\
+                            self.logger.error('Something went wrong with feature\
 analytic ticker update')
+
+                    self.logger.debug("Date %s " % target_price['date'])
+                    target_price_date_timestamp = date.fromtimestamp(target_price['date']).timetuple()
+
+                    matches = (x for x in stock_data if x['date'] == time.mktime(target_price_date_timestamp))
+
+                    try:
+                        stock_entry = matches.next()
+                        target_price['change'] = float((target_price['price'] - stock_entry['close'])/stock_entry['close'])
+                        target_price['change'] = target_price['change'] * 100
+                        self.logger.debug('Stock entry close price %s' % stock_entry['close'])
+                        self.logger.debug('Target price %s' % target_price['price'])
+                        self.logger.debug('Change %s' % target_price['change'])
+                    except StopIteration:
+                        self.logger.debug('Date %s' % target_price['date'])
+                        self.logger.debug('Ticker %s' % ticker_slug)
+                        self.logger.error('No target price stock date found')
+                        target_price['change'] = 0
+
                     _date = datetime.datetime.fromtimestamp(
                         target_price['date']
                     )
@@ -153,8 +189,20 @@ analytic ticker update')
 
                     targetprices.send(data)
 
+                    # Submitting results to the server
+                    # There are entries in the server about the ticker
+                    # and analytic, so no problems will appear
+                    rest.send(
+                        'PUT',
+                        '/api/target_price_analytic_ticker/',
+                        {
+                            'analytic': target_price['analytic'],
+                            'ticker': target_price['ticker'],
+                            'date': target_price['date_human']
+                        })
+
             else:
-                logging.debug(
+                self.logger.debug(
                     "Not enought data for %s on %s, skipping" %
                     (target_price['ticker'], target_price['analytic'])
                 )
@@ -162,4 +210,6 @@ analytic ticker update')
 
 if __name__ == '__main__':
     app = App()
+    app.fetch_units()
+    app.fetch_features()
     app.main()

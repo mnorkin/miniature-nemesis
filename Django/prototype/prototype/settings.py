@@ -1,6 +1,5 @@
 # Django settings for prototype project.
 import os
-import django
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -14,10 +13,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'morbid',                      # Or path to database file if using sqlite3.
-        'USER': 'maksim',
-        'PASSWORD': '',
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'NAME': 'fp-morbid',                      # Or path to database file if using sqlite3.
+        'USER': 'postgres',
+        'PASSWORD': 'sWAgu4e7',
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -148,7 +147,7 @@ LOGGING = {
     },
     'handlers': {
         'mail_admins': {
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         }
@@ -156,7 +155,7 @@ LOGGING = {
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
-            'level': 'ERROR',
+            'level': 'DEBUG',
             'propagate': True,
         },
     }

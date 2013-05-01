@@ -7,7 +7,6 @@ App written specially for the Target Price project.
 """
 from lxml.html import fromstring  # More control
 from lxml.html import submit_form  # Form submit
-from random import shuffle
 from random import random
 from datetime import date
 from datetime import datetime
@@ -21,6 +20,7 @@ import urllib2  # Access interwebs
 import logging  # Logging
 import os  # Directories
 from mailman import mailman
+import argparse
 
 
 class crawler():
@@ -28,7 +28,7 @@ class crawler():
     Crawler class
     """
 
-    def __init__(self):
+    def __init__(self, _login_username, _login_password):
         """
         Initialization of the crawler buddy
         """
@@ -36,20 +36,21 @@ class crawler():
         self.current_url = self.url
         self.html = None
         self.login_page = 'login'
-        self.login_username = 'arvydas.tamulis@gmail.com'
-        self.login_password = 'liko789'
+        self.login_username = _login_username
+        self.login_password = _login_password
         self.companies_page = 'companies'
         self.alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.letter = None
+        self.ticker = None  # This is v2 addition
         self.page_number = 1
         self.debug = True
         self.companies_list = []
         self.target_price_list = []
         self.open_http = self.make_open_http()
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
-        self.logging_file = self.absolute_path + '/logs/crawler_' + date.today().isoformat() + '.log'
+        self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 12  # Then the crawler starts its job
+        self.start_hour = 0  # Then the crawler starts its job
         self.len_hour = 7  # How long in hours the crawler works
         self.mailman = mailman(
             'AKIAJKFJFUKWVJSBYA5Q',
@@ -59,12 +60,17 @@ class crawler():
             filename=self.logging_file,
             level=self.logging_level, format='%(asctime)s %(message)s')
 
-    def main(self):
+    def run(self):
         """
         Main things happens here.
 
         Need to implement the threading right here
         """
+        sleep_for = int(random() * 100)
+        logging.debug('Randomizing the start for %s ' % self.login_username)
+        logging.debug('Delaying %s seconds' % sleep_for)
+        time.sleep(sleep_for)
+        logging.debug('And here it goes')
 
         self.shuffle_letter()  # shuffle letter for initial browsing
         self.login()  # Make the login happen
@@ -72,8 +78,8 @@ class crawler():
 
         while (self.check_time()):
             self.companies()  # Go to the companies page and start the job
-            sleep_time = int(random() * 300) + 30
-            logging.debug("sleeping: " + str(sleep_time))
+            sleep_time = int(random() * 200) + 30
+            logging.debug("Sleeping: " + str(sleep_time))
             time.sleep(sleep_time)
             if not self.login_check():
                 if not self.login():
@@ -136,14 +142,56 @@ class crawler():
             self.current_url = self.url + page
         except urllib2.URLError:
             logging.debug('Urllib2.URLError : ' + self.url + page)
-            time.sleep(1000*cycle)  # Sleeping time
-            if cycle < 10:
+            time.sleep(100*cycle)  # Sleeping time
+            if cycle < 5:
                 self.go(page, cycle + 1)
             else:
                 mailman.write('Cannot connect to the page')
                 logging.debug('Connection to the page failed')
                 return False
         return True
+
+    def rest_with_response(self, url, request, data=None, cycle=1):
+        """
+        Rest interface for the crawler API
+
+        Then the page does not respond, returning the 502 error, added a
+        listener for that. Waiting ensures, that nothing does drop off, and
+        one can immediately respond to such a system fault, because the email
+        is deployed to the developer.
+        """
+        params = json.dumps(data)
+        headers = {"Content-type": "application/json"}
+        # conn = httplib.HTTPConnection("cra.baklazanas.lt")
+        conn = httplib.HTTPConnection("localhost:8000")
+        conn.request(request.upper(), url, params, headers)
+        response = conn.getresponse()
+        conn.close()
+        if response.status != 502:
+            # ALL_OK
+            if response.status == 200 and request.upper() == 'GET':
+                return json.loads(response.read())
+            # CREATED
+            elif response.status == 201 and request.upper() == 'POST':
+                return json.loads(response.read())
+            # ALL_OK
+            elif response.status == 200 and request.upper() == 'PUT':
+                return json.loads(response.read())
+            # DELETED
+            elif response.status == 204 and request.upper() == 'DELETE':
+                return json.loads(response.read())
+            else:
+                return None
+        else:
+            logging.debug('Received 502 error on connecting to\
+cra.baklazanas.lt, sleeping')
+            time.sleep(1000*cycle)  # Sleeping
+            if cycle < 10:
+                return self.rest(url, request, data, cycle + 1)
+            else:
+                mailman.write('Cannot connect to cra.baklazanas.lt, check logs')
+                logging.error('Cannot connect to cra.baklazanas.lt')
+                return False
 
     def rest(self, url, request, data=None, cycle=1):
         """
@@ -161,13 +209,17 @@ class crawler():
         response = conn.getresponse()
         conn.close()
         if response.status != 502:
-            if response.status == 200 and request.upper() == 'GET':  # ALL_OK
+            # ALL_OK
+            if response.status == 200 and request.upper() == 'GET':
                 return True
-            elif response.status == 201 and request.upper() == 'POST':  # CREATED
+            # CREATED
+            elif response.status == 201 and request.upper() == 'POST':
                 return True
-            elif response.status == 200 and request.upper() == 'PUT':  # ALL_OK
+            # ALL_OK
+            elif response.status == 200 and request.upper() == 'PUT':
                 return True
-            elif response.status == 204 and request.upper() == 'DELETE':  # DELETED
+            # DELETED
+            elif response.status == 204 and request.upper() == 'DELETE':
                 return True
             else:
                 return None
@@ -193,8 +245,12 @@ cra.baklazanas.lt, sleeping')
         The random letters distribution is uniform, so there is equal
         probability for each letter to pop-out
         """
-        shuffle(self.alphabet)  # Randomize the list
-        self.letter = str(self.alphabet[1])  # Return the letter
+        response = self.rest_with_response('/api/tickers/', 'GET')
+        # New method with v2
+        # shuffle(self.alphabet)  # Randomize the list
+        logging.debug('Received ticker %s' % response['ticker'])
+        self.letter = str(response['ticker'][0])  # Return the letter
+        self.ticker = response['ticker']
         self.page_number = 1  # also reset the page numbering
 
     def companies_next_page_available(self):
@@ -220,11 +276,13 @@ cra.baklazanas.lt, sleeping')
         ):
             logging.debug("No more pages available")
             logging.debug("Current Url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return False
         else:
 
             logging.debug("Pages are available")
             logging.debug("Current Url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return True
 
     def send_target_prices(self):
@@ -252,7 +310,11 @@ cra.baklazanas.lt, sleeping')
         """
         Method to visit the company page and get the list of the target prices
         """
-        self.go(self.companies_list[company_index]['link'])
+        if company_index:
+            self.go(self.companies_list[company_index]['link'])
+            ticker = self.companies_list[company_index]['ticker']
+        else:
+            ticker = self.ticker
 
         # table = self.html.xpath('//table[2]/tbody/tr[position()>1]')
         table = self.html.xpath('//table[2]/tr')
@@ -293,9 +355,12 @@ cra.baklazanas.lt, sleeping')
                 """
                 prices.append('0')
 
-            logging.debug('Plain data: ' + entry.text_content().strip())
+            # logging.debug('Plain data: ' + entry.text_content().strip())
             # Month-Day-Year (stupid Americans)
-            date = datetime.strptime(items[-1].text_content().strip(), "%m/%d/%y")
+            date = datetime.strptime(
+                items[-1].text_content().strip(),
+                "%m/%d/%y"  # Stupid America
+            )
 
             item = {
                 'action': items[0].text_content().strip(),
@@ -304,7 +369,7 @@ cra.baklazanas.lt, sleeping')
                 'price0': prices[0],
                 'price1': prices[1],
                 'date': date.strftime('%Y-%m-%d'),
-                'ticker': self.companies_list[company_index]['ticker']
+                'ticker': ticker
             }
             """Form a list item"""
 
@@ -313,7 +378,7 @@ cra.baklazanas.lt, sleeping')
             self.target_price_list.append(item)
             """Append to the buffer"""
 
-        if len(self.target_price_list) > 1:
+        if len(self.target_price_list) >= 1:
             return True
         else:
             self.mailman.write('Target Price list fail, please check the logs')
@@ -322,21 +387,26 @@ cra.baklazanas.lt, sleeping')
             logging.debug("Data\n" + json.dumps(self.target_price_list))
             return False
 
-    def companies_parse_list(self):
+    def companies_parse_list(self, version=1):
         """
         Parse companies list
         """
-        links = self.html.xpath('//div[@id="company-list"]//a')
+        if version == 2:
+            links = self.html.xpath('//div[@class="block"]//a')
+        else:
+            links = self.html.xpath('//div[@id="company-list"]//a')
 
         if len(links) < 1:
             self.mailman.write('Company-list selector link fail, please check the logs')
             logging.error("company-list links select fail")
             logging.debug("Current url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return False
 
         self.companies_list = []
 
         for link in links:
+            logging.debug(link.text)
             item = {
                 'name': " ".join(re.findall('\S+', link.text)[:-1]),
                 'market': re.findall('\w+', re.findall('\S+', link.text)[-1])[0],
@@ -345,12 +415,13 @@ cra.baklazanas.lt, sleeping')
             }
             self.companies_list.append(item)
 
-        if len(self.companies_list) > 1:
+        if len(self.companies_list) >= 1:
             return True
         else:
             self.mailman.write('Companies list length fail, please check the logs')
             logging.error("Companies list length fail")
             logging.debug("Current url: " + self.current_url)
+            logging.debug("Current login: %s " % self.login_username)
             return False
 
     def digesture_companies_list(self):
@@ -360,11 +431,10 @@ cra.baklazanas.lt, sleeping')
 
         # something_was_sent = False
         for company_index, company in enumerate(self.companies_list):
-            if company['ticker'].isalpha():
-                response = self.rest(
-                    "/api/tickers/" + company['ticker'] + "/", "GET")
+            if company['ticker'] is self.ticker:
+                response = True
             else:
-                response = None
+                response = False
 
             if response:
                 """
@@ -377,11 +447,14 @@ cra.baklazanas.lt, sleeping')
                 else:
                     logging.error("Ticker target price list fail")
                     logging.debug("Current url: " + self.current_url)
+                    logging.debug("Current login: %s " % self.login_username)
             else:
                 """
                 API said it's ok, go on to the next one
                 """
-                logging.debug("Ticker %s does not exist or is very confidential with data" % company['ticker'])
+                # logging.debug("Ticker %s does not exist or is very confidential with data" % company['ticker'])
+                # logging.debug("Current login: %s " % self.login_username)
+                logging.debug('Skip %s ' % company['ticker'])
 
         return False
 
@@ -389,28 +462,70 @@ cra.baklazanas.lt, sleeping')
         """
         Method to crawl the companies page
         """
-        self.go(
-            self.companies_page
-            + '/' + self.letter + '/' + str(self.page_number)
-        )  # Go the companies list page, with specific letter and page number
+        # self.go(
+            # self.companies_page
+            # + '/' + self.letter + '/' + str(self.page_number)
+        # )  # Go the companies list page, with specific letter and page number
 
-        self.companies_parse_list()  # Make the list of companies in the page
-        if self.digesture_companies_list():  # Scroll through every company and check with server
-            """Check if any company in the list was good for the serve"""
-            logging.debug("Some target price data was send from the list")
-            logging.debug("Continue with the next letter from the big list")
-            self.shuffle_letter()  # Shuffle the random letter
-            logging.debug("Next letter: " + self.letter)
-        else:
-            """If no companies data was sent -- switch to the next page if available"""
-            logging.debug("No companies data was send, consider to go to the\
-                next page or switch to the next letter")
-            if self.companies_next_page_available:  # If there is any more pages
-                self.page_number = self.page_number + 1  # Add next page
-                logging.debug("Moving to the next page: " + str(self.page_number))
-            else:
-                self.shuffle_letter()  # Shuffle the next letter
-            return  # Return to main
+        self.search()
+
+        logging.debug('Ticker %s' % self.ticker)
+
+        # try:
+            # Try to search by the list
+        logging.debug('Try to ident the list')
+        self.companies_parse_list(version=2)
+            # If not -- parse the table
+        # except:
+        #     logging.debug('Target price list')
+        #     self.targetprice_parse_list()
+        #     if self.send_target_prices():
+        #         logging.debug('Target price sent, ticker %s' % self.ticker)
+        #         return True
+
+        self.shuffle_letter()
+
+        # self.companies_parse_list()  # Make the list of companies in the page
+        # if self.digesture_companies_list():  # Scroll through every company and check with server
+        #     """Check if any company in the list was good for the serve"""
+        #     logging.debug("Some target price data was send from the list")
+        #     logging.debug("Continue with the next letter from the big list")
+        #     self.shuffle_letter()  # Shuffle the random letter
+        #     logging.debug("Next letter: " + self.letter)
+        #     logging.debug("Current login: %s " % self.login_username)
+        # else:
+        #     """If no companies data was sent -- switch to the next page if available"""
+        #     logging.debug("No companies data was send, consider to go to the\
+        #         next page or switch to the next letter")
+        #     self.go(
+        #         self.companies_page
+        #         + '/' + self.letter + '/' + str(self.page_number))
+        #     if self.companies_next_page_available:  # If there is any more pages
+        #         self.page_number = self.page_number + 1  # Add next page
+        #         logging.debug("Moving to the next page: " + str(self.page_number))
+        #         logging.debug("Current login: %s " % self.login_username)
+        #     else:
+        #         self.shuffle_letter()  # Shuffle the next letter
+        #     return  # Return to main
+
+    def search(self):
+        """
+        Method to make a search happen
+        """
+        logging.debug('Making the search')
+        try:
+            search_form = self.html.forms[0]
+        except:
+            logging.error('Search form is not found')
+            return False
+
+        search_form.action = self.url + '/' + search_form.action
+        search_form.fields['q'] = self.ticker
+
+        submit_form(
+            search_form,
+            open_http=self.open_http
+        )
 
     def login(self):
         """
@@ -426,6 +541,7 @@ cra.baklazanas.lt, sleeping')
         except:
             self.mailman.write('Login form find fail, please check the logs')
             logging.error("Login form find fail")
+            logging.debug("Current login: %s " % self.login_username)
             return False
 
         login_form.action = self.url + '/' + login_form.action
@@ -448,12 +564,32 @@ cra.baklazanas.lt, sleeping')
         self.go("my-account")
 
         if len(self.html.xpath('//a[@href="/login?mode=logout"]')) == 0:
-            logging.debug('User is not logged in')
+            logging.debug('User %s is not logged in' % self.login_username)
             return False
         else:
-            logging.debug('User is logged in')
+            logging.debug('User %s is logged in' % self.login_username)
             return True
 
 if __name__ == '__main__':
-    cra = crawler()  # Define the crawler
-    cra.main()  # Launch the main guy into the wild
+    # Set arguments parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--account')
+    args = parser.parse_args()
+    if args.account == '1':
+        print "Running 1 login"
+        cra = crawler('arvydas.tamulis@gmail.com', 'liko789')
+        cra.run()
+    elif args.account == '2':
+        print "Running 2 login"
+        cra = crawler('trialseoproject@gmail.com', 'saras86')
+        cra.run()
+    else:
+        print args
+    # Define the crawler
+    # cra1 = crawler('arvydas.tamulis@gmail.com', 'liko789')
+    # cra1.setDaemon(True)
+    # cra1.run()  # Launch the main guy into the wild
+    # cra2 = crawler('trialseoproject@gmail.com', 'saras86')
+    # cra2.setDaemon(True)
+    # cra2.run()
+    # pass

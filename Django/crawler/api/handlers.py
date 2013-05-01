@@ -1,8 +1,54 @@
-from sink.models import Ticker, TargetPrice, TickerChange, Market, Analytic
+from sink.models import Ticker
+from sink.models import TargetPrice
+from sink.models import TickerChange
+from sink.models import Market
+from sink.models import Analytic
+from sink.models import Stock
 from piston.handler import BaseHandler
 from piston.utils import require_mime
-from piston.utils import rc, validate
-from django.http import HttpResponse, Http404
+from piston.utils import rc
+from django.http import Http404
+
+
+class StockHandler(BaseHandler):
+
+    model = Stock
+
+    def read(self, request):
+        """
+        Returning the stock list, which is required
+        """
+        return Ticker.objects.all()
+
+    @require_mime('json')
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+
+            ticker = Ticker
+            try:
+                ticker = Ticker.objects.get(ticker=data['ticker'])
+            except ticker.DoesNotExist:
+                return rc.NOT_FOUND
+            em = self.model(
+                ticker=ticker,
+                date=data['date'],
+                price_open=data['price_open'],
+                price_close=data['price_close'],
+                price_high=data['price_high'],
+                price_low=data['price_low']
+            )
+            em.save()
+
+            return rc.CREATED
+        else:
+            super(Stock, self).create(request)
+
+    def update(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def delete(self, request):
+        return rc.NOT_IMPLEMENTED
 
 
 class TickerHandler(BaseHandler):
@@ -22,28 +68,33 @@ class TickerHandler(BaseHandler):
 
         ticker = Ticker
         target_price = TargetPrice
-
-        try:
-            ticker = self.model.objects.get(ticker=_ticker)
-            """
-            If ticker exists, check if we have any data
-            """
-
-            target_price = TargetPrice.objects.filter(ticker=ticker)
-
-            if len(target_price) < 10:
+        if _ticker is not None:
+            try:
+                ticker = self.model.objects.get(ticker=_ticker)
                 """
-                We have no data of this ticket, feed me
+                If ticker exists, check if we have any data
                 """
-                return rc.ALL_OK
-            else:
-                """
-                We have some data, don't need anything to send
-                """
-                return rc.CREATED
 
-        except ticker.DoesNotExist:
-            return rc.NOT_FOUND
+                target_price = TargetPrice.objects.filter(ticker=ticker)
+
+                if len(target_price) < 10:
+                    """
+                    We have no data of this ticket, feed me
+                    """
+                    return rc.ALL_OK
+                else:
+                    """
+                    We have some data, don't need anything to send
+                    """
+                    return rc.CREATED
+
+            except ticker.DoesNotExist:
+                return rc.NOT_FOUND
+        else:
+            having_tickers = TargetPrice.objects.values_list('ticker__ticker', flat=True)
+            ticker = Ticker.objects.exclude(ticker__in=having_tickers).order_by('?')[0]
+            return ticker
+        # super(Ticker, self).create(request)
 
         # else:
             # super(Ticker, self).create(request)
@@ -109,7 +160,7 @@ class TargetPriceHandler(BaseHandler):
 
     def read(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TargetPrice, self).create(request)
 
@@ -128,11 +179,23 @@ class TargetPriceHandler(BaseHandler):
                 em.save()
                 analytic = Analytic.objects.get(name=data['analytic'])
 
-            try:
-                ticker = Ticker.objects.get(ticker=data['ticker'])
-            except ticker.DoesNotExist:
-                return rc.NOT_FOUND
+            # Daily Crawler has only company name information,
+            # no ticker information is provided
+            if 'company_name' in data:
+                try:
+                    ticker = Ticker.objects.get(name=data['company_name'])
+                except ticker.DoesNotExist:
+                    return rc.NOT_FOUND
 
+            # Big ticker browser has the information in ticker information
+            # so, the ticker in the database is identified by `ticker`
+            if 'ticker' in data:
+                try:
+                    ticker = Ticker.objects.get(ticker=data['ticker'])
+                except ticker.DoesNotExist:
+                    return rc.NOT_FOUND
+
+            # Saving the entry
             em = self.model(
                 action=data['action'],
                 analytic=analytic,
@@ -140,7 +203,7 @@ class TargetPriceHandler(BaseHandler):
                 price0=data['price0'],
                 price1=data['price1'],
                 ticker=ticker,
-                date=data['date']
+                date=data['pub_date']
             )
 
             em.save()
@@ -151,13 +214,13 @@ class TargetPriceHandler(BaseHandler):
 
     def update(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TargetPrice, self).create(request)
 
     def delete(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TargetPrice, self).create(request)
 
@@ -171,24 +234,24 @@ class TickerChangeHandler(BaseHandler):
 
     def read(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)
 
     def create(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)
 
     def update(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)
 
     def delete(self, request):
         if request.content_type:
-            rc.NOT_IMPLEMENTED
+            return rc.NOT_IMPLEMENTED
         else:
             super(TickerChange, self).create(request)

@@ -1,425 +1,433 @@
 """
 The Database
 """
-import MySQLdb
+# import MySQLdb
+import psycopg2
 import re
-import datetime
 import time
-import utils
+from logger import logger
+from settings import db_config
+import rest
 
 
-def connect_to_mysql_db():
-    """
-    Connecting to mysql and return database
-    """
+class database:
 
-    db = MySQLdb.connect(
-        host="localhost",
-        user="root",
-        passwd="classic",
-        db="morbid"
-    )
+    def __init__(self):
+        self.cursor = self.connect_to_postgres()
+        self.db = self.connect_to_postgres_db()
+        self.logger = logger('database')
+        self.logger.debug('Starting')
 
-    return db
+    # def connect_to_mysql_db(self):
+    #     """
+    #     Connecting to mysql and return database
+    #     """
 
+    #     db = MySQLdb.connect(
+    #         host="localhost",
+    #         user="root",
+    #         passwd="classic",
+    #         db="morbid"
+    #     )
 
-def connect_to_mysql():
-    """
-    Connecting to the database
-    """
+    #     return db
 
-    db = MySQLdb.connect(
-        host="localhost",
-        user="root",
-        passwd="classic",
-        db="morbid"
-    )
+    # def connect_to_mysql(self):
+    #     """
+    #     Connecting to the database
+    #     """
 
-    return db.cursor()
+    #     db = MySQLdb.connect(
+    #         host="localhost",
+    #         user="root",
+    #         passwd="classic",
+    #         db="morbid"
+    #     )
 
+    #     return db.cursor()
 
-def get_analytics(ticker=None):
-    """
-    Returns the list of analytics
-    """
-    cur = connect_to_mysql()
-    # Collect all the analytics
+    def connect_to_postgres_db(self):
+        """
+        Connecting to postgresql
+        Returning database object
+        """
+        c_l = "dbname=%(db_name)s \
+        user=%(db_username)s \
+        password=%(db_password)s \
+        host=%(db_host)s" % db_config
+        db = psycopg2.connect(c_l)
+        return db
 
-    if not ticker:
-        cur.execute("SELECT DISTINCT(`analytic`) FROM `entries`")
-    else:
-        cur.execute("SELECT DISTINCT(`analytic`) FROM `entries` WHERE `ticket`='%s'" % re.escape(ticker))
+    def connect_to_postgres(self):
+        """
+        Connecting to postgres
+        Returning database cursor
+        """
+        c_l = "dbname=%(db_name)s \
+        user=%(db_username)s \
+        password=%(db_password)s \
+        host=%(db_host)s" % db_config
+        db = psycopg2.connect(c_l)
+        return db.cursor()
 
-    results = []
+    # Password for the postgres: sWAgu4e7
 
-    for row in cur.fetchall():
-        results.append(row[0])
+    def get_analytic_names(self, ticker=None):
+        """
+        Returns the names of analytics
 
-    return results
+        If the ticker is defined -- returns all the analytics,
+        which has any relationship with specific ticker
+        """
 
-
-def get_analytic(analytic=None):
-    """
-    Method to return the data of analytic
-    """
-
-    number_of_companies = 0
-    """Number of companies"""
-    number_of_tp = 0
-    """Number of target prices"""
-    last_target_price = 0
-    """Last target price"""
-    volatility_positive = 0
-    """Positive volatility
-        Equals to total amount of target prices"""
-    volatility_negative = 0
-    """Negative volatility
-        Equals to total amount of target prices, which failed to be valid 250 days"""
-
-    cur = connect_to_mysql()
-
-    query = "SELECT COUNT(DISTINCT(`ticket`)) FROM `entries` WHERE `analytic`='%s'" % re.escape(analytic)
-    """Number of companies query"""
-    cur.execute(query)
-    number_of_companies = cur.fetchone()[0]
-
-    query = "SELECT COUNT(DISTINCT(`ticket`)) \
-        FROM `entries` \
-        WHERE `analytic`='%s' AND (`price0` != 0 OR `price1` != 0) AND `date` + INTERVAL 1 YEAR > NOW()\
-        ORDER BY `date` DESC " % re.escape(analytic)
-    """Number of target prices query"""
-
-    cur.execute(query)
-
-    number_of_tp = cur.fetchone()[0]
-
-    query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-        FROM `entries` \
-        WHERE `analytic`='%s' AND (`price0`!=0 OR `price1`!=0) \
-        ORDER BY `date` DESC LIMIT 1" % (re.escape(analytic))
-    """Last target price query"""
-
-    cur.execute(query)
-
-    row = cur.fetchone()
-
-    if row[1] != 0 or row[2] != 0:
-        # Checking the price variation (updated price or old)
-        if row[2] == 0:
-            price = row[1]
+        if not ticker:
+            self.cursor.execute("SELECT DISTINCT ON (analytic) FROM entries")
         else:
-            price = row[2]
-    else:
-        price = 0
+            self.cursor.execute("SELECT DISTINCT ON (analytic) FROM entries WHERE ticker='%s'" % re.escape(ticker))
 
-    last_target_price = price
+        for row in self.cursor.fetchall():
+            yield row[0]
 
-    query = "SELECT `ticket`, `date` \
-        FROM `entries` \
-        WHERE `analytic`='%s' AND (`price0` != 0 OR `price1` != 0) \
-        GROUP BY `ticket`, `date`\
-        ORDER BY `ticket` ASC" % re.escape(analytic)
-    """Positive volatility query"""
+    def get_ticker_number_of_targetprices(self, ticker=None):
+        """
+        Returns ticker number of target prices
+        """
 
-    cur.execute(query)
+        number_of_tp = 0
+        """Number of target prices"""
 
-    tp_buffer = []
-    """Target price buffer"""
+        query = "SELECT DISTINCT ON (pub_date) COUNT(id) FROM entries \
+            WHERE price0 != 0 AND ticker='%s' \
+            ORDER BY pub_date DESC" % (re.escape(ticker))
 
-    for row in cur.fetchall():
-        volatility_positive += 1
-        tp_buffer.append(row)
+        self.cursor.execute(query)
 
-    for index in range(0, tp_buffer.__len__()-1):
-        """Loop through all the entries, sorted by name"""
-        if tp_buffer[index][0] == tp_buffer[index+1][0]:
-            """Check if the ticker names are the same"""
-            # print "We have same ticker name", tp_buffer[index][0], tp_buffer[index+1][0]
-            # print "Difference between dates", utils.workdaysub(tp_buffer[index][1], tp_buffer[index+1][1])
-            if utils.workdaysub(tp_buffer[index][1], tp_buffer[index+1][1]) < 250:
-                volatility_negative += 1
+        number_of_tp = self.cursor.fetchone()[0]
 
-    item = {
-        'number_of_companies': number_of_companies,
-        'number_of_tp': number_of_tp,
-        'last_target_price': last_target_price,
-        'volatility_negative': volatility_negative,
-        'volatility_positive': volatility_positive
-    }
+        item = {
+            "number_of_tp": number_of_tp
+        }
 
-    return item
+        return item
 
+    def get_tickers(self, analytic=None):
+        """
+        Method to get the tickers, which belongs to analytic
+        """
+        results = []
 
-def get_ticker(ticker=None):
-    """
-    Returns the ticker information
-    """
-    con = connect_to_mysql()
+        if not analytic:
+            self.cursor.execute("SELECT DISTINCT(ticker) FROM entries")
+            """Fetch all existing tickers from the database"""
+        else:
+            self.cursor.execute("SELECT DISTINCT(ticker) FROM entries WHERE analytic='%s'" % re.escape(analytic))
+            """Fetch tickers which analytic works with from the database"""
 
-    number_of_tp = 0
-    """Number of target prices"""
+        for row in self.cursor.fetchall():
+            results.append(row[0])
 
-    query = "SELECT `date`, `analytic` FROM `entries` \
-        WHERE (`price1`!=0 OR `price0` != 0 ) AND `ticket`='%s' \
-        GROUP BY `ticket`, `date` \
-        ORDER BY `date` DESC" % (re.escape(ticker))
+        return results
 
-    con.execute(query)
+    # def get_previous_targetprice(self, analytic=None, ticker=None, date=None):
+    #     """
+    #     Method to return not current, but later target price
+    #     """
+    #     if analytic and ticker and date:
 
-    number_of_tp = con.fetchall().__len__()
+    #         query = "SELECT date, price0, price1, analytic, ticker \
+    #             FROM entries WHERE analytic=\"%s\" AND pub_date < '%s' AND ticker='%s' AND (price0 != 0 OR price1 != 0 ) \
+    #             ORDER BY pub_date DESC LIMIT 1" % (analytic, date, ticker)
+    #         self.cursor.execute(query)
 
-    item = {
-        "number_of_tp": number_of_tp
-    }
-
-    return item
-
-
-def get_tickers(analytic=None):
-    """
-    Method to get the tickers, which belongs to analytic
-    """
-    cur = connect_to_mysql()
-
-    results = []
-    # if not utils.DEBUG:
-    #     # if not analytic:
-    #         cur.execute("SELECT DISTINCT(`ticket`) FROM `entries`")
-    #         """Fetch all existing tickers from the database"""
+    #         for row in self.cursor.fetchall():
+    #             if row[1] != 0 or row[2] != 0:
+    #                 # Checking the price variation (updated price or old)
+    #                 if row[2] == 0:
+    #                     price = row[1]
+    #                 else:
+    #                     price = row[2]
+    #                 item = {
+    #                     'date': time.mktime(row[0].timetuple()),
+    #                     'date_human': str(row[0]),
+    #                     'price': price,
+    #                     'analytic': row[3],
+    #                     'ticker': row[4]
+    #                 }
+    #                 return item
     #     else:
-    #         cur.execute("SELECT DISTINCT(`ticket`) FROM `entries` WHERE `analytic`='%s'" % re.escape(analytic))
-    #         """Fetch tickers which analytic works with from the database"""
-    # else:
-    #     if not analytic:
-    #         cur.execute("SELECT DISTINCT(`ticket`) FROM `entries` LIMIT 1,10")
-    #     else:
-    #         cur.execute("SELECT DISTINCT(`ticket`) FROM `entries` WHERE `analytic`='%s' LIMIT 1,10" % re.escape(analytic))
+    #         return None
 
-    if not analytic:
-        cur.execute("SELECT DISTINCT(`ticket`) FROM `entries`")
-        """Fetch all existing tickers from the database"""
-    else:
-        cur.execute("SELECT DISTINCT(`ticket`) FROM `entries` WHERE `analytic`='%s'" % re.escape(analytic))
-        """Fetch tickers which analytic works with from the database"""
+    def return_targetprices(self, analytic=None, ticker=None):
+        """
+        Complete return of target prices, specified by analytic and ticker
 
-    for row in cur.fetchall():
-        results.append(row[0])
+        The returned target prices must be older, than a year, in order to
+        participate in the calculations of features
 
-    return results
+        The method is only used by the feature calculations
+        """
+        if analytic and ticker:
+            results = []
+            query = "SELECT pub_date, price0, analytic, ticker \
+                FROM entries \
+                WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
+                AND pub_date < NOW() - interval '1 year' \
+                ORDER BY pub_date" % (
+                    re.escape(analytic),
+                    re.escape(ticker))
+            """Query for the target prices, which are older than the maximum date
+                (getting rid of the most recent one, because of model requires
+                old data)"""
+            self.cursor.execute(query)
+            for row in self.cursor.fetchall():
+                change = 0
 
+                # previous_targetprice = self.get_previous_targetprice(row[3], row[4], row[0])
+                # Change is calculated in the app, because it needs the
+                # Target price data
+                change = 0
 
-def get_previous_targetprice(analytic=None, ticker=None, date=None):
-    """
-    Method to return not current, but later target price
-    """
-    cur = connect_to_mysql()
-    if analytic and ticker and date:
-
-        query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-            FROM `entries` WHERE `analytic`=\"%s\" AND `date`<'%s' AND `ticket`='%s' AND (`price0` != 0 OR `price1` != 0 ) \
-            ORDER BY `date` DESC LIMIT 1" % (analytic, date, ticker)
-        cur.execute(query)
-
-        for row in cur.fetchall():
-            if row[1] != 0 or row[2] != 0:
-                # Checking the price variation (updated price or old)
-                if row[2] == 0:
-                    price = row[1]
-                else:
-                    price = row[2]
                 item = {
                     'date': time.mktime(row[0].timetuple()),
                     'date_human': str(row[0]),
-                    'price': price,
-                    'analytic': row[3],
-                    'ticker': row[4]
+                    'date_datetime': row[0],
+                    'price': row[1],
+                    'analytic': row[2],
+                    'ticker': row[3],
+                    'change': round(change, 2)
                 }
-                return item
-    else:
-        return None
+                """Forming the dict"""
+                if item not in results:
+                    """Escaping possible duplicates"""
+                    results.append(item)
 
+            return results
+        else:
+            return None
 
-def get_targetprices(analytic=None, ticker=None):
-    """
-    Method to return the target prices
-    """
-    cur = connect_to_mysql()
-    results = []
-    if analytic and ticker:
-        query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-            FROM `entries` \
-            WHERE `analytic`='%s' AND `ticket`='%s' \
-            AND (`price0`!=0 OR `price1` !=0) \
-            AND `date` < (SELECT max(`date`) FROM `entries` WHERE `analytic`='%s' AND `ticket`='%s') \
-            ORDER BY `date`" % (re.escape(analytic), re.escape(ticker), re.escape(analytic), re.escape(ticker))
-        """Query for the target prices, which are older than the maximum date (getting rid of the most recent one, because of model requires old data)"""
-    elif not analytic and ticker:
-        query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-            FROM `entries` \
-            WHERE `ticket`='%s' AND (`price0` !=0 OR `price1`!=0) \
-            ORDER BY `date` ASC" % (re.escape(ticker))
-        """Query for the target prices, which belongs only to ticker"""
-    elif analytic and not ticker:
-        query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-            FROM `entries` \
-            WHERE `analytic`='%s' AND (`price0`!=0 OR `price1`!=0) \
-            ORDER BY `date`" % (re.escape(analytic))
-        """Query for the target prices, which belongs only to analytic"""
-    else:
-        # query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-        #     FROM `entries` \
-        #     WHERE `date`=(SELECT max(`date`) FROM `entries`) AND (`price0`!=0 OR `price1` != 0)"
-        # query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-        #     FROM `entries` \
-        #     WHERE `date`=(SELECT MAX(`date`) FROM `entries`) AND (`price0`!=0 OR `price1` != 0)"
-        # query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-        #     FROM `entries` \
-        #     WHERE `date`='2013-02-05' AND (`price0` != 0 OR `price1` != 0) \
-        #     GROUP BY `analytic`, `date` \
-        #     ORDER BY `date` DESC"
-        query = "SELECT `date`, `price0`, `price1`, `analytic`, `ticket` \
-            FROM `entries` \
-            WHERE `date` >= '2012-11-01' AND (`price0` != 0 OR `price1` != 0) \
-            GROUP BY `analytic`, `date` \
-            ORDER BY `date` DESC"
-        """Query for the most recent dates"""
-    cur.execute(query)
+    def get_targetprices(self, analytic=None, ticker=None):
+        """
+        Method to return the target prices
 
-    for row in cur.fetchall():
-        change = 0
-        if row[1] != 0 or row[2] != 0:
-            # Checking the price variation (updated price or old)
-            if row[2] == 0:
-                price = row[1]
-            else:
-                price = row[2]
+        On of the ideas is to use the yeild operator to speed things up
+        """
+        if analytic and ticker:
+            query = "SELECT pub_date, price0, analytic, ticker \
+                FROM entries \
+                WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
+                AND pub_date < NOW() - interval '1 year' \
+                ORDER BY pub_date" % (
+                    re.escape(analytic),
+                    re.escape(ticker))
+            """Query for the target prices, which are older than the maximum date
+                (getting rid of the most recent one, because of model requires
+                old data)"""
+        elif not analytic and ticker:
+            query = "SELECT pub_date, price0, analytic, ticker \
+                FROM entries \
+                WHERE ticker='%s' AND price0 != 0 \
+                ORDER BY pub_date ASC" % (re.escape(ticker))
+            """Query for the target prices, which belongs only to ticker"""
+        elif analytic and not ticker:
+            query = "SELECT pub_date, price0, analytic, ticker \
+                FROM entries \
+                WHERE analytic=E'%s' AND price0 != 0 \
+                ORDER BY pub_date" % (re.escape(analytic))
+            """Query for the target prices, which belongs only to analytic"""
+        else:
+            # Query to retrieve the most recent target prices of analytic
+            query = "SELECT pub_date, price0, analytic, ticker \
+                FROM entries \
+                WHERE pub_date >= NOW() - interval '1 year' AND price0 != 0 \
+                ORDER BY pub_date"
+        self.cursor.execute(query)
 
-            previous_targetprice = get_previous_targetprice(row[3], row[4], row[0])
-            if previous_targetprice is not None:
-                change = float((price - previous_targetprice['price']) / previous_targetprice['price']) * 100
-            else:
-                change = 0
+        for row in self.cursor.fetchall():
+            change = 0
+
+            # Need to thing how to calculate this change measure
+            # previous_targetprice = self.get_previous_targetprice(row[3], row[4], row[0])
+            # if previous_targetprice is not None:
+            #     change = float((price - previous_targetprice['price']) / previous_targetprice['price']) * 100
+            # else:
+            # Change is calculated else place
+            change = 0
 
             item = {
                 'date': time.mktime(row[0].timetuple()),
                 'date_human': str(row[0]),
                 'date_datetime': row[0],
-                'price': price,
-                'analytic': row[3],
-                'ticker': row[4],
+                'price': row[1],
+                'analytic': row[2],
+                'ticker': row[3].strip(),
                 'change': round(change, 2)
             }
-            """Forming the dict"""
-            if item not in results:
-                """Escaping possible duplicates"""
-                results.append(item)
+            calculations_done = rest.send(
+                'POST',
+                '/api/target_price_analytic_ticker/',
+                {
+                    'ticker': item['ticker'],
+                    'analytic': item['analytic'],
+                    'date': item['date_human']
+                }
+            )
+            self.logger.debug('Ticker %s, analytic %s, date %s' % (
+                item['ticker'], item['analytic'], item['date_human']
+            ))
+            if not calculations_done:
+                self.logger.debug('Calculations not done, going')
+                yield item
+            else:
+                self.logger.debug('Calculations done, skipping')
 
-    return results
+    def get_number_of_target_prices(self, analytic=None, ticker=None):
+        """
+        Returns the target price number of analytic to ticker
 
+        Returns the number of target prices, which are older than a YEAR,
+        which makes them include into the calculations
+        """
+        if analytic and ticker:
+            query = "SELECT COUNT(pub_date) \
+                FROM ( \
+                    SELECT DISTINCT pub_date FROM entries \
+                    WHERE analytic=E'%s' AND ticker='%s' \
+                    AND price0 != 0 \
+                    AND pub_date + INTERVAL '1 year' < NOW() \
+                    ORDER BY pub_date ASC \
+                    ) p" % (
+                re.escape(analytic),
+                re.escape(ticker))
 
-def get_consensus(ticker=None):
-    """
-    Consensus measure calculation
-    """
+            self.cursor.execute(query)
+            return self.cursor.fetchone()[0]
+        else:
+            return None
 
-    measures = []
-    """The averages of target prices per day"""
-    evaluated_results = []
-    """Constructed consensus measure"""
-    if ticker:
-        target_prices = get_targetprices(ticker=ticker)
-        if target_prices:
-            """Form a pretty order or target prices"""
-            pretty_target_prices = {}
-            for target_price in target_prices:
-                if target_price['analytic'] not in pretty_target_prices.keys():
-                    pretty_target_prices[target_price['analytic']] = list()
-                pretty_target_prices[target_price['analytic']].append(target_price)
+    def get_volatility(self, analytic=None, ticker=None):
+        """
+        Volatility measure
 
-            today = datetime.datetime.now()
-            """Get today date"""
-            start_date = datetime.date(2006, 1, 1)
-            """Start date"""
-            end_date = datetime.date(today.year, today.month, today.day)
-            """End date"""
-            total_days = utils.workdaysub(start_date, end_date)
-            """Total number of work days"""
-            results = []
-            """Target prices per analytic"""
-            for target_price in pretty_target_prices:
-                """Loop through every available ticker target price"""
-                bulk = [0.0]*(total_days)
-                for tp in pretty_target_prices[target_price]:
-                    """Get the record"""
-                    start_index = utils.workdaysub(start_date, tp['date_datetime'])
-                    end_index = start_index + 250
-                    # print "Start index:", start_index, "end index:", end_index, "price:", tp['price']
-                    bulk[start_index:end_index] = [tp['price']]*(end_index-start_index)
-                results.append(bulk)
+        Volatility defines how many target prices where not hold 1 YEAR
+        """
+        number = 0
+        if analytic and ticker:
+            # Select unique dates, older than a year
+            query = "SELECT DISTINCT ON (pub_date) pub_date \
+                FROM entries \
+                WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
+                AND pub_date + INTERVAL '1 year' < NOW() \
+                ORDER BY pub_date ASC" % (
+                    re.escape(analytic),
+                    re.escape(ticker))
 
-            for row in zip(*results):
-                """Transpose the results, so that every index would have a number of total target prices"""
-                row_length = (len(row) - row.count(0))
-                """Calculate the total amount of defined target prices and drop entries with zeros"""
-                if row_length != 0:
-                    """Append the mean of target prices devided by total amount of target prices on that day"""
-                    measures.append(round(sum(row)/row_length, 2))
+            self.cursor.execute(query)
 
-            window_length = 90
-            for j in range(window_length, len(measures)-window_length):
-                evaluated_results.append(round(sum(measures[j:window_length+j])/90, 2))
+            # Removing bulk
+            dates = [x[0] for x in self.cursor.fetchall()]
+            # Total number of target prices
+            dates_length = len(dates)
+            # Iteratation
+            for index, pub_date in enumerate(dates):
+                if index < dates_length - 1:
+                    # If the time length is approx ~250 work days
+                    if (dates[index+1] - dates[index]).days > 365:
+                        number += 1
 
             item = {
-                'consensus_min': min(evaluated_results),
-                'consensus_avg': evaluated_results[-1],
-                'consensus_max': max(evaluated_results)
+                'number': number,
+                'total': dates_length
             }
 
             return item
-
         else:
             return None
-    else:
-        return None
 
+    def get_consensus(self, ticker=None):
+        """
+        All the active target prices min/avg/max
+        on the specitic ticker
+        """
+        if ticker:
+            query = "SELECT DISTINCT ON (analytic) analytic, pub_date, price0 \
+                FROM ( \
+                    SELECT * FROM entries \
+                    WHERE ticker = '%s' \
+                    AND price0 != 0 \
+                    ) p \
+                GROUP BY pub_date, analytic, price0 \
+                ORDER BY analytic, pub_date desc, price0;" % (
+                    re.escape(ticker))
+            self.cursor.execute(query)
 
-def get_beta(ticker):
-    """
-    Function to return the beta value
-    """
-    cur = connect_to_mysql()
+            data = []
 
-    if ticker:
-        query = "SELECT `beta` FROM `tickers` WHERE `name`='%s' LIMIT 1" % re.escape(ticker)
-        if cur.execute(query) != 0:
-            row = cur.fetchone()
-            return row[0]
+            for row in self.cursor.fetchall():
+                data.append(row[2])
+
+            self.logger.debug('ticker %s' % ticker)
+
+            self.logger.debug('data %s' % data)
+
+            try:
+                item = {
+                    'min': min(data),
+                    'avg': sum(data)/len(data),
+                    'max': max(data)
+                }
+            except ValueError:
+                item = {
+                    'min': 0,
+                    'avg': 0,
+                    'max': 0
+                }
+
+            return item
+
+    def get_beta(self, ticker=None):
+        """
+        Function to return the beta value
+        """
+        if ticker:
+            query = "SELECT value FROM betas WHERE name='%s' LIMIT 1" % (
+                re.escape(ticker))
+            if self.cursor.execute(query) != 0:
+                row = self.cursor.fetchone()
+                try:
+                    return row[0]
+                except:
+                    return None
+            else:
+                return None
         else:
             return None
-    else:
-        return None
 
+    def write_beta(self, ticker=None, beta=None):
+        """
+        Function to write beta measure to the database (In case of multiple
+        processing same ticker )
+        """
+        self.logger.debug('Received beta: %s' % beta)
+        self.logger.debug('ticker %s' % ticker)
+        cur = self.db.cursor()  # Make a private cursor, from the db link
 
-def write_beta(ticker, beta):
-    """
-    Function to write beta measure to the database (In case of multiple processing same ticker )
-    """
-    db = connect_to_mysql_db()
-
-    cur = db.cursor()
-
-    if ticker and beta:
-        print "Ticker and beta ok"
-        query = "SELECT `id` FROM `tickers` WHERE `name`='%s' LIMIT 1" % re.escape(ticker)
-        if cur.execute(query) == 0:
-            print "Select returned 0"
-            query = "INSERT INTO `tickers` (`name`, `beta`) VALUES ('%s', %s)" % (re.escape(ticker), beta)
-            """Write beta measure"""
-            if cur.execute(query) == 1:
-                db.commit()
-        else:
-            query = "UPDATE `tickers` SET `beta`='%s' WHERE `name`='%s' LIMIT 1" % (re.escape(beta), re.escape(ticker))
-            """Update beta measure"""
+        if ticker and beta:
+            self.logger.debug("Ticker and beta ok")
+            query = "SELECT count(id) FROM betas WHERE name='%s'" % re.escape(ticker)
             cur.execute(query)
-    else:
-        return None
+            if cur.fetchone()[0] == 0:
+                self.logger.debug("Select returned 0 length")
+                query = "INSERT INTO betas (name, value) VALUES ('%s', %d)" % (
+                    re.escape(ticker),
+                    beta)
+                """Write beta measure"""
+                if cur.execute(query) == 1:
+                    self.db.commit()
+            else:
+                query = "UPDATE betas SET value='%s' WHERE name='%s'" % (
+                    beta,
+                    re.escape(ticker))
+                """Update beta measure"""
+                cur.execute(query)
+        else:
+            return None

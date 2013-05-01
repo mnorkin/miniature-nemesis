@@ -3,11 +3,13 @@ from django.template import Context, loader
 from sink.models import TargetPrice, Ticker
 from sink.decorators import logged_in_or_basicauth
 
+
 def index(request):
     """
     Index page, lol
     """
     raise Http404
+
 
 @logged_in_or_basicauth(realm="Limited access")
 def progress(request):

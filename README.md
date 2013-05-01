@@ -9,34 +9,27 @@ Documentation and implementation of target price project
 
 ### Implementation
 
-* [Front-end](Django/prototype/prototype)
-* [Back-end](model)
+* [Front-end](Django/prototype)
+* [Crawler API](Django/crawler)
+* [Daily Crawler API](crawler_daily)
+* [Yahoo stock prices crawler](stock_prices_crawler)
+* [Calculations model](model)
 
 ### Deployment
 
-* Full deployment of app (virtualenv with all dependencies, clean database)
+* Full deployment of public (Django part)
 
-  $ fab environment setup
+  $ fab public_setup
 
-* Small deployment of app (just a code from git to current virtualenv)
-  
-  $ fab environment update
+* Full deployment of private (model, crawlers)
 
-* Handy commands list:
+  $ fab private_setup
 
-  $ fab environment stop_webserver
+* Public page update
 
-  $ fab environment start_webserver
-  
-  $ fab environment restart_webserver
+  $ fab django_prototype_update
 
-Still a lot of bugs and conflicts, work in progress version
 
 ### Dependencies
 
-* django==1.4.3
-* django-piston
-* django-apikey
-* gunicorn
-* psycopg2
-* pyyaml
+Individual for every implementation

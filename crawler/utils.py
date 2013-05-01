@@ -13,14 +13,6 @@ from datetime import timedelta
 DEBUG = True
 
 
-def log(str):
-    """
-    Logging method
-    """
-
-    print str
-
-
 def slugify(str):
     """
     Slugify the string
