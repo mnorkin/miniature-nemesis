@@ -88,6 +88,10 @@ li{ list-style: none; }
     font-size: 15px;
     float: left;
 }
+#header .title .search .sub-s:hover{
+    background-color: #ea7231;
+    border: 1px solid #ea7231;
+}
 
 .search_res {
     position:absolute;
@@ -164,6 +168,7 @@ li{ list-style: none; }
     display:block;
     font-weight: bold;
     position: relative;
+    margin-top: 5px;
 }
 
 /** Long company names moving. If you find a better solution for that, I will buy you a beer! */
@@ -239,8 +244,8 @@ li{ list-style: none; }
     text-align: right;
     font-weight: bold;
     position: absolute;
-    top:31px;
-    left:188px;
+    top:37px;
+    left:174px;
 }
 
 /* A little bit of fixing part */
@@ -304,7 +309,7 @@ li{ list-style: none; }
 
 .title.grid .chart .bar{
     position: relative;
-    top:23px;
+    top:18px;
     left:-12px;
     width:388px;
 }
@@ -382,8 +387,8 @@ li{ list-style: none; }
     position: absolute;
     width: 90px;
     height: 90px;
-    top: 6px;
-    right: 3px;
+    top: 12px;
+    right: 8px;
     text-align: center;
 }
 .title.grid .chart .circle strong{
@@ -614,6 +619,12 @@ li{ list-style: none; }
     cursor: pointer;
     color:transparent;
 }
+#header .inner .search .sub-s:hover{
+    border: 1px solid #ea7231;
+    background-color: #ea7231;
+}
+
+
 
 
 .corp_info{
@@ -952,6 +963,9 @@ li{ list-style: none; }
     right:0;
     font-weight: bold;
     cursor: pointer;
+}
+.in_graph button:hover{
+    background-color: #ea7231;
 }
 .in_graph .sear{
     display: none;
