@@ -33,7 +33,7 @@
 		<li class='avg'>
 		<ul>
 			<li class='mn'><i>{{ ticker.consensus_min }}</i> min </li>
-			<li class='av' style="left:113px;"><i>{{ ticker.consensus_avg }}</i>avg </li>
+			<li class='av' style="left:113px;"><i>{{ ticker.consensus_avg|floatformat }}</i>avg </li>
 			<li class='mx'><i>{{ ticker.consensus_max }}</i> max </li>
 		</ul>
 		</li>
@@ -77,8 +77,8 @@
 					</span> 
 					<span class="date">{{ target.date }}</span>
 					<span class="number">{{ target.price|cut:'.0' }} <strong>Last target price</strong> </span>
-					<span class="number">{{ target.analytic.number_of_tp }}<strong>No of target prices</strong> </span>
-					<span class="number">{{ target.analytic.volatility_positive }}/{{ target.analytic.volatility_negative }}<strong>Volatility</strong> </span>
+					<span class="number">{{ target.target_price_number_analytic_ticker.number }}<strong>No of target prices</strong> </span>
+					<span class="number">{{ target.volatility.number }}/{{ target.volatility.total }}<strong>Volatility</strong> </span>
 				</li>
 			{% endfor %}
 		</ul>

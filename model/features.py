@@ -51,7 +51,7 @@ class Features:
             'unit_id': 1,
             'position': 1
         },
-        'closeness':
+        'proximity':
         {
             'name': 'Proximity',
             'display_in_frontpage': 0,
@@ -65,7 +65,7 @@ class Features:
             'unit_id': 1,
             'position': 3
         },
-        'difference':
+        'aggressiveness':
         {
             'name': 'Aggressiveness',
             'display_in_frontpage': 0,
@@ -125,7 +125,6 @@ class Features:
             self.beta = beta
 
         if plot:
-            self._plot = Plot()
             self._show_plot = True
 
         if calculate:
@@ -238,14 +237,14 @@ class Features:
 
         return round(result, 2)
 
-    def closeness(self):
+    def proximity(self):
         """
-        Closeness measure
+        Proximity measure
 
         AKA proximity
         """
         results = []
-        self.logger.debug("Closeness")
+        self.logger.debug("Proximity")
 
         if self._show_plot:
             self._plot.plot_continue([[self.stock_data[i]['date'], self.stock_data[i]['high']] for i in range(0, self.stock_data.__len__())], 'g')
@@ -308,20 +307,20 @@ class Features:
 
         result = float(sum(results)/self.local_target_data.__len__())
 
-        self.logger.debug("\n\nCloseness measure\n")
+        self.logger.debug("Proximity measure")
         self.logger.debug("Results: %s" % results)
         self.logger.debug("Return result: %s" % result)
 
         return round(result, 2)
 
-    def difference(self):
+    def aggressiveness(self):
         """
-        Difference measure
+        Aagressiveness measure
 
         AKA aggression
         """
         results = []
-        self.logger.debug('Difference')
+        self.logger.debug('Aggressiveness')
 
         if self._show_plot:
             self._plot.plot_continue([[self.stock_data[i]['date'], self.stock_data[i]['high']] for i in range(0, self.stock_data.__len__())], 'g')
@@ -363,7 +362,7 @@ class Features:
 
         result = float(sum(results)/self.local_target_data.__len__()) * 100
 
-        self.logger.debug("Difference measure")
+        self.logger.debug("Aggressiveness measure")
         self.logger.debug("Results: %s " % results)
         self.logger.debug("Return result: %s " % result)
 
@@ -423,7 +422,7 @@ class Features:
 
         result = float(sum(results)/self.local_target_data.__len__()) * 100
 
-        self.logger.debug("\n\nProfitability measure\n")
+        self.logger.debug("Profitability measure")
         self.logger.debug("Results: %s" % results)
         self.logger.debug("Return result: %s" % result)
 
@@ -660,7 +659,6 @@ class Features:
             result = float(sum(results)/len(results))
         except ZeroDivisionError:
             result = 0
-        
 
         self.logger.debug("\n\nReach time measure\n")
         self.logger.debug("Results: %s" % results)

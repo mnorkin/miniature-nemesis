@@ -23,16 +23,27 @@ def index(request, page=0):
     if page > dates.__len__() or page >= 12:
         raise Http404
 
-    latest_target_prices = TargetPrice.objects.with_count().filter(date=dates[page]).order_by('-id')
+    latest_target_prices = TargetPrice.objects.with_count().filter(
+        date=dates[page]
+    ).order_by('-id')
 
     feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-        analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct,
-        ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct,
+        analytic_id__in=latest_target_prices.values_list(
+            'analytic_id',
+            flat=True
+        ).distinct,
+        ticker_id__in=latest_target_prices.values_list(
+            'ticker_id',
+            flat=True
+        ).distinct,
         feature__display_in_frontpage=True)
     target_price_list = []
 
     for target_price in latest_target_prices:
-        target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker).order_by('-feature').distinct('feature')
+        target_price.fap = feature_analytic_tickers.filter(
+            analytic=target_price.analytic,
+            ticker=target_price.ticker
+        ).order_by('-feature').distinct('feature')
         if sum(target_price.fap.values_list('value', flat=True)) > 0:
             target_price.sum = sum(target_price.fap.values_list('value', flat=True))
             target_price_list.append(target_price)
@@ -73,15 +84,24 @@ def ticker(request, slug):
         raise Http404
 
     # Load target orice info
-    latest_target_prices = TargetPrice.objects.filter(ticker_id=ticker.id).order_by('analytic', 'date').reverse().distinct('analytic')
+    latest_target_prices = TargetPrice.objects.filter(
+        ticker_id=ticker.id
+    ).order_by('analytic', 'date').reverse().distinct('analytic')
 
-    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id__in=latest_target_prices.values_list('analytic_id', flat=True).distinct, ticker_id=ticker.id)
+    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+        analytic_id__in=latest_target_prices.values_list(
+            'analytic_id',
+            flat=True
+        ).distinct,
+        ticker_id=ticker.id)
 
     target_price_list = []
 
     for target_price in latest_target_prices:
 
-        target_price.fap = feature_analytic_tickers.filter(analytic_id=target_price.analytic_id)
+        target_price.fap = feature_analytic_tickers.filter(
+            analytic_id=target_price.analytic_id
+        )
         target_price_list.append(target_price)
 
     # Load feature info
@@ -181,15 +201,22 @@ def analytic(request, slug):
         raise Http404
 
     # Load target price info
-    latest_target_prices = TargetPrice.objects.filter(analytic_id=analytic.id).order_by('ticker', 'date').reverse().distinct('ticker')
+    latest_target_prices = TargetPrice.objects.filter(
+        analytic_id=analytic.id
+    ).order_by('ticker', 'date').reverse().distinct('ticker')
 
     target_price_list = []
 
-    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(analytic_id=analytic.id, ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct)
+    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+        analytic_id=analytic.id,
+        ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct
+    )
 
     for target_price in latest_target_prices:
 
-        feature_analytic_tickers = feature_analytic_tickers.filter(ticker_id=target_price.ticker_id)
+        feature_analytic_tickers = feature_analytic_tickers.filter(
+            ticker_id=target_price.ticker_id
+        )
 
         target_price.fap = feature_analytic_tickers
         target_price_list.append(target_price)
@@ -222,7 +249,10 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
                 analytic=analytic, feature__display_in_frontpage=True)
 
             for target_price in target_prices:
-                target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker)
+                target_price.fap = feature_analytic_tickers.filter(
+                    analytic=target_price.analytic,
+                    ticker=target_price.ticker
+                )
                 target_price_list.append(target_price)
 
         except analytic.DoesNotExist:
@@ -238,7 +268,10 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
                 ticker=ticker, feature__display_in_frontpage=True)
 
             for target_price in target_prices:
-                target_price.fap = feature_analytic_tickers.filter(analytic=target_price.analytic, ticker=target_price.ticker)
+                target_price.fap = feature_analytic_tickers.filter(
+                    analytic=target_price.analytic,
+                    ticker=target_price.ticker
+                )
                 target_price_list.append(target_price)
 
         except ticker.DoesNotExist:

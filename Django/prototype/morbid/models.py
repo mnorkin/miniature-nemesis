@@ -231,6 +231,18 @@ class TargetPrice(models.Model):
         price_hash = "".join([all_letters[int(letter)] for letter in str(self.price).replace(".", "")])
         return price_hash + self.analytic.slug + self.ticker.slug + id_hash
 
+    def target_price_number_analytic_ticker(self):
+        return TargetPriceNumberAnalyticTicker.objects.get(
+            ticker=self.ticker,
+            analytic=self.analytic
+        )
+
+    def volatility(self):
+        return Volatility.objects.get(
+            ticker=self.ticker,
+            analytic=self.analytic
+        )
+
     def __unicode__(self):
         """
         Returns unicode object name
