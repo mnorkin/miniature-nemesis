@@ -46,19 +46,22 @@ class stock_quote():
     def get_data(self, ticker=None):
         data = []
         try:
-            with open('%s%s.json' % (self.data_dir, ticker)):
-                f = open('%s%s.json' % (self.data_dir, ticker), 'r')
+            with open('%s/%s.json' % (self.data_dir, ticker)):
+                f = open('%s/%s.json' % (self.data_dir, ticker), 'r')
                 entries = json.loads(f.read())
-                for entry in entries:
-                    item = {
-                        'date': time.mktime(datetime.datetime.strptime(entry['date'], "%Y-%m-%d").timetuple()),
-                        'open': entry['price_open'],
-                        'close': entry['price_close'],
-                        'high': entry['price_high'],
-                        'low': entry['price_low']
-                    }
-                    data.append(item)
-                return data
+                if type(entries) is list:
+                    self.logger.debug('Returning %s stock data' % ticker)
+                    for entry in entries:
+                        item = {
+                            'date': time.mktime(datetime.datetime.strptime(entry['date'], "%Y-%m-%d").timetuple()),
+                            'open': entry['price_open'],
+                            'close': entry['price_close'],
+                            'high': entry['price_high'],
+                            'low': entry['price_low']
+                        }
+                        data.append(item)
+                    return data
+                return None
         except IOError:
             return False
 

@@ -6,6 +6,6 @@ db_config = {
     'db_host': 'localhost'
 }
 
-data_dir = '/home/agurkas/'
+data_dir = '/home/agurkas/data'
 
-rest_url = 'dev2.baklazanas.lt'
+rest_url = 'dev3.baklazanas.lt'

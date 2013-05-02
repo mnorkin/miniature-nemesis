@@ -73,7 +73,8 @@ class App():
                         self.logger.debug('%s ticker data incorrect' % (
                             stock_data_file.split('.')[0]))
                         ff = open('%s/%s' % (data_dir, stock_data_file), 'w')
-                        ff.write(json.dumps(data.reverse()))
+                        data.reverse()
+                        ff.write(json.dumps(data))
 
         self.logger.debug('Stock database check finished')
 
@@ -121,7 +122,7 @@ class App():
             * Finally, fetch the target price data to the front-end
         """
 
-        self.check_stock_database()
+        # self.check_stock_database()
 
         analytics = Analytics()
         tickers = Tickers()
@@ -168,6 +169,7 @@ class App():
                 stock_data = self.stock_quote.get_data(target_price['ticker'])
                 beta = self.stock_quote.get_beta(target_price['ticker'])
                 if stock_data and beta:
+                    self.logger.debug('Stock data and beta values are okay')
 
                     features = Features(
                         target_data=target_data,
@@ -229,6 +231,10 @@ analytic ticker update')
                             'ticker': target_price['ticker'],
                             'date': target_price['date_human']
                         })
+
+                else:
+                    self.logger.debug('!! Stock data and beta')
+                    self.logger.debug('Beta %s' % beta)
 
             else:
                 self.logger.debug(
