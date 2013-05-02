@@ -15,6 +15,9 @@ env.deploy_group = 'square_wheel'
 env.deploy_user = 'agurkas'
 env.deploy_pass = 'Tutatru3'
 
+# Version part
+env.version = 3
+
 # Local directory part
 env.model_path = 'model'
 env.crawler_path = 'crawler'
@@ -39,9 +42,6 @@ env.release_django_sink = 'django_sink_' + env.release
 
 # Password configuration part
 env.postgresql_pass = 'fupHU8Ut'
-
-# Version part
-env.version = 3
 
 
 def virtualenv(command):
@@ -276,11 +276,10 @@ def archive_git_and_put(opts):
     local('rm %(what_to_send_path)s/%(release)s.tar.gz' % opts)
     # Updating or creating the current release
     opts['symlink_path'] = '%(deploy_path)s/releases/current' % opts
-    dir_ensure(opts['symlink_path'])
     if not files.exists(opts['symlink_path']):
-        run('ln -s %(full_deploy_path)s %(symlink_path)s' % opts)
+        run('ln -s %(full_deploy_path)s/ %(symlink_path)s' % opts)
     else:
-        run('ln -nsf %(full_deploy_path)s %(symlink_path)s' % opts)
+        run('ln -nsf %(full_deploy_path)s/ %(symlink_path)s' % opts)
 
 
 def install_requirements(opts):
@@ -402,6 +401,7 @@ def django_production_update():
         what_to_send_path=env.django_production_path,
         release=env.release_django_production,
         deploy_path=env.deploy_django_production_path,
+        version=env.version,
         createdb=False
     )
     archive_git_and_put(opts)
@@ -414,6 +414,7 @@ def django_production_deploy():
         what_to_send_path=env.django_production_path,
         release=env.release_django_production,
         deploy_path=env.deploy_django_production_path,
+        version=env.version,
         createdb=True
     )
     archive_git_and_put(opts)

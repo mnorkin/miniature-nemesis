@@ -144,16 +144,16 @@ class Daemon:
 class guniron_daemon(Daemon):
     def run(self):
         # Development version binds on 9000 port
-        os.system('cd /var/www/dev2_targetprice/releases/current/; \
-            gunicorn --bind=127.0.0.1:9080 prototype.wsgi')
+        os.system('cd /var/www/dev3_targetprice/releases/current/; \
+            gunicorn --bind=127.0.0.1:9090 prototype.wsgi')
 
 if __name__ == '__main__':
     """
     The run
     """
     log_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    log_path = "/var/log/dev2-gunicorn_everything_" + log_date + ".log"
-    deamon = guniron_daemon('/tmp/dev2-gunicorn-deamon.pid', '/dev/null', log_path, log_path)
+    log_path = "/var/log/dev3-gunicorn_everything_" + log_date + ".log"
+    deamon = guniron_daemon('/tmp/dev3-gunicorn-deamon.pid', '/dev/null', log_path, log_path)
 
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
