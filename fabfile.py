@@ -26,7 +26,7 @@ env.django_sink_path = 'Django/crawler'
 env.deploy_model_path = '/home/%s/model' % env.deploy_user
 env.deploy_crawler_path = '/home/%s/crawler' % env.deploy_user
 env.deploy_crawler_daily_path = '/home/%s/crawler_daily' % env.deploy_user
-env.deploy_django_production_path = '/var/www/dev2_targetprice'
+env.deploy_django_production_path = '/var/www/dev%s_targetprice' % env.version
 env.deploy_django_sink_path = '/var/www/cra_targetprice'
 
 # Release part
@@ -39,6 +39,9 @@ env.release_django_sink = 'django_sink_' + env.release
 
 # Password configuration part
 env.postgresql_pass = 'fupHU8Ut'
+
+# Version part
+env.version = 3
 
 
 def virtualenv(command):
@@ -331,13 +334,13 @@ def model_configuration(opts):
     if opts['createdb']:
         with settings(warn_only=True):
             # Backup
-            sudo('pg_dump tp2-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            sudo('pg_dump tp%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
             # Clean
-            sudo('dropdb tp2-morbid', user='postgres')
+            sudo('dropdb tp%(version)s-morbid' % opts, user='postgres')
         # Create
-        sudo('createdb tp2-morbid', user='postgres')
+        sudo('createdb tp%(version)s-morbid' % opts, user='postgres')
         # Populate
-        sudo('cat %(deploy_path)s/releases/current/database.sql | psql tp2-morbid' % opts, user='postgres')
+        sudo('cat %(deploy_path)s/releases/current/database.sql | psql tp%(version)s-morbid' % opts, user='postgres')
 
 
 def model_update():
@@ -345,6 +348,7 @@ def model_update():
         what_to_send_path=env.model_path,
         release=env.release_model,
         deploy_path=env.deploy_model_path,
+        version=env.version,
         createdb=True
     )
     archive_git_and_put(opts)
@@ -359,6 +363,7 @@ def model_deploy():
         what_to_send_path=env.model_path,
         release=env.release_model,
         deploy_path=env.deploy_model_path,
+        version=env.version,
         createdb=True
     )
     archive_git_and_put(opts)
@@ -382,11 +387,11 @@ def django_production_configuration(opts):
     if opts['createdb']:
         with settings(warn_only=True):
             # Backup if there was anything
-            sudo('pg_dump fp2-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            sudo('pg_dump fp%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
             # Clean
-            sudo('dropdb fp2-morbid', user='postgres')
+            sudo('dropdb fp%(version)s-morbid' % opts, user='postgres')
         # Create
-        sudo('createdb fp2-morbid', user='postgres')
+        sudo('createdb fp%(version)s-morbid' % opts, user='postgres')
 
     virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
     virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
@@ -432,11 +437,11 @@ def django_sink_configuration(opts):
     if opts['createdb']:
         with settings(warn_only=True):
             # Backup if there was anything
-            sudo('pg_dump tp2-sink > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            sudo('pg_dump tp%(version)s-sink > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
             # Clean
-            sudo('dropdb tp2-sink', user='postgres')
+            sudo('dropdb tp%(version)s-sink' % opts, user='postgres')
         # Create
-        sudo('createdb tp2-sink', user='postgres')
+        sudo('createdb tp%(version)s-sink' % opts, user='postgres')
 
     virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
     virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
