@@ -231,7 +231,7 @@ class Features:
 
         result = float(sum(results)/self.local_target_data.__len__()) * 100
 
-        self.logger.debug("\n\nAccuracy measure\n")
+        self.logger.debug("Accuracy measure")
         self.logger.debug("Results: %s " % results)
         self.logger.debug("Return result: %s " % result)
 
@@ -250,11 +250,16 @@ class Features:
             self._plot.plot_continue([[self.stock_data[i]['date'], self.stock_data[i]['high']] for i in range(0, self.stock_data.__len__())], 'g')
             self._plot.plot_continue([[self.stock_data[i]['date'], self.stock_data[i]['low']] for i in range(0, self.stock_data.__len__())], 'b')
 
+        # Looping through the target data
         for index, target_entry in enumerate(self.local_target_data):
             measure = 0
+            # First field of target entry is the date
             target_date = target_entry[0]
+            # Second field of target entry is the price
             target_price = target_entry[1]
             try:
+                self.logger.debug('Stock dates format %s ' % self.stock_dates[1])
+                self.logger.debug('Target date format %s ' % target_date)
                 start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
                 end_index = start_index+249
 
@@ -266,23 +271,23 @@ class Features:
                 if end_index >= next_start_index:
                     end_index = next_start_index
 
-                self.logger.debug("\nStart index: %s" % start_index)
-                self.logger.debug("\nEnd Index: %s" % end_index)
-                self.logger.debug("\nNext start index: %s " % next_start_index)
-                self.logger.debug("\nFrom: %s" % datetime.datetime.fromtimestamp(
+                self.logger.debug("Start index: %s" % start_index)
+                self.logger.debug("End Index: %s" % end_index)
+                self.logger.debug("Next start index: %s " % next_start_index)
+                self.logger.debug("From: %s" % datetime.datetime.fromtimestamp(
                     self.stock_dates[start_index]))
-                self.logger.debug("\nTo: %s" % datetime.datetime.fromtimestamp(
+                self.logger.debug("To: %s" % datetime.datetime.fromtimestamp(
                     self.stock_dates[end_index]))
-                self.logger.debug("\nStock from: %s" % datetime.datetime.fromtimestamp(
+                self.logger.debug("Stock from: %s" % datetime.datetime.fromtimestamp(
                     self.stock_dates[0]))
-                self.logger.debug("\nStock to: %s" % datetime.datetime.fromtimestamp(
+                self.logger.debug("Stock to: %s" % datetime.datetime.fromtimestamp(
                     self.stock_dates[self.stock_dates.__len__()-1]))
 
                 if self._show_plot:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
 
                 number_of_entries = range(start_index, end_index).__len__()
-                self.logger.debug("\nNumber of entries: %s" % number_of_entries)
+                self.logger.debug("Number of entries: %s" % number_of_entries)
 
                 for j in range(start_index, end_index):
                     if target_price > self.stock_lows[j] and target_price > self.stock_highs[j]:
@@ -389,12 +394,12 @@ class Features:
                 if end_index >= self.stock_dates.__len__():
                     end_index = self.stock_dates.__len__()-1
 
-                self.logger.debug("\nStart index: %s " % start_index)
-                self.logger.debug("\nEnd Index: %s" % end_index)
-                self.logger.debug("\nFrom: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
-                self.logger.debug("\nTo: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
-                self.logger.debug("\nStock from: %s" % datetime.datetime.fromtimestamp(self.stock_dates[0]))
-                self.logger.debug("\nStock to: %s" % datetime.datetime.fromtimestamp(self.stock_dates[self.stock_dates.__len__()-1]))
+                self.logger.debug("Start index: %s " % start_index)
+                self.logger.debug("End Index: %s" % end_index)
+                self.logger.debug("From: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
+                self.logger.debug("To: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
+                self.logger.debug("Stock from: %s" % datetime.datetime.fromtimestamp(self.stock_dates[0]))
+                self.logger.debug("Stock to: %s" % datetime.datetime.fromtimestamp(self.stock_dates[self.stock_dates.__len__()-1]))
 
                 if self._show_plot:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]], 'b')
@@ -538,12 +543,12 @@ class Features:
                     end_index = self.stock_dates.__len__()-1
 
                 if utils.DEBUG:
-                    self.logger.debug("\nStart index: %s" % start_index)
-                    self.logger.debug("\nEnd Index: %s" % end_index)
-                    self.logger.debug("\nFrom: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
-                    self.logger.debug("\nTo: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
-                    self.logger.debug("\nStock from: %s" % datetime.datetime.fromtimestamp(self.stock_dates[0]))
-                    self.logger.debug("\nStock to: %s" % datetime.datetime.fromtimestamp(self.stock_dates[self.stock_dates.__len__()-1]))
+                    self.logger.debug("Start index: %s" % start_index)
+                    self.logger.debug("End Index: %s" % end_index)
+                    self.logger.debug("From: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
+                    self.logger.debug("To: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
+                    self.logger.debug("Stock from: %s" % datetime.datetime.fromtimestamp(self.stock_dates[0]))
+                    self.logger.debug("Stock to: %s" % datetime.datetime.fromtimestamp(self.stock_dates[self.stock_dates.__len__()-1]))
 
                 if self._show_plot:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
@@ -565,7 +570,7 @@ class Features:
 
         result = round(float(sum(results))*100, 2)
 
-        self.logger.debug("\n\nImpact to the market measure\n")
+        self.logger.debug("Impact to the market measure")
         self.logger.debug("Results: %s" % results)
         self.logger.debug("Return result: %s" % result)
 
@@ -594,12 +599,12 @@ class Features:
                     end_index = self.stock_dates.__len__()-1
 
                 if utils.DEBUG:
-                    self.logger.debug("\nStart index: %s" % start_index)
-                    self.logger.debug("\nEnd Index: %s" % end_index)
-                    self.logger.debug("\nFrom: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
-                    self.logger.debug("\nTo: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
-                    self.logger.debug("\nStock from: %s" % datetime.datetime.fromtimestamp(self.stock_dates[0]))
-                    self.logger.debug("\nStock to: %s" % datetime.datetime.fromtimestamp(self.stock_dates[-1]))
+                    self.logger.debug("Start index: %s" % start_index)
+                    self.logger.debug("End Index: %s" % end_index)
+                    self.logger.debug("From: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
+                    self.logger.debug("To: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
+                    self.logger.debug("Stock from: %s" % datetime.datetime.fromtimestamp(self.stock_dates[0]))
+                    self.logger.debug("Stock to: %s" % datetime.datetime.fromtimestamp(self.stock_dates[-1]))
 
                 if self._show_plot:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]], 'b')
@@ -660,7 +665,7 @@ class Features:
         except ZeroDivisionError:
             result = 0
 
-        self.logger.debug("\n\nReach time measure\n")
+        self.logger.debug("Reach time measure")
         self.logger.debug("Results: %s" % results)
         self.logger.debug("Return result: %s" % result)
 

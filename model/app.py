@@ -18,6 +18,9 @@ from database import database
 import rest
 from logger import logger
 import time
+import settings
+import os
+import json
 
 
 class App():
@@ -49,6 +52,30 @@ class App():
                 self.logger.debug('Unit data sent')
             else:
                 self.logger.debug('Unit data sent fail')
+
+    def check_stock_database(self):
+        """
+        Checking stock database in order to get the right format of data
+
+        Right format of data:
+        * Increasing date, e.g. from 2001 to 2013 not over wise (this is important)
+        """
+        self.logger.debug('Start checking stock database')
+        data_dir = settings.data_dir
+
+        for stock_data_file in os.listdir(data_dir):
+            if stock_data_file != "." and stock_data_file != "..":
+                f = open(data_dir + '/' + stock_data_file, 'r')
+                data = json.loads(f.read())
+                if type(data) is list and len(data) > 1:
+                    # Check if first entry is the biggest entry
+                    if data[0]['date'] > data[-1]['date']:
+                        self.logger.debug('%s ticker data incorrect' % (
+                            stock_data_file.split('.')[0]))
+                        ff = open('%s/%s' % (data_dir, stock_data_file), 'w')
+                        ff.write(json.dumps(data.reverse()))
+
+        self.logger.debug('Stock database check finished')
 
     def fetch_features(self):
         """
@@ -93,6 +120,9 @@ class App():
             * Calculate all the features and fetch them to the front-end
             * Finally, fetch the target price data to the front-end
         """
+
+        self.check_stock_database()
+        return True
 
         analytics = Analytics()
         tickers = Tickers()

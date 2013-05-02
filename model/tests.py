@@ -47,6 +47,8 @@ class feature_test(unittest.TestCase):
     def test_accuracy(self):
         """
         Testing Accuracy
+
+        Alpha
         """
         self.assertEqual(
             self.features.accuracy(),
@@ -58,7 +60,7 @@ class feature_test(unittest.TestCase):
         """
         Testing Aggresiveness calculations
         """
-        measure = self.features.difference()
+        measure = self.features.aggressiveness()
         self.assertEqual(
             measure,
             48.48,
@@ -99,13 +101,15 @@ class feature_test(unittest.TestCase):
     def test_proximity(self):
         """
         Testing proximity calculations
+
+        Beta
         """
-        measure = self.features.closeness()
+        measure = self.features.proximity()
         self.assertEqual(
             measure,
-            9.84,
+            10.35,
             "Proximity fail %s, to %s" % (
-                9.84,
+                10.35,
                 measure
             )
         )
