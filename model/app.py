@@ -122,7 +122,6 @@ class App():
         """
 
         self.check_stock_database()
-        return True
 
         analytics = Analytics()
         tickers = Tickers()
