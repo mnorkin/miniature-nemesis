@@ -66,7 +66,11 @@ class App():
         for stock_data_file in os.listdir(data_dir):
             if stock_data_file != "." and stock_data_file != "..":
                 f = open(data_dir + '/' + stock_data_file, 'r')
-                data = json.loads(f.read())
+                try:
+                    data = json.loads(f.read())
+                except ValueError:
+                    data = []
+
                 if type(data) is list and len(data) > 1:
                     # Check if first entry is the biggest entry
                     if data[0]['date'] > data[-1]['date']:

@@ -41,7 +41,8 @@ class crawler():
         self.companies_page = 'companies'
         self.alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.letter = None
-        self.ticker = None  # This is v2 addition
+        self.ticker = None  # This is v2 addition, stores ticker
+        self.name = None  # This is v2 adddition, stores company name
         self.page_number = 1
         self.debug = True
         self.companies_list = []
@@ -50,7 +51,7 @@ class crawler():
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
         self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 0  # Then the crawler starts its job
+        self.start_hour = 20  # Then the crawler starts its job
         self.len_hour = 7  # How long in hours the crawler works
         self.mailman = mailman(
             'AKIAJKFJFUKWVJSBYA5Q',
@@ -69,12 +70,9 @@ class crawler():
         sleep_for = int(random() * 100)
         logging.debug('Randomizing the start for %s ' % self.login_username)
         logging.debug('Delaying %s seconds' % sleep_for)
-        time.sleep(sleep_for)
+        # time.sleep(sleep_for)
         logging.debug('And here it goes')
-
-        self.shuffle_letter()  # shuffle letter for initial browsing
         self.login()  # Make the login happen
-        self.login_check()  # Check if the user logged in
 
         while (self.check_time()):
             self.companies()  # Go to the companies page and start the job
@@ -122,6 +120,9 @@ class crawler():
             if method == "POST":
                 return opener.open(url, urllib.urlencode(values))
             else:
+                logging.debug('url %s ' % url)
+                logging.debug('params % s' % urllib.urlencode(values))
+                logging.debug('full %s ' % self.url_with_query(url, values))
                 return opener.open(self.url_with_query(url, values))
 
         return open_http
@@ -132,19 +133,19 @@ class crawler():
         """
         self.html = fromstring(self.open_http("GET", _url).read())
 
-    def go(self, page, cycle=1):
+    def go(self, page, params=[], cycle=1):
         """
         Method to go to the page
         """
         logging.debug('Going to: ' + page)
         try:
-            self.html = fromstring(self.open_http("GET", self.url + page).read())
+            self.html = fromstring(self.open_http("GET", self.url + page, params).read())
             self.current_url = self.url + page
         except urllib2.URLError:
             logging.debug('Urllib2.URLError : ' + self.url + page)
             time.sleep(100*cycle)  # Sleeping time
             if cycle < 5:
-                self.go(page, cycle + 1)
+                self.go(page, params, cycle + 1)
             else:
                 mailman.write('Cannot connect to the page')
                 logging.debug('Connection to the page failed')
@@ -245,12 +246,19 @@ cra.baklazanas.lt, sleeping')
         The random letters distribution is uniform, so there is equal
         probability for each letter to pop-out
         """
-        response = self.rest_with_response('/api/tickers/', 'GET')
+
+        # response = self.rest_with_response('/api/tickers/', 'GET')
+        # Name filtering with TEX ticker
+        response = {}
+        response['ticker'] = 'TEX'
+        response['name'] = 'Terex Corporation'
         # New method with v2
         # shuffle(self.alphabet)  # Randomize the list
         logging.debug('Received ticker %s' % response['ticker'])
+        logging.debug('Received ticker %s' % response['name'])
         self.letter = str(response['ticker'][0])  # Return the letter
         self.ticker = response['ticker']
+        self.name = response['name']
         self.page_number = 1  # also reset the page numbering
 
     def companies_next_page_available(self):
@@ -431,7 +439,19 @@ cra.baklazanas.lt, sleeping')
 
         # something_was_sent = False
         for company_index, company in enumerate(self.companies_list):
-            if company['ticker'] is self.ticker:
+            logging.debug('Company having %s, given %s' % (company['name'], self.name))
+            logging.debug('Ticker having %s, given %s' % (company['ticker'], self.ticker))
+            if company['ticker'] == self.ticker:
+                logging.debug('Ticker equals')
+            else:
+                logging.debug('Ticker does not equals')
+
+            if company['name'] == self.name:
+                logging.debug('Name equals')
+            else:
+                logging.debug('Name not equals')
+
+            if company['ticker'] == self.ticker and company['name'] == self.name:
                 response = True
             else:
                 response = False
@@ -467,23 +487,22 @@ cra.baklazanas.lt, sleeping')
             # + '/' + self.letter + '/' + str(self.page_number)
         # )  # Go the companies list page, with specific letter and page number
 
+        self.shuffle_letter()
         self.search()
 
         logging.debug('Ticker %s' % self.ticker)
 
-        # try:
-            # Try to search by the list
-        logging.debug('Try to ident the list')
-        self.companies_parse_list(version=2)
-            # If not -- parse the table
-        # except:
-        #     logging.debug('Target price list')
-        #     self.targetprice_parse_list()
-        #     if self.send_target_prices():
-        #         logging.debug('Target price sent, ticker %s' % self.ticker)
-        #         return True
-
-        self.shuffle_letter()
+        if self.companies_parse_list(version=2):
+            logging.debug('Companies list found')
+            if self.digesture_companies_list():  # Scroll through every company and sent data
+                logging.debug('Something was sent')
+        elif self.targetprice_parse_list():
+            logging.debug('Target price list found')
+            if self.send_target_prices():
+                logging.debug('Target price sent, ticker %s' % self.ticker)
+                return True
+        else:
+            logging.debug('No results found')
 
         # self.companies_parse_list()  # Make the list of companies in the page
         # if self.digesture_companies_list():  # Scroll through every company and check with server
@@ -513,19 +532,23 @@ cra.baklazanas.lt, sleeping')
         Method to make a search happen
         """
         logging.debug('Making the search')
-        try:
-            search_form = self.html.forms[0]
-        except:
-            logging.error('Search form is not found')
-            return False
+        # try:
+        #     search_form = self.html.forms[0]
+        # except:
+        #     logging.error('Search form is not found')
+        #     return False
 
-        search_form.action = self.url + '/' + search_form.action
-        search_form.fields['q'] = self.ticker
+        self.go('companies/', {'q': self.ticker})
 
-        submit_form(
-            search_form,
-            open_http=self.open_http
-        )
+        # search_form.action = self.url + '/' + search_form.action
+        # search_form.fields['q'] = self.ticker
+
+        # submit_values = {'submit': 'Search'}
+
+        # submit_form(
+        #     search_form,
+        #     extra_values=submit_values, open_http=self.open_http
+        # )
 
     def login(self):
         """

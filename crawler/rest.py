@@ -4,6 +4,7 @@ The REST
 import httplib
 import json
 import logger
+import settings
 
 list_of_requests = ['GET', 'POST', 'PUT', 'DELETE']
 
@@ -12,7 +13,8 @@ def send_with_response(request, url, data):
     if any(request.upper() in s for s in list_of_requests):
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
-        conn = httplib.HTTPConnection("localhost:8000")
+        # conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection(settings.rest_url)
         logger.debug('Request: %s' % request)
         logger.debug('Params: %s' % params)
         logger.debug('Headers: %s' % headers)
@@ -43,7 +45,8 @@ def send(request, url, data):
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("185.5.55.178")
-        conn = httplib.HTTPConnection("localhost:8000")
+        # conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection(settings.rest_url)
         # conn = httplib.HTTPConnection("cra.baklazanas.lt")
         logger.debug("Request: %s" % request)
         logger.debug("Params: %s" % params)
