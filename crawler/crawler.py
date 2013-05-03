@@ -21,6 +21,7 @@ import logging  # Logging
 import os  # Directories
 from mailman import mailman
 import argparse
+import settings
 
 
 class crawler():
@@ -164,7 +165,8 @@ class crawler():
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("cra.baklazanas.lt")
-        conn = httplib.HTTPConnection("localhost:8000")
+        # conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection(settings.rest_url)
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         conn.close()
@@ -205,7 +207,8 @@ cra.baklazanas.lt, sleeping')
         """
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
-        conn = httplib.HTTPConnection("cra.baklazanas.lt")
+        # conn = httplib.HTTPConnection("cra.baklazanas.lt")
+        conn = httplib.HTTPConnection(settings.rest_url)
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         conn.close()

@@ -14,6 +14,7 @@ import json
 import httplib
 import time
 import re
+import settings
 
 
 class crawler_daily():
@@ -106,7 +107,8 @@ class crawler_daily():
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("cra.baklazanas.lt")
-        conn = httplib.HTTPConnection("localhost:8000")
+        # conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection(settings.rest_url)
         logging.debug(url)
         logging.debug(headers)
         logging.debug(params)

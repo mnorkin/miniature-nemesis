@@ -280,6 +280,7 @@ def archive_git_and_put(opts):
         run('ln -s %(full_deploy_path)s/ %(symlink_path)s' % opts)
     else:
         run('ln -nsf %(full_deploy_path)s/ %(symlink_path)s' % opts)
+    run('mkdir %(symlink_path)/logs' % opts)
 
 
 def install_requirements(opts):
@@ -438,11 +439,11 @@ def django_sink_configuration(opts):
     if opts['createdb']:
         with settings(warn_only=True):
             # Backup if there was anything
-            sudo('pg_dump tp%(version)s-sink > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            sudo('pg_dump cra%(version)s-sink > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
             # Clean
-            sudo('dropdb tp%(version)s-sink' % opts, user='postgres')
+            sudo('dropdb cra%(version)s-sink' % opts, user='postgres')
         # Create
-        sudo('createdb tp%(version)s-sink' % opts, user='postgres')
+        sudo('createdb cra%(version)s-sink' % opts, user='postgres')
 
     virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
     virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
@@ -454,7 +455,8 @@ def django_sink_update():
     opts = dict(
         what_to_send_path=env.django_sink_path,
         release=env.release_django_sink,
-        deploy_path=env.deploy_django_sink_path
+        deploy_path=env.deploy_django_sink_path,
+        createdb=False
     )
     archive_git_and_put(opts)
     django_sink_configuration(opts)
@@ -467,7 +469,8 @@ def django_sink_deploy():
     opts = dict(
         what_to_send_path=env.django_sink_path,
         release=env.release_django_sink,
-        deploy_path=env.deploy_django_sink_path
+        deploy_path=env.deploy_django_sink_path,
+        createdb=True
     )
     archive_git_and_put(opts)
     django_sink_configuration(opts)
