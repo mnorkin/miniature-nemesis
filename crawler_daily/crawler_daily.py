@@ -146,7 +146,9 @@ class crawler_daily():
         for target_price in self.target_price_list:
             response = self.rest("/api/target_prices/", "POST", target_price)
             if not response:
-                logging.error("Target price send data fail")
+                logging.error("FAIL Target price send data")
+            else:
+                logging.error("OK Target price send")
         return True
 
     def targetprice_parse_list(self):
