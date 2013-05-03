@@ -280,7 +280,6 @@ def archive_git_and_put(opts):
         run('ln -s %(full_deploy_path)s/ %(symlink_path)s' % opts)
     else:
         run('ln -nsf %(full_deploy_path)s/ %(symlink_path)s' % opts)
-    run('mkdir %(symlink_path)/logs' % opts)
 
 
 def install_requirements(opts):
@@ -299,6 +298,15 @@ def restart_deamon(opts):
             sleep 2' % opts)
 
 
+def crawler_daily_configuration(opts):
+    # Update settings
+    run('mv %(deploy_path)s/releases/%(release)s/settings.py \
+        %(deploy_path)s/releases/%(release)s/settings_development.py' % opts)
+    run('mv %(deploy_path)s/releases/%(release)s/settings_production.py \
+        %(deploy_path)s/releases/%(release)s/settings.py' % opts)
+    run('mkdir %(deploy_path)s/releases/current/logs' % opts)
+
+
 def crawler_daily_deploy():
     opts = dict(
         what_to_send_path=env.crawler_daily_path,
@@ -308,6 +316,7 @@ def crawler_daily_deploy():
     )
     archive_git_and_put(opts)
     install_requirements(opts)
+    crawler_daily_configuration(opts)
 
 
 def crawler_daily_update():
@@ -318,6 +327,7 @@ def crawler_daily_update():
         createdb=False
     )
     archive_git_and_put(opts)
+    crawler_daily_configuration(opts)
 
 
 def model_configuration(opts):
@@ -431,9 +441,9 @@ def django_sink_configuration(opts):
     env.activate = 'source %(deploy_path)s/bin/activate' % opts
     # Update settings
     run('mv %(deploy_path)s/releases/current/crawler/settings.py \
-        %(deploy_path)s/releases/current/crawler/settings_dev.py')
-    run('mv %(deploy_path)s/releases/current/crawler/setting_prod.py \
-        %(deploy_path)s/releases/current/crawler/settings.py')
+        %(deploy_path)s/releases/current/crawler/settings_dev.py' % opts)
+    run('mv %(deploy_path)s/releases/current/crawler/settings_production.py \
+        %(deploy_path)s/releases/current/crawler/settings.py' % opts)
     sudo('chmod +x %(deploy_path)s/releases/current/deamon.py' % opts)
     # Create the database
     if opts['createdb']:

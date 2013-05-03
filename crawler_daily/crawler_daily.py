@@ -140,7 +140,7 @@ class crawler_daily():
 
     def send_target_prices(self):
         """
-        Method ot send the target prices
+        Method to send the target prices
         """
 
         for target_price in self.target_price_list:
