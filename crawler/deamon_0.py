@@ -6,6 +6,7 @@ import time
 import atexit
 from signal import SIGTERM
 import datetime
+import settings
 
 
 class Daemon:
@@ -123,7 +124,7 @@ class Daemon:
                     sys.exit(1)
 
         # os.system('pkill gunicorn')
-        os.system("ps aux | grep '/home/agurkas/crawler/' | awk '{print $2}' | xargs -r kill -9")
+        os.system("ps aux | grep 'crawler.py' | awk '{print $2}' | xargs -r kill -9")
         # Filtering out process, which runs in `cra_targetprice` directory and kill it
 
     def restart(self):
@@ -144,18 +145,16 @@ class Daemon:
 class cra_daemon(Daemon):
     def run(self):
         # Crawler binds on 9050 port
-        os.system('cd /home/agurkas/crawler/releases/current;\
-            python2 crawler.py -ac 1')
-        os.system('cd /home/agurkas/crawler/releases/current;\
-            python2 crawler.py -ac 2')
+        os.system('cd %s;\
+            python2 crawler.py -a 1' % settings.crawler_dir)
 
 if __name__ == '__main__':
     """
     This is the main worker here
     """
     log_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    log_path = "/var/log/cra_everything_" + log_date + ".log"
-    deamon = cra_daemon('/tmp/cra-deamon.pid', '/dev/null', log_path, log_path)
+    log_path = "/var/log/cra_0_everything_" + log_date + ".log"
+    deamon = cra_daemon('/tmp/cra-0-deamon.pid', '/dev/null', log_path, log_path)
 
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:

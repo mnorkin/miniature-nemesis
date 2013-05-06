@@ -52,7 +52,7 @@ class crawler():
         self.absolute_path = os.path.dirname(os.path.realpath(__file__))
         self.logging_file = self.absolute_path + '/logs/' + date.today().isoformat() + '.log'
         self.logging_level = logging.DEBUG
-        self.start_hour = 20  # Then the crawler starts its job
+        self.start_hour = 0  # Then the crawler starts its job
         self.len_hour = 7  # How long in hours the crawler works
         self.mailman = mailman(
             'AKIAJKFJFUKWVJSBYA5Q',
@@ -250,12 +250,16 @@ cra.baklazanas.lt, sleeping')
         probability for each letter to pop-out
         """
 
-        # response = self.rest_with_response('/api/tickers/', 'GET')
+        response = self.rest_with_response('/api/tickers/', 'GET')
         # Name filtering with TEX ticker
-        response = {}
-        response['ticker'] = 'TEX'
-        response['name'] = 'Terex Corporation'
+        # response = {}
+        # response['ticker'] = 'TEX'
+        # response['name'] = 'Terex Corporation'
         # New method with v2
+        # Name lower filtering with PRE ticker
+        # response = {}
+        # response['ticker'] = 'PRE'
+        # response['name'] = 'PartnerRe Ltd.'
         # shuffle(self.alphabet)  # Randomize the list
         logging.debug('Received ticker %s' % response['ticker'])
         logging.debug('Received ticker %s' % response['name'])
@@ -442,19 +446,23 @@ cra.baklazanas.lt, sleeping')
 
         # something_was_sent = False
         for company_index, company in enumerate(self.companies_list):
-            logging.debug('Company having %s, given %s' % (company['name'], self.name))
-            logging.debug('Ticker having %s, given %s' % (company['ticker'], self.ticker))
-            if company['ticker'] == self.ticker:
+            company_name_form_page = re.sub('\W+', '', company['name'].lower())
+            company_name_from_api = re.sub('\W+', '', self.name.lower())
+            company_ticker_from_page = company['ticker']
+            company_ticker_from_api = self.ticker
+            logging.debug('Company having %s, given %s' % (company_name_form_page, company_name_from_api))
+            logging.debug('Ticker having %s, given %s' % (company_ticker_from_page, company_ticker_from_api))
+            if company_ticker_from_page == company_ticker_from_api:
                 logging.debug('Ticker equals')
             else:
                 logging.debug('Ticker does not equals')
 
-            if company['name'] == self.name:
+            if company_name_form_page == company_name_from_api:
                 logging.debug('Name equals')
             else:
                 logging.debug('Name not equals')
 
-            if company['ticker'] == self.ticker and company['name'] == self.name:
+            if company_ticker_from_page == company_ticker_from_api and company_name_form_page == company_name_from_api:
                 response = True
             else:
                 response = False

@@ -109,12 +109,21 @@ class crawler_daily():
         # conn = httplib.HTTPConnection("cra.baklazanas.lt")
         # conn = httplib.HTTPConnection("localhost:8000")
         conn = httplib.HTTPConnection(settings.rest_url)
-        logging.debug(url)
-        logging.debug(headers)
-        logging.debug(params)
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         conn.close()
+        if response.status == 500:
+            # This parameter is return, then there is error from the server
+            # side
+            logging.debug('500 ERROR')
+            logging.debug('***')
+            logging.debug(url)
+            logging.debug(headers)
+            logging.debug(params)
+            logging.debug('***')
+        if response.status == 404:
+            logging.debug('404 returned')
+            logging.debug(params)
         if response.status != 502:
             # ALL_OK
             if response.status == 200 and request.upper() == 'GET':
@@ -187,6 +196,9 @@ class crawler_daily():
 
             parsed_raiting = items[3].text
 
+            if parsed_raiting is None:
+                parsed_raiting = 'NULL'
+
             # Form a list
             item = {
                 'action': items[0].text_content().strip(),
@@ -194,7 +206,7 @@ class crawler_daily():
                 'rating': parsed_raiting,
                 'price0': prices[0],
                 'price1': prices[1],
-                'pub_date': parsed_date.strftime('%Y-%m-%d'),
+                'date': parsed_date.strftime('%Y-%m-%d'),
                 'company_name': items[1].text_content().strip()  # Need to change in the APIs
             }
             # Construct the list

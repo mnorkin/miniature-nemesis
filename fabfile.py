@@ -298,6 +298,38 @@ def restart_deamon(opts):
             sleep 2' % opts)
 
 
+def crawler_configuration(opts):
+    # Update settings
+    run('mv %(deploy_path)s/releases/%(release)s/settings.py \
+        %(deploy_path)s/releases/%(release)s/settings_development.py' % opts)
+    run('mv %(deploy_path)s/releases/%(release)s/settings_production.py \
+        %(deploy_path)s/releases/%(release)s/settings.py' % opts)
+    run('mkdir %(deploy_path)s/releases/current/logs' % opts)
+
+
+def crawler_deploy():
+    opts = dict(
+        what_to_send_path=env.crawler_path,
+        release=env.release_crawler,
+        deploy_path=env.deploy_crawler_path,
+        createdb=False
+    )
+    archive_git_and_put(opts)
+    install_requirements(opts)
+    crawler_configuration(opts)
+
+
+def crawler_update():
+    opts = dict(
+        what_to_send_path=env.crawler_path,
+        release=env.release_crawler,
+        deploy_path=env.deploy_crawler_path,
+        createdb=False
+    )
+    archive_git_and_put(opts)
+    crawler_configuration(opts)
+
+
 def crawler_daily_configuration(opts):
     # Update settings
     run('mv %(deploy_path)s/releases/%(release)s/settings.py \

@@ -183,8 +183,8 @@ class TargetPriceHandler(BaseHandler):
             # no ticker information is provided
             if 'company_name' in data:
                 try:
-                    ticker = Ticker.objects.get(name=data['company_name'])
-                except ticker.DoesNotExist:
+                    ticker = Ticker.objects.filter(name__icontains=data['company_name'])[0]
+                except IndexError:
                     return rc.NOT_FOUND
 
             # Big ticker browser has the information in ticker information
@@ -203,7 +203,7 @@ class TargetPriceHandler(BaseHandler):
                 price0=data['price0'],
                 price1=data['price1'],
                 ticker=ticker,
-                date=data['pub_date']
+                date=data['date']
             )
 
             em.save()
