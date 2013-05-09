@@ -127,7 +127,8 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'gunicorn',
     'apikey',
-    'morbid'
+    'morbid',
+    'south'
 )
 
 APIKEY_AUTHORIZATION_HEADER = 'App-Authorization'
