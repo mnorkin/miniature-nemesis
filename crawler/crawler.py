@@ -169,20 +169,21 @@ class crawler():
         conn = httplib.HTTPConnection(settings.rest_url)
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
+        raw_response = response.read()
         conn.close()
         if response.status != 502:
             # ALL_OK
             if response.status == 200 and request.upper() == 'GET':
-                return json.loads(response.read())
+                return json.loads(raw_response)
             # CREATED
             elif response.status == 201 and request.upper() == 'POST':
-                return json.loads(response.read())
+                return json.loads(raw_response)
             # ALL_OK
             elif response.status == 200 and request.upper() == 'PUT':
-                return json.loads(response.read())
+                return json.loads(raw_response)
             # DELETED
             elif response.status == 204 and request.upper() == 'DELETE':
-                return json.loads(response.read())
+                return json.loads(raw_response)
             else:
                 return None
         else:
