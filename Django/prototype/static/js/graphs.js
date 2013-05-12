@@ -82,7 +82,7 @@ var graphs = (function () {
 
             for (i = 0; i < json.length; i++) {
                 tmp_obj = {};
-                // TODO: why values come negatyve?
+                // TODO: why values come negative?
                 // set values max 100, min 0
                 tmp_obj.value = Math.max(0, json[i].value);
                 tmp_obj.value = Math.min(100, tmp_obj.value);
@@ -131,7 +131,7 @@ var graphs = (function () {
 
             for (var i = 0 ; i < full_data.length; i++) {
                 if(full_data[i].slug == order_elem_name){
-                    if(to_end == true){
+                    if(to_end === true){
                         full_data.push(full_data[i]);
                         full_data.splice(i, 1);
                     }else{
@@ -142,7 +142,7 @@ var graphs = (function () {
                 }
             }
             return;
-        },        
+        },
         draw_reordered_UNUSED: function(){
 
             d3.selectAll("#" + _element_id + " svg").remove();

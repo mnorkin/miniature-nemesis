@@ -139,7 +139,8 @@ class yahoo_stock():
         Getting all the tickers from the server
         """
         # tickers = self.rest('/api/stocks/', 'GET')
-        tickers = [{'ticker': '^GSPC'}]
+        # tickers = [{'ticker': '^GSPC'}]
+        tickers = [{'ticker': 'YRI'}]
         start_time = 0
         # Start the request loop
         for ticker in tickers:

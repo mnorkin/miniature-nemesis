@@ -8,10 +8,32 @@ from morbid.models import Analytic
 from morbid.models import Unit
 from morbid.models import Volatility
 from morbid.models import TargetPriceNumberAnalyticTicker
+from morbid.utils import stock_data
 from piston.handler import BaseHandler
 from piston.utils import rc
 from piston.utils import validate
 from django.http import HttpResponse, Http404
+
+
+class StockHandler(BaseHandler):
+    """
+    The yahoo stock handler
+    """
+
+    def read(self, request, ticker=None):
+        if ticker:
+            return stock_data(ticker)
+        else:
+            return rc.NOT_IMPLEMENTED
+
+    def create(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def update(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def delete(self, request):
+        return rc.NOT_IMPLEMENTED
 
 
 class ApiKeyHandler(BaseHandler):
@@ -434,9 +456,9 @@ class TargetPriceHandler(BaseHandler):
     allowed_methods = ('GET', 'POST', 'PUT')
     model = TargetPrice
 
-    def read(self, request, target_price_id=None):
-        if target_price_id:
-            return TargetPrice.objects.get(id=target_price_id)
+    def read(self, request, ticker=None):
+        if ticker:
+            return TargetPrice.objects.filter(ticker__name=ticker)
         else:
             return TargetPrice.objects.all()
 

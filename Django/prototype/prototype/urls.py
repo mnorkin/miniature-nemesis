@@ -16,6 +16,7 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^page/(?P<page>\d+)/$', 'morbid.views.index'),
+    url(r'^testing/$', 'morbid.views.test'),
     url(r'^$', 'morbid.views.index'),
     url(r'^analytic/target_prices/(?P<analytic_slug>[^/]+)/$', 'morbid.views.target_prices'),
     url(r'^ticker/target_prices/(?P<ticker_slug>[^/]+)/$', 'morbid.views.target_prices'),

@@ -439,6 +439,24 @@ def django_production_configuration(opts):
     virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
 
 
+def django_production_backup():
+    """
+    Backing up the production database
+    """
+    opts = dict(
+        what_to_send_path=env.django_production_path,
+        release=env.release_django_production,
+        deploy_path=env.deploy_django_production_path,
+        version=env.version
+    )
+    sudo('touch %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('chmod 777 %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('pg_dump fp%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+    local('mkdir -p ../backups/production')
+    get('%(deploy_path)s/%(release)s.sql' % opts, '../backups/production/%(release)s.sql' % opts)
+    sudo('rm %(deploy_path)s/%(release)s.sql' % opts)
+
+
 def django_production_update():
     opts = dict(
         what_to_send_path=env.django_production_path,
@@ -481,14 +499,32 @@ def django_sink_configuration(opts):
     if opts['createdb']:
         with settings(warn_only=True):
             # Backup if there was anything
-            sudo('pg_dump cra%(version)s-sink > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            sudo('pg_dump cra-sink > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
             # Clean
-            sudo('dropdb cra%(version)s-sink' % opts, user='postgres')
+            sudo('dropdb cra-sink' % opts, user='postgres')
         # Create
-        sudo('createdb cra%(version)s-sink' % opts, user='postgres')
+        sudo('createdb cra-sink' % opts, user='postgres')
 
     virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
     virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
+
+
+def django_sink_backup():
+    """
+    Backing up the production database
+    """
+    opts = dict(
+        what_to_send_path=env.django_sink_path,
+        release=env.release_django_sink,
+        deploy_path=env.deploy_django_sink_path,
+        createdb=False
+    )
+    sudo('touch %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('chmod 777 %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('pg_dump cra-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+    local('mkdir -p ../backups/sink')
+    get('%(deploy_path)s/%(release)s.sql' % opts, '../backups/sink/%(release)s.sql' % opts)
+    sudo('rm %(deploy_path)s/%(release)s.sql' % opts)
 
 
 def django_sink_update():

@@ -91,7 +91,10 @@ class TickerHandler(BaseHandler):
             except ticker.DoesNotExist:
                 return rc.NOT_FOUND
         else:
-            having_tickers = TargetPrice.objects.values_list('ticker__ticker', flat=True)
+            having_tickers = TargetPrice.objects.values_list(
+                'ticker__ticker',
+                flat=True
+            ).distinct('ticker__ticker')
             ticker = Ticker.objects.exclude(ticker__in=having_tickers).order_by('?')[0]
             return ticker
         # super(Ticker, self).create(request)

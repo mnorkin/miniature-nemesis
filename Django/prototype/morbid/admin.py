@@ -23,6 +23,7 @@ class FeatureAnalyticTickerAdmin(admin.ModelAdmin):
 
 class TargetPriceAdmin(admin.ModelAdmin):
     list_display = ('analytic', 'date', 'price', 'ticker')
+    search_fields = ['ticker__name']
 
 
 class TickerAdmin(admin.ModelAdmin):

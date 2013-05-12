@@ -1,0 +1,13 @@
+{% extends "morbid/base.html" %}
+
+{% block content %}
+
+<h1>{{ticker.ticker.name}}</h1>
+
+<div class="hidden" id="current-ticker">{{ticker.ticker.name}}</div>
+
+<div id="stock-graph"></div>
+
+<script type="text/javascript" src="/static/js/stock-test.js"></script>
+
+{% endblock %}

@@ -1,14 +1,18 @@
 from django.http import HttpResponse, Http404
 from django.template import Context, loader
-from morbid.models import TargetPrice, Analytic, FeatureAnalyticTicker, Feature, Ticker
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from morbid.models import TargetPrice
+from morbid.models import Analytic
+from morbid.models import FeatureAnalyticTicker
+from morbid.models import Feature
+from morbid.models import Ticker
+from morbid.utils import stock_data
 import re
 import json
-# from prototype.decorators import logged_in_or_basicauth
 import urllib as u
 
 
-# @logged_in_or_basicauth(realm="Limited access")
 def index(request, page=0):
     """
     Index page
@@ -415,9 +419,30 @@ def graph_03(request):
 
 
 def screen(request):
+    """
+    This is the screen page, which displays the screen shots of the system
+    """
 
     t = loader.get_template("screen.html")
 
     c = Context()
+
+    return HttpResponse(t.render(c))
+
+
+@login_required(login_url='/admin/')
+def test(request):
+    """
+    This is the testing platform, which will make the role of testing platform
+    from the various users, to make sure, all the data is calculated correctly
+    """
+
+    ticker = FeatureAnalyticTicker.objects.all().order_by('?')[0]
+
+    t = loader.get_template("test.html")
+
+    c = Context({
+        'ticker': ticker
+    })
 
     return HttpResponse(t.render(c))
