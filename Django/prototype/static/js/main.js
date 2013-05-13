@@ -1240,10 +1240,17 @@ function load_more_target_prices(){
 
     /* Give it a bigger offset, for better experience */
 
-    var last_offset = $('.target_price_list > li:nth-last-of-type(1)').offset().top
+    var last_offset = 0;
 
-    if ($(window).scrollTop() + $(window).height() >= last_offset + 310  &&
-        bottom_of_page === false && loading_target_prices == false) { 
+    if ($('.target_price_list > li:nth-last-of-type(1)').offset() !== undefined) {
+        last_offset = $('.target_price_list > li:nth-last-of-type(1)').offset().top;
+    }
+
+    if (
+        $(window).scrollTop() + $(window).height() >= last_offset + 310  &&
+        bottom_of_page === false &&
+        loading_target_prices === false
+    ) {
         page_number +=1;
         loading_target_prices = true;
 
