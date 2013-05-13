@@ -437,12 +437,26 @@ def test(request):
     from the various users, to make sure, all the data is calculated correctly
     """
 
-    ticker = FeatureAnalyticTicker.objects.all().order_by('?')[0]
+    feature_analytic_tickers = FeatureAnalyticTicker.objects.all()
+
+    feature_analytic_ticker = feature_analytic_tickers.order_by('?')[0]
+
+    feature_analytic_ticker_data = feature_analytic_tickers.filter(
+        ticker__slug=feature_analytic_ticker.ticker.slug,
+        analytic__slug=feature_analytic_ticker.analytic.slug
+    )
+
+    target_prices = TargetPrice.objects.filter(
+        ticker__slug=feature_analytic_ticker.ticker.slug,
+        analytic__slug=feature_analytic_ticker.analytic.slug
+    )
 
     t = loader.get_template("test.html")
 
     c = Context({
-        'ticker': ticker
+        'feature_analytic_ticker': feature_analytic_ticker,
+        'feature_analytic_ticker_data': feature_analytic_ticker_data,
+        'target_prices': target_prices
     })
 
     return HttpResponse(t.render(c))

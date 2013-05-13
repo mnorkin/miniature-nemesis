@@ -2,12 +2,46 @@
 
 {% block content %}
 
-<h1>{{ticker.ticker.name}}</h1>
+<h1>{{feature_analytic_ticker.analytic.name}} -- {{feature_analytic_ticker.ticker.name}}</h1>
 
-<div class="hidden" id="current-ticker">{{ticker.ticker.name}}</div>
+<div class="hidden" id="current-ticker-slug">{{feature_analytic_ticker.ticker.slug}}</div>
+<div class="hidden" id="current-analytic-slug">{{feature_analytic_ticker.analytic.slug}}</div>
 
 <div id="stock-graph"></div>
 
 <script type="text/javascript" src="/static/js/stock-test.js"></script>
 
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Price</th>
+        </tr>
+    </thread>
+    <tbody>
+        {% for target_price in target_prices %}
+        <tr>
+            <td>{{target_price.date}}</td>
+            <td>{{target_price.price}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in feature_analytic_ticker_data %}
+        <tr>
+            <td>{{ data.feature.name }}</td>
+            <td>{{ data.value }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

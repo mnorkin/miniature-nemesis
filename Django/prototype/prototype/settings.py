@@ -21,6 +21,13 @@ DATABASES = {
     }
 }
 
+TP_DATABASE = {
+    'NAME': 'tp-morbid',
+    'USER': 'postgres',
+    'PASSWORD': 'sWAgu4e7',
+    'HOST': 'localhost'
+}
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.

@@ -22,7 +22,9 @@ input, select, textarea, option, table {
     font-family: Arial, sans-serif;
     font-size: 12px;
 }
-table { border-collapse: collapse; }
+table {
+    border-collapse: collapse;
+}
 li{ list-style: none; }
 .clear { clear:both; }
 .left { float: left; }
@@ -1213,4 +1215,27 @@ li{ list-style: none; }
     fill: none;
     stroke: green;
     stroke-width: 1.5px;   
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.table tr:hover td {
+    background: #FFE373;
+}
+
+.table, .table td, .table th {
+    border: 1px solid #A68400;
+}
+
+.table th {
+    font-weight: bold;
+    padding: 5px;
+}
+
+.table td {
+    padding: 5px;
+    text-align: center;
 }

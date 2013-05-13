@@ -9,6 +9,7 @@ from morbid.models import Unit
 from morbid.models import Volatility
 from morbid.models import TargetPriceNumberAnalyticTicker
 from morbid.utils import stock_data
+from morbid.utils import target_data
 from piston.handler import BaseHandler
 from piston.utils import rc
 from piston.utils import validate
@@ -20,9 +21,10 @@ class StockHandler(BaseHandler):
     The yahoo stock handler
     """
 
-    def read(self, request, ticker=None):
-        if ticker:
-            return stock_data(ticker)
+    def read(self, request, ticker_slug=None):
+        if ticker_slug:
+            ticker = Ticker.objects.get(slug=ticker_slug)
+            return stock_data(ticker.name)
         else:
             return rc.NOT_IMPLEMENTED
 
@@ -456,9 +458,15 @@ class TargetPriceHandler(BaseHandler):
     allowed_methods = ('GET', 'POST', 'PUT')
     model = TargetPrice
 
-    def read(self, request, ticker=None):
-        if ticker:
-            return TargetPrice.objects.filter(ticker__name=ticker)
+    def read(self, request, ticker_slug=None, analytic_slug=None):
+        if ticker_slug and analytic_slug:
+            ticker = Ticker.objects.get(slug=ticker_slug)
+            analytic = Analytic.objects.get(slug=analytic_slug)
+            return target_data(ticker.name, analytic.name)
+            # return TargetPrice.objects.filter(
+            #     ticker__slug=ticker_slug,
+            #     analytic__slug=analytic_slug
+            # )
         else:
             return TargetPrice.objects.all()
 

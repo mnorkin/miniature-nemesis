@@ -1244,6 +1244,8 @@ function load_more_target_prices(){
 
     if ($('.target_price_list > li:nth-last-of-type(1)').offset() !== undefined) {
         last_offset = $('.target_price_list > li:nth-last-of-type(1)').offset().top;
+    } else {
+        return false;
     }
 
     if (

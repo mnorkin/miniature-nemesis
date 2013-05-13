@@ -6,6 +6,8 @@ db_config = {
     'db_host': 'localhost'
 }
 
+# Data Storage path
 data_dir = '/home/agurkas/data'
 
+# REST interface URL
 rest_url = 'dev3.baklazanas.lt'

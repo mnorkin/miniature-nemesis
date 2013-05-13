@@ -35,14 +35,17 @@ target_price_analytic_ticker = Resource(TargetPriceAnalyticTickerHandler)
 urlpatterns = patterns(
     '',
     url(r'^stock_prices/$', stock_price_handler),
-    url(r'^stocks/(?P<ticker>[\w-]+)/$', stock_handler),
+    url(r'^stocks/(?P<ticker_slug>[\w-]+)/$', stock_handler),
     url(r'^feature_analytic_tickers/$', feature_analytic_ticker_handler),
     url(r'^analytics/$', analytic_handler),
     url(r'^analytics/(?P<analytic_slug>[\w-]+)/$', analytic_handler),
     url(r'^tickers/$', ticker_handler),
     url(r'^tickers/(?P<ticker_slug>[\w-]+)/$', ticker_handler),
     url(r'^target_prices/$', target_price_handler),
-    url(r'^target_prices/(?P<ticker>[\w-]+)/$', target_price_handler),
+    url(
+        r'^target_prices/(?P<ticker_slug>[\w-]+)/(?P<analytic_slug>[\w-]+)/$',
+        target_price_handler
+    ),
     url(r'^features/$', feature_handler),
     url(r'^features/(?P<feature_id>\d+)/$', feature_handler),
     url(r'^units/$', unit_handler),
