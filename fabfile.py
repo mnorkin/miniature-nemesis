@@ -385,6 +385,21 @@ def model_configuration(opts):
         sudo('cat %(deploy_path)s/releases/current/database.sql | psql tp%(version)s-morbid' % opts, user='postgres')
 
 
+def model_backup():
+    opts = dict(
+        what_to_send_path=env.model_path,
+        release=env.release_model,
+        deploy_path=env.deploy_model_path,
+        version=env.version
+    )
+    sudo('touch %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('chmod 777 %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('pg_dump tp2-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+    local('mkdir -p ../backups/model')
+    get('%(deploy_path)s/%(release)s.sql' % opts, '../backups/model/%(release)s.sql' % opts)
+    sudo('rm %(deploy_path)s/%(release)s.sql' % opts)
+
+
 def model_update():
     opts = dict(
         what_to_send_path=env.model_path,

@@ -135,10 +135,11 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'gunicorn',
     'apikey',
-    'morbid'
+    'morbid',
+    'APIKEY_AUTHORIZATION_HEADER'
 )
 
-APIKEY_AUTHORIZATION_HEADER = 'App-Authorization'
+south = 'App-Authorization'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
