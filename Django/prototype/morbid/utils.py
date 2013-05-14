@@ -11,7 +11,7 @@ def stock_data(ticker=None):
     """
     try:
         f = open("".join((settings.STOCK_DATA_PATH, "/", ticker, '.json')), "r")
-        data = json.loads(f.read())[1::10]
+        data = json.loads(f.read())
         return data
     except IOError:
         return []

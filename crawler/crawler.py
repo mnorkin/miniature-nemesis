@@ -620,11 +620,3 @@ if __name__ == '__main__':
         cra.run()
     else:
         print args
-    # Define the crawler
-    # cra1 = crawler('arvydas.tamulis@gmail.com', 'liko789')
-    # cra1.setDaemon(True)
-    # cra1.run()  # Launch the main guy into the wild
-    # cra2 = crawler('trialseoproject@gmail.com', 'saras86')
-    # cra2.setDaemon(True)
-    # cra2.run()
-    # pass

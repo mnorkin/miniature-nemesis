@@ -463,10 +463,6 @@ class TargetPriceHandler(BaseHandler):
             ticker = Ticker.objects.get(slug=ticker_slug)
             analytic = Analytic.objects.get(slug=analytic_slug)
             return target_data(ticker.name, analytic.name)
-            # return TargetPrice.objects.filter(
-            #     ticker__slug=ticker_slug,
-            #     analytic__slug=analytic_slug
-            # )
         else:
             return TargetPrice.objects.all()
 

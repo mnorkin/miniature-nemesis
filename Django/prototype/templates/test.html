@@ -14,8 +14,10 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Price</th>
+            <th>Target Date</th>
+            <th>Target Price</th>
+            <th>Stock price open</th>
+            <th>Stock price close</th>
         </tr>
     </thread>
     <tbody>
@@ -23,6 +25,8 @@
         <tr>
             <td>{{target_price.date}}</td>
             <td>{{target_price.price}}</td>
+            <td>{{ target_price.stock_price_open }}</td>
+            <td>{{ target_price.stock_price_close }}</td>
         </tr>
         {% endfor %}
     </tbody>

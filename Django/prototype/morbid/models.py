@@ -192,6 +192,14 @@ class FeatureAnalyticTicker(models.Model):
         return str(self.value) + " " + str(self.feature) + " " + str(self.analytic)
 
 
+class FeatureAnalyticTickerCheck(models.Model):
+    """
+    Testing platform to check the calculations
+    """
+    value = models.FloatField()
+    feature_analytic_ticker = models.ForeignKey(FeatureAnalyticTicker)
+
+
 class TargetPriceManager(models.Manager):
     """
     Custom Target Price Manager

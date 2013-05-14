@@ -55,12 +55,15 @@ $(document).ready(function() {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    var stocks_data = null;
+
     d3.json('/api/stocks/' + current_ticker_slug + '/', function(data) {
         data.forEach(function(d) {
             d.date = parseDate(d.date);
             d.close = d.price_close;
             d.open = d.price_open;
         });
+        stocks_data = data;
 
         x.domain([ d3.min(data, function(d) {
             return d.date;
@@ -77,7 +80,7 @@ $(document).ready(function() {
         // })]).nice();
 
         y.domain([0, d3.max(data, function(d) {
-            return d.close + d.close*0.20;
+            return d.close + d.close*0.50;
         })]);
 
         svg.append("g")
@@ -103,87 +106,80 @@ $(document).ready(function() {
             .attr('class', 'line_open')
             .attr('d', line_open(data));
 
-    });
+        d3.json(
+            '/api/target_prices/' + current_ticker_slug + '/' + current_analytic_slug + '/', function(data) {
+            data.forEach(function(d) {
+                d.parsed_date = parseDate(d.date);
+                d.date_1 = (parseFloat(d.date.split('-')[0])+1).toString() +
+                    '-' + d.date.split('-')[1] +
+                    '-' + d.date.split('-')[2];
+                d.parsed_date_1 = parseDate(d.date_1);
+                d.x_date = x(d.parsed_date);
+                d.x_date_1 = x(d.parsed_date_1);
+                d.y_price = y(d.price);
+                d.start_point = {
+                    'parsed_date': x(d.parsed_date),
+                    'price': y(d.price)
+                };
+                d.end_point = {
+                    'parsed_date': x(d.parsed_date_1),
+                    'price': y(d.price)
+                };
+            });
 
-    d3.json(
-        '/api/target_prices/' + current_ticker_slug + '/' + current_analytic_slug + '/', function(data) {
-        data.forEach(function(d) {
-            d.parsed_date = parseDate(d.date);
-            d.date_1 = (parseFloat(d.date.split('-')[0])+1).toString() +
-                '-' + d.date.split('-')[1] +
-                '-' + d.date.split('-')[2];
-            d.parsed_date_1 = parseDate(d.date_1);
-            d.x_date = x(d.parsed_date);
-            d.x_date_1 = x(d.parsed_date_1);
-            d.y_price = y(d.price);
-            d.start_point = {
-                'parsed_date': x(d.parsed_date),
-                'price': y(d.price)
-            };
-            d.end_point = {
-                'parsed_date': x(d.parsed_date_1),
-                'price': y(d.price)
-            };
+
+            x.domain([ d3.min(data, function(d) {
+                return d.parsed_date;
+            }), d3.max(data, function(d) {
+                return d.parsed_date_1;
+            })]);
+
+            svg.selectAll("svg")
+                .data(data).enter()
+                .append('svg:circle')
+                .attr('cx', function(d, i) {
+                    return d.x_date;
+                })
+                .attr('cy', function(d, i) {
+                    return d.y_price;
+                })
+                .attr('r', 2)
+                .attr('fill', '#333');
+
+            svg.selectAll("svg")
+                .data(data).enter()
+                .append('svg:circle')
+                .attr('cx', function(d, i) {
+                    return d.x_date_1;
+                })
+                .attr('cy', function(d, i) {
+                    return d.y_price;
+                })
+                .attr('r', 2)
+                .attr('fill', '#333');
+
+            svg.selectAll("#stock-graph")
+                .data(data).enter()
+                .append('svg:line')
+                .attr('x1', function(d) {
+                    console.log(d.start_point.parsed_date);
+                    return d.start_point.parsed_date;
+                })
+                .attr('y1', function(d) {
+                    console.log(d.start_point.price);
+                    return d.start_point.price;
+                })
+                .attr('x2', function(d) {
+                    console.log(d.end_point.parsed_date);
+                    return d.end_point.parsed_date;
+                })
+                .attr('y2', function(d) {
+                    return d.end_point.price;
+                })
+                .style('stroke', 'rgb(6,120,155)');
+
         });
 
-
-        x.domain([ d3.min(data, function(d) {
-            return d.date;
-        }), d3.max(data, function(d) {
-            return d.date;
-        })]);
-
-        svg.selectAll("svg")
-            .data(data).enter()
-            .append('svg:circle')
-            .attr('cx', function(d, i) {
-                return d.x_date;
-            })
-            .attr('cy', function(d, i) {
-                return d.y_price;
-            })
-            .attr('r', 2)
-            .attr('fill', '#333');
-
-        svg.selectAll("svg")
-            .data(data).enter()
-            .append('svg:circle')
-            .attr('cx', function(d, i) {
-                return d.x_date_1;
-            })
-            .attr('cy', function(d, i) {
-                return d.y_price;
-            })
-            .attr('r', 2)
-            .attr('fill', '#333');
-
-        svg.selectAll("svg")
-            .data(data).enter()
-            .append('svg:line')
-            .attr('x1', function(d) {
-                console.log(d.start_point.parsed_date);
-                return d.start_point.parsed_date;
-            })
-            .attr('y1', function(d) {
-                console.log(y(d.start_point.price));
-                return d.start_point.price;
-            })
-            .attr('x2', function(d) {
-                console.log(d.end_point.parsed_date);
-                return d.end_point.parsed_date;
-            })
-            .attr('y2', function(d) {
-                return d.end_point.price;
-            })
-            .style('stroke', 'rgb(6,120,155)');
-
-        x.domain([d3.min(function(d) {
-            return d.parsed_date;
-        }), d3.max(function(d) {
-            return d.parsed_date_1;
-        })]);
     });
-
-
 
 });

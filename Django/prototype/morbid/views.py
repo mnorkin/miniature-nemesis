@@ -8,6 +8,7 @@ from morbid.models import FeatureAnalyticTicker
 from morbid.models import Feature
 from morbid.models import Ticker
 from morbid.utils import stock_data
+from morbid.utils import target_data
 import re
 import json
 import urllib as u
@@ -431,25 +432,53 @@ def screen(request):
 
 
 @login_required(login_url='/admin/')
-def test(request):
+def test(request, ticker_name=None, analytic_name=None):
     """
     This is the testing platform, which will make the role of testing platform
     from the various users, to make sure, all the data is calculated correctly
     """
 
+    # Collect all the features
     feature_analytic_tickers = FeatureAnalyticTicker.objects.all()
 
-    feature_analytic_ticker = feature_analytic_tickers.order_by('?')[0]
+    if ticker_name and analytic_name:
+        # Select ticker in question
+        feature_analytic_ticker = feature_analytic_tickers.filter(
+            ticker__name=ticker_name,
+            analytic__name=analytic_name
+        )[0]
+    elif ticker_name:
+        # Select ticker in question
+        feature_analytic_ticker = feature_analytic_tickers.filter(
+            ticker__name=ticker_name
+        ).order_by('?')[0]
+    else:
+        # Randomly select one
+        feature_analytic_ticker = feature_analytic_tickers.order_by('?')[0]
 
     feature_analytic_ticker_data = feature_analytic_tickers.filter(
         ticker__slug=feature_analytic_ticker.ticker.slug,
         analytic__slug=feature_analytic_ticker.analytic.slug
+    ).order_by('feature__position')
+
+    stocks_data = stock_data(
+        ticker=feature_analytic_ticker.ticker.name
     )
 
-    target_prices = TargetPrice.objects.filter(
-        ticker__slug=feature_analytic_ticker.ticker.slug,
-        analytic__slug=feature_analytic_ticker.analytic.slug
+    target_prices = target_data(
+        ticker=feature_analytic_ticker.ticker.name,
+        analytic=feature_analytic_ticker.analytic.name
     )
+
+    for target_price in target_prices:
+        matches = (x for x in stocks_data if x['date'] == target_price['date'])
+        try:
+            stock_entry = matches.next()
+            target_price['stock_price_open'] = stock_entry['price_open']
+            target_price['stock_price_close'] = stock_entry['price_close']
+        except StopIteration:
+            target_price['stock_price_open'] = 0
+            target_price['stock_price_close'] = 0
 
     t = loader.get_template("test.html")
 
