@@ -7,41 +7,29 @@ The test manager, just to be on the safe side of the road
 
 from django.utils import unittest
 from django.test.client import Client
+from morbid.models import Analytic
+from morbid.models import Ticker
 
 
-class ModelTest(unittest.TestCase):
+class AnalyticTest(unittest.TestCase):
     """
-    Model test
+    Testing `last_target_price`
     """
-    def test_unit_fields(self):
+    def setUp(self):
         """
-        Test for the unit fields
+        Setting up the environment
         """
-        pass
+        self.goldman = Analytic(
+            name='Goldman',
+            slug='goldman'
+        )
 
-    def test_feature_fields(self):
-        """
-        Test for the unit fields
-        """
-        pass
-
-    def test_ticker_fields(self):
-        """
-        Test for the ticker fields
-        """
-        pass
-
-    def test_analytic_fields(self):
-        """
-        Test for the analytic fields
-        """
-        pass
-
-    def test_featureanalyticticker_fields(self):
-        """
-        Test for the feature analytic ticker fields
-        """
-        pass
+        self.jp = Analytic(
+            name='JP',
+            slug='jp'
+        )
+        self.aapl = Ticker(
+        )
 
 
 class UrlTest(unittest.TestCase):

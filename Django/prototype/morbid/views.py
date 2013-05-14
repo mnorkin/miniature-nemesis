@@ -1,12 +1,17 @@
 from django.http import HttpResponse, Http404
-from django.template import Context, loader
+from django.template import Context
+from django.template import loader
+from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.db import DatabaseError
 from morbid.models import TargetPrice
 from morbid.models import Analytic
 from morbid.models import FeatureAnalyticTicker
+from morbid.models import FeatureAnalyticTickerCheck
 from morbid.models import Feature
 from morbid.models import Ticker
+from morbid.forms import FeatureAnalyticTickerCheckForm
 from morbid.utils import stock_data
 from morbid.utils import target_data
 import re
@@ -432,25 +437,44 @@ def screen(request):
 
 
 @login_required(login_url='/admin/')
-def test(request, ticker_name=None, analytic_name=None):
+def test(request, ticker_slug=None, analytic_slug=None):
     """
     This is the testing platform, which will make the role of testing platform
     from the various users, to make sure, all the data is calculated correctly
     """
+    message = dict()
+    if request.method == 'POST':
+        feature_analytic_ticker_check_form = FeatureAnalyticTickerCheckForm(request.POST)
+        if feature_analytic_ticker_check_form.is_valid():
+            feature_analytic_ticker_id = feature_analytic_ticker_check_form.cleaned_data['feature_analytic_ticker']
+            value = feature_analytic_ticker_check_form.cleaned_data['value']
+            fatc = FeatureAnalyticTickerCheck()
+            fatc.value = value
+            fatc.feature_analytic_ticker = FeatureAnalyticTicker.objects.get(
+                id=feature_analytic_ticker_id
+            )
+
+            try:
+                fatc.save()
+                message['type'] = 'message-success'
+                message['text'] = 'Submission saved successfully'
+            except DatabaseError:
+                message['type'] = 'message-fail'
+                message['text'] = 'Something failed'
 
     # Collect all the features
     feature_analytic_tickers = FeatureAnalyticTicker.objects.all()
 
-    if ticker_name and analytic_name:
+    if ticker_slug and analytic_slug:
         # Select ticker in question
         feature_analytic_ticker = feature_analytic_tickers.filter(
-            ticker__name=ticker_name,
-            analytic__name=analytic_name
+            ticker__slug=ticker_slug,
+            analytic__slug=analytic_slug
         )[0]
-    elif ticker_name:
+    elif ticker_slug:
         # Select ticker in question
         feature_analytic_ticker = feature_analytic_tickers.filter(
-            ticker__name=ticker_name
+            ticker__name=ticker_slug
         ).order_by('?')[0]
     else:
         # Randomly select one
@@ -459,7 +483,20 @@ def test(request, ticker_name=None, analytic_name=None):
     feature_analytic_ticker_data = feature_analytic_tickers.filter(
         ticker__slug=feature_analytic_ticker.ticker.slug,
         analytic__slug=feature_analytic_ticker.analytic.slug
-    ).order_by('feature__position')
+    ).order_by('feature__position').values('feature__name', 'value', 'id')
+
+    results = []
+
+    for data in feature_analytic_ticker_data:
+        feature_analytic_ticker_check_form = FeatureAnalyticTickerCheckForm(
+            initial={'feature_analytic_ticker': data['id']}
+        )
+        item = {
+            'name': data['feature__name'],
+            'value': data['value'],
+            'feature_analytic_ticker_check_form': feature_analytic_ticker_check_form
+        }
+        results.append(item)
 
     stocks_data = stock_data(
         ticker=feature_analytic_ticker.ticker.name
@@ -482,10 +519,40 @@ def test(request, ticker_name=None, analytic_name=None):
 
     t = loader.get_template("test.html")
 
-    c = Context({
+    c = RequestContext(request, {
         'feature_analytic_ticker': feature_analytic_ticker,
-        'feature_analytic_ticker_data': feature_analytic_ticker_data,
-        'target_prices': target_prices
+        'feature_analytic_ticker_data': results,
+        'target_prices': target_prices,
+        'current_url': request.path,
+        'message': message
     })
 
     return HttpResponse(t.render(c))
+
+
+def test_page_search(self, search_me):
+    """
+    The search of the page
+
+    @param search_me: The string to query search the database
+
+    @return: Http Response in JSON.
+    """
+
+    results = []
+
+    raw_tickers = Ticker.objects.filter(Q(name__icontains=search_me) | Q(long_name__icontains=search_me))
+
+    for ticker in raw_tickers:
+        target_prices = TargetPrice.objects.filter(ticker=ticker).distinct('analytic')
+        for target_price in target_prices:
+            item = {
+                'name': ticker.long_name,
+                'ticker': ticker.name,
+                'analytic': target_price.analytic.name,
+                'title': ' '.join((ticker.name, target_price.analytic.name)),
+                'url': '/' + '/'.join(('testing', ticker.slug, target_price.analytic.slug))
+            }
+            results.append(item)
+
+    return HttpResponse(json.dumps(results, indent=4))

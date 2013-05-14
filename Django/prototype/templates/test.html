@@ -37,15 +37,45 @@
         <tr>
             <th>Feature</th>
             <th>Value</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         {% for data in feature_analytic_ticker_data %}
         <tr>
-            <td>{{ data.feature.name }}</td>
+            <td>{{ data.name }}</td>
             <td>{{ data.value }}</td>
+            <td class="form">
+                <form action="{{ current_url }}" method="POST">{% csrf_token %}
+                    {{ data.feature_analytic_ticker_check_form.as_p }}
+                    <input type="submit" value="Submit" />
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+{% endblock %}
+
+
+{% block nosearch %}
+
+<form action="" method="get">
+    <input type="text" name="q" autocomplete="off" value="" class="inp-s" id="search_inp" onkeyup="tp.process_testing_page_search(this, event)" onclick="tp.process_testing_page_search(this, event)" />
+    <input type="submit" value="Search" class="sub-s" onclick="tp.process_testing_page_search(this, event)" />
+    <ul class="search_res"></ul>
+</form>
+
+{% endblock %}
+
+{% block topline  %}
+{% if message %}
+<div class="top-line">
+    <div class="inner">
+        <div class="message {{ message.type }}">
+            {{message.text}}
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

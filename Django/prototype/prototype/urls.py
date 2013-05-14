@@ -17,9 +17,9 @@ urlpatterns = patterns(
     '',
     url(r'^page/(?P<page>\d+)/$', 'morbid.views.index'),
     url(r'^testing/$', 'morbid.views.test'),
-    url(r'^testing/(?P<ticker_name>[\w-]+)$', 'morbid.views.test'),
-    url(r'^testing/(?P<analytic_name>[\w-]+)$', 'morbid.views.test'),
-    url(r'^testing/(?P<ticker_name>[\w-]+)/(?P<analytic_name>[\w-]+)$', 'morbid.views.test'),
+    url(r'^testing/(?P<ticker_slug>[\w-]+)$', 'morbid.views.test'),
+    url(r'^testing/(?P<analytic_slug>[\w-]+)$', 'morbid.views.test'),
+    url(r'^testing/(?P<ticker_slug>[\w-]+)/(?P<analytic_slug>[\w-]+)$', 'morbid.views.test'),
     url(r'^$', 'morbid.views.index'),
     url(r'^analytic/target_prices/(?P<analytic_slug>[^/]+)/$', 'morbid.views.target_prices'),
     url(r'^ticker/target_prices/(?P<ticker_slug>[^/]+)/$', 'morbid.views.target_prices'),
@@ -33,6 +33,7 @@ urlpatterns = patterns(
     url(r'^feature_by_ticker/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_ticker'),  # JSON only
     url(r'^feature_by_analytic/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_analytic'),  # JSON only
     url(r'^search/(?P<search_me>[^/]+)/$', 'morbid.views.search'),  # JSON only
+    url(r'^test_page_search/(?P<search_me>[\w-]+)/$', 'morbid.views.test_page_search'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

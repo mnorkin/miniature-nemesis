@@ -1,5 +1,6 @@
 from morbid.models import ApiKey
 from morbid.models import FeatureAnalyticTicker
+from morbid.models import FeatureAnalyticTickerCheck
 from morbid.models import TargetPriceAnalyticTicker
 from morbid.models import Feature
 from morbid.models import TargetPrice
@@ -661,6 +662,25 @@ class FeatureHandler(BaseHandler):
 
     def delete(self, request):
         rc.NOT_IMPLEMENTED
+
+class FeatureAnalyticTickerCheckHandler(BaseHandler):
+    """
+    Testing platform for the feature analytic ticker
+    """
+    allowed_methods = ('POST')
+    model = FeatureAnalyticTickerCheck
+
+    def read(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def create(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def update(self, request):
+        return rc.NOT_IMPLEMENTED
+
+    def delete(self, request):
+        return rc.NOT_IMPLEMENTED
 
 
 class FeatureAnalyticTickerHandler(BaseHandler):

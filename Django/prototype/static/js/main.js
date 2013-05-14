@@ -151,6 +151,42 @@ return {
         });
     },
 
+    process_testing_page_search: function (dom_obj, e){
+        e.preventDefault();
+        var key = e.keyCode ? e.keyCode : e.charCode;
+        var obj = $('#search_inp');
+        var url = '/test_page_search/'+ obj.val()+'/';
+
+        if (key == 40 || key == 38){ process_search_nav(key); return; }
+        if($(dom_obj).attr('type') == "submit"){ 
+            if($('#search_inp').attr('href') != undefined){ location.href = $('#search_inp').attr('href'); }  
+            return false;
+        }
+
+        if(obj.val().length < 1) {
+            $('.search_res').html(''); return;
+        }
+
+        $.ajax({
+            url: url,
+            dataType: "json"
+        }).done(function(resp) {
+            var resp_html = '';
+            search_result = resp;
+
+            if(resp.length){
+                // resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'tickers\')" href="">Companies <span>See all</span></a></li>';
+                for(i = 0; i < resp.length ; i++){
+                    // if(i >= 5) { break; }
+                    resp_html += '<li class="entry"><a href="'+resp[i].url+'">' +
+                        resp[i].title + '</a></li>';
+                }
+            }
+
+            $('.search_res').html(resp_html);
+        });
+    },
+
     process_search_page: function (type){
         var response = '', elem, name, search_resul = search_result[type];
 
