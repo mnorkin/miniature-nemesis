@@ -136,10 +136,10 @@ INSTALLED_APPS = (
     'gunicorn',
     'apikey',
     'morbid',
-    'APIKEY_AUTHORIZATION_HEADER'
+    'south'
 )
 
-south = 'App-Authorization'
+APIKEY_AUTHORIZATION_HEADER = 'App-Authorization'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
