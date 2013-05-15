@@ -78,10 +78,21 @@ class database:
         Dumping all the database
         """
         result = []
-        query = "SELECT pub_date, price0, analytic, ticker FROM entries WHERE price0 != 0"
+        query = "SELECT pub_date, price0, analytic, ticker FROM entries WHERE price0 != 0 ORDER BY ticker"
 
         self.cursor.execute(query)
+        prev_ticker_name = None
+        current_ticker = None
         for row in self.cursor.fetchall():
+            current_ticker = row[3]
+            if prev_ticker_name != current_ticker and len(result) > 0 and prev_ticker_name is not None:
+                f = open("/".join(('..', '..', 'tp-dump', (".".join((prev_ticker_name, 'json'))))), 'w')
+                f.write(json.dumps(result, indent=4))
+                result = []
+                prev_ticker_name = current_ticker
+            elif prev_ticker_name is None:
+                prev_ticker_name = current_ticker
+
             item = {
                 'date': time.mktime(row[0].timetuple()),
                 'date_human': str(row[0]),
@@ -91,7 +102,8 @@ class database:
             }
             result.append(item)
 
-        print json.dumps(result, indent=4)
+        f = open("/".join(('..', '..', 'tp-dump', (".".join((current_ticker, 'json'))))), 'w')
+        f.write(json.dumps(result, indent=4))
 
     def get_analytic_names(self, ticker=None):
         """
