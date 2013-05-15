@@ -663,6 +663,7 @@ class FeatureHandler(BaseHandler):
     def delete(self, request):
         rc.NOT_IMPLEMENTED
 
+
 class FeatureAnalyticTickerCheckHandler(BaseHandler):
     """
     Testing platform for the feature analytic ticker
@@ -674,7 +675,47 @@ class FeatureAnalyticTickerCheckHandler(BaseHandler):
         return rc.NOT_IMPLEMENTED
 
     def create(self, request):
-        return rc.NOT_IMPLEMENTED
+        if request.content_type:
+            data = request.data
+
+            analytic = Analytic
+            ticker = Ticker
+            feature = Feature
+            featureanalyticticker = FeatureAnalyticTicker
+
+            try:
+                analytic = Analytic.objects.get(slug=data['analytic_slug'])
+            except analytic.DoesNotExist:
+                return rc.NOT_FOUND
+
+            try:
+                ticker = Ticker.objects.get(slug=data['ticker_slug'])
+            except ticker.DoesNotExist:
+                return rc.NOT_FOUND
+
+            try:
+                feature = Feature.objects.get(slug=data['feature_slug'])
+            except feature.DoesNotExist:
+                return rc.NOT_FOUND
+
+            try:
+                featureanalyticticker = FeatureAnalyticTicker.objects.get(
+                    analytic=analytic,
+                    ticker=ticker,
+                    feature=feature
+                )
+            except featureanalyticticker.DoesNotExist:
+                return rc.NOT_FOUND
+
+            em = self.model(
+                feature_analytic_ticker=featureanalyticticker,
+                value=data['value']
+            )
+
+            em.save()
+            return rc.CREATED
+        else:
+            super(FeatureAnalyticTickerCheck, self).create(request)
 
     def update(self, request):
         return rc.NOT_IMPLEMENTED

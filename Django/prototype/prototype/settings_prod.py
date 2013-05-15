@@ -171,3 +171,4 @@ LOGGING = {
 }
 PISTON_IGNORE_DUPE_MODELS = True
 STOCK_DATA_PATH = '/home/agurkas/data'
+FC_DIR = '/home/agurkas/model'

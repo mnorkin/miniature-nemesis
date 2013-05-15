@@ -14,6 +14,7 @@ from morbid.models import Ticker
 from morbid.forms import FeatureAnalyticTickerCheckForm
 from morbid.utils import stock_data
 from morbid.utils import target_data
+from morbid.utils import beta_data
 import re
 import json
 import urllib as u
@@ -508,14 +509,22 @@ def test(request, ticker_slug=None, analytic_slug=None):
     )
 
     for target_price in target_prices:
-        matches = (x for x in stocks_data if x['date'] == target_price['date'])
+        matches = ((i, x) for i, x in enumerate(stocks_data) if x['date'] == target_price['date'])
         try:
             stock_entry = matches.next()
-            target_price['stock_price_open'] = stock_entry['price_open']
-            target_price['stock_price_close'] = stock_entry['price_close']
+            target_price['stock_price_open'] = stock_entry[1]['price_open']
+            target_price['stock_price_close'] = stock_entry[1]['price_close']
+            try:
+                target_price['stock_price_next_open'] = stocks_data[stock_entry[0]+250]['price_open']
+                target_price['stock_price_next_close'] = stocks_data[stock_entry[0]+250]['price_close']
+            except IndexError:
+                target_price['stock_price_next_open'] = 0
+                target_price['stock_price_next_close'] = 0
         except StopIteration:
             target_price['stock_price_open'] = 0
             target_price['stock_price_close'] = 0
+            target_price['stock_price_next_open'] = 0
+            target_price['stock_price_next_close'] = 0
 
     t = loader.get_template("test.html")
 
@@ -524,7 +533,8 @@ def test(request, ticker_slug=None, analytic_slug=None):
         'feature_analytic_ticker_data': results,
         'target_prices': target_prices,
         'current_url': request.path,
-        'message': message
+        'message': message,
+        'beta': beta_data(feature_analytic_ticker.ticker.name)
     })
 
     return HttpResponse(t.render(c))

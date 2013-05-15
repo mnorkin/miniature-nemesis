@@ -3,6 +3,7 @@
 {% block content %}
 
 <h1>{{feature_analytic_ticker.analytic.name}} -- {{feature_analytic_ticker.ticker.name}}</h1>
+<h3>Beta: {{ beta }}</h3>
 
 <div class="hidden" id="current-ticker-slug">{{feature_analytic_ticker.ticker.slug}}</div>
 <div class="hidden" id="current-analytic-slug">{{feature_analytic_ticker.analytic.slug}}</div>
@@ -18,15 +19,19 @@
             <th>Target Price</th>
             <th>Stock price open</th>
             <th>Stock price close</th>
+            <th>Stock price open</th>
+            <th>Stock price close</th>
         </tr>
     </thread>
     <tbody>
         {% for target_price in target_prices %}
         <tr>
-            <td>{{target_price.date}}</td>
-            <td>{{target_price.price}}</td>
+            <td>{{ target_price.date }}</td>
+            <td>{{ target_price.price }}</td>
             <td>{{ target_price.stock_price_open }}</td>
             <td>{{ target_price.stock_price_close }}</td>
+            <td>{{ target_price.stock_price_next_open }}</td>
+            <td>{{ target_price.stock_price_next_close }}</td>
         </tr>
         {% endfor %}
     </tbody>

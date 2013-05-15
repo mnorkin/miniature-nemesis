@@ -3,6 +3,9 @@ from django.conf import settings    # Settings
 import psycopg2
 import re
 import time
+import imp
+from datetime import datetime
+from datetime import timedelta
 
 
 def stock_data(ticker=None):
@@ -17,6 +20,14 @@ def stock_data(ticker=None):
         return []
 
 
+def beta_data(ticker=None):
+    """
+    The link between betas and utils interface
+    """
+    bt = betas()
+    return bt.get_beta(ticker)
+
+
 def target_data(ticker=None, analytic=None):
     """
     The link between target prices class and utils interface.
@@ -28,6 +39,45 @@ def target_data(ticker=None, analytic=None):
     """
     tp = target_prices()
     return tp.return_target_prices(ticker, analytic)
+
+
+class betas():
+    """
+    Beta bridge
+    """
+    def __init__(self):
+        """
+        Initialization
+        """
+        self.cursor = self.connect_to_db()
+
+    def connect_to_db(self):
+        """
+        """
+        c_l = "dbname=%(NAME)s \
+        user=%(USER)s \
+        password=%(PASSWORD)s \
+        host=%(HOST)s" % settings.TP_DATABASE
+        db = psycopg2.connect(c_l)
+        return db.cursor()
+
+    def get_beta(self, ticker=None):
+        """
+        Function to return the beta value
+        """
+        if ticker:
+            query = "SELECT value FROM betas WHERE name='%s' LIMIT 1" % (
+                re.escape(ticker))
+            if self.cursor.execute(query) != 0:
+                row = self.cursor.fetchone()
+                try:
+                    return row[0]
+                except:
+                    return None
+            else:
+                return None
+        else:
+            return None
 
 
 class target_prices():
@@ -79,6 +129,9 @@ class target_prices():
                 item = {
                     'date_timestamp': time.mktime(row[0].timetuple()),
                     'date': str(row[0]),
+                    'date_next': (
+                        datetime.strptime(str(row[0]), '%Y-%m-%d') + timedelta(days=356)
+                    ).strftime('%Y-%m-%d'),
                     'price': row[1],
                     'analytic': row[2],
                     'ticker': row[3],
@@ -92,3 +145,14 @@ class target_prices():
             return results
         else:
             return None
+
+
+def feature_data(ticker=None):
+    """
+    Loading the feature data
+    """
+    # Getting stock data
+    stock_data = stock_data(ticker)
+    # Receive the beta
+    beta = self.stock_quote.get_beta(target_price['ticker'])
+    foo = imp.load_source('')

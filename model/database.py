@@ -8,6 +8,7 @@ import time
 from logger import logger
 from settings import db_config
 import rest
+import json
 
 
 class database:
@@ -71,6 +72,26 @@ class database:
         return db.cursor()
 
     # Password for the postgres: sWAgu4e7
+
+    def dump(self):
+        """
+        Dumping all the database
+        """
+        result = []
+        query = "SELECT pub_date, price0, analytic, ticker FROM entries WHERE price0 != 0"
+
+        self.cursor.execute(query)
+        for row in self.cursor.fetchall():
+            item = {
+                'date': time.mktime(row[0].timetuple()),
+                'date_human': str(row[0]),
+                'price': row[1],
+                'analytic': row[2],
+                'ticker': row[3],
+            }
+            result.append(item)
+
+        print json.dumps(result, indent=4)
 
     def get_analytic_names(self, ticker=None):
         """
@@ -431,3 +452,8 @@ class database:
                 cur.execute(query)
         else:
             return None
+
+
+if __name__ == '__main__':
+    db = database()
+    db.dump()

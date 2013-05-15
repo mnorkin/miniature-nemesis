@@ -28,6 +28,8 @@ TP_DATABASE = {
     'HOST': 'localhost'
 }
 
+FC_DIR = '/home/maksim/Work/Morbid/miniature-nemesis/model'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -170,3 +172,4 @@ LOGGING = {
 }
 PISTON_IGNORE_DUPE_MODELS = True
 STOCK_DATA_PATH = '/home/maksim/Work/Morbid/data'
+FC_DIR = '/home/maksim/Work/Morbid/miniature-nemesis/model'

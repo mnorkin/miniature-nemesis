@@ -171,7 +171,9 @@ class App():
                     ticker=target_price['ticker'])
                 # Getting stock data
                 stock_data = self.stock_quote.get_data(target_price['ticker'])
+                # Receive the beta
                 beta = self.stock_quote.get_beta(target_price['ticker'])
+                # Check if stock and beta are okay
                 if stock_data and beta:
                     self.logger.debug('Stock data and beta values are okay')
 
@@ -190,8 +192,7 @@ class App():
 
                     if features_values:
                         if not feature_analytic_tickers.send(features_values):
-                            self.logger.error('Something went wrong with feature\
-analytic ticker update')
+                            self.logger.error('Something went wrong with feature analytic ticker update')
 
                     self.logger.debug("Date %s " % target_price['date'])
                     target_price_date_timestamp = date.fromtimestamp(target_price['date']).timetuple()
@@ -237,7 +238,7 @@ analytic ticker update')
                         })
 
                 else:
-                    self.logger.debug('!! Stock data and beta')
+                    self.logger.debug('Stock data and beta fail')
                     self.logger.debug('Beta %s' % beta)
 
             else:
