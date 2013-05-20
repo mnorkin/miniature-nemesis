@@ -105,6 +105,24 @@ class database:
         f = open("/".join(('..', '..', 'tp-dump', (".".join((current_ticker, 'json'))))), 'w')
         f.write(json.dumps(result, indent=4))
 
+    def dump_betas(self):
+        """
+        Dumping all the database
+        """
+        result = []
+        query = "SELECT name, value FROM betas ORDER BY name"
+
+        self.cursor.execute(query)
+        for row in self.cursor.fetchall():
+            item = {
+                'ticker': row[0],
+                'beta': row[1]
+            }
+            result.append(item)
+
+        f = open("/".join(('..', '..', 'tp-dump', (".".join(('betas', 'json'))))), 'w')
+        f.write(json.dumps(result, indent=4))
+
     def get_analytic_names(self, ticker=None):
         """
         Returns the names of analytics
@@ -468,4 +486,4 @@ class database:
 
 if __name__ == '__main__':
     db = database()
-    db.dump()
+    db.dump_betas()

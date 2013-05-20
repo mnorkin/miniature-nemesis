@@ -110,6 +110,11 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+# Set your DSN value
+RAVEN_CONFIG = {
+    'dsn': 'https://33f459ac02e24c2b976de8fc5aabc4ea:7df03bab54844db18ace7d6508895b0c@app.getsentry.com/8617',
+}
+
 ROOT_URLCONF = 'prototype.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
@@ -136,9 +141,11 @@ INSTALLED_APPS = (
     'gunicorn',
     'apikey',
     'morbid',
-    'south'
+    'south',
+    'raven.contrib.django.raven_compat'
 )
 
+# APIKEY
 APIKEY_AUTHORIZATION_HEADER = 'App-Authorization'
 
 # A sample logging configuration. The only tangible logging

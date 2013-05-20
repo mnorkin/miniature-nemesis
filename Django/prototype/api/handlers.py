@@ -668,15 +668,16 @@ class FeatureAnalyticTickerCheckHandler(BaseHandler):
     """
     Testing platform for the feature analytic ticker
     """
-    allowed_methods = ('POST')
+    allowed_methods = ('GET', 'POST')
     model = FeatureAnalyticTickerCheck
 
     def read(self, request):
-        return rc.NOT_IMPLEMENTED
+        return FeatureAnalyticTickerCheck.objects.all()
 
     def create(self, request):
         if request.content_type:
             data = request.data
+            print data
 
             analytic = Analytic
             ticker = Ticker
@@ -684,17 +685,17 @@ class FeatureAnalyticTickerCheckHandler(BaseHandler):
             featureanalyticticker = FeatureAnalyticTicker
 
             try:
-                analytic = Analytic.objects.get(slug=data['analytic_slug'])
+                analytic = Analytic.objects.get(name=data['analytic'])
             except analytic.DoesNotExist:
                 return rc.NOT_FOUND
 
             try:
-                ticker = Ticker.objects.get(slug=data['ticker_slug'])
+                ticker = Ticker.objects.get(name=data['ticker'])
             except ticker.DoesNotExist:
                 return rc.NOT_FOUND
 
             try:
-                feature = Feature.objects.get(slug=data['feature_slug'])
+                feature = Feature.objects.get(slug=data['feature'])
             except feature.DoesNotExist:
                 return rc.NOT_FOUND
 

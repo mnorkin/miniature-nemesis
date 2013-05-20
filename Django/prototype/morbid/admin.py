@@ -16,21 +16,24 @@ class VolatilityAdmin(admin.ModelAdmin):
 
 class AnalyticAdmin(admin.ModelAdmin):
     list_display = ('name', 'last_target_price')
+    search_fields = ['name']
+
 
 class FeatureAnalyticTickerCheckAdmin(admin.ModelAdmin):
     list_display = ('ticker', 'analytic', 'feature_name', 'value', 'feature_value')
 
     def feature_value(self, obj):
-        return "%s" % ( obj.feature_analytic_ticker.value )
+        return "%s" % (obj.feature_analytic_ticker.value)
 
     def feature_name(self, obj):
-        return "%s" % ( obj.feature_analytic_ticker.feature.name )
+        return "%s" % (obj.feature_analytic_ticker.feature.name)
 
     def ticker(self, obj):
-        return "%s" % ( obj.feature_analytic_ticker.ticker.name )
+        return "%s" % (obj.feature_analytic_ticker.ticker.name)
 
     def analytic(self, obj):
-        return "%s" % ( obj.feature_analytic_ticker.analytic.name )
+        return "%s" % (obj.feature_analytic_ticker.analytic.name)
+
 
 class FeatureAnalyticTickerAdmin(admin.ModelAdmin):
     list_display = ('analytic', 'ticker', 'feature', 'value')
@@ -38,7 +41,7 @@ class FeatureAnalyticTickerAdmin(admin.ModelAdmin):
 
 class TargetPriceAdmin(admin.ModelAdmin):
     list_display = ('analytic', 'date', 'price', 'ticker')
-    search_fields = ['ticker__name']
+    search_fields = ['ticker__name', 'analytic__name']
 
 
 class TickerAdmin(admin.ModelAdmin):
