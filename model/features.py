@@ -554,8 +554,8 @@ class Features:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
 
                 for index in range(start_index, end_index):
-                    market_price_change = round((self.market_closes[index-1] - self.market_closes[index])/self.market_closes[index-1], 4)
-                    stock_price_change = round((self.stock_closes[index-1] - self.stock_closes[index])/self.stock_closes[index-1], 4)
+                    market_price_change = market_price_change + round((self.market_closes[index-1] - self.market_closes[index])/self.market_closes[index-1], 4)
+                    stock_price_change = stock_price_change + round((self.stock_closes[index-1] - self.stock_closes[index])/self.stock_closes[index-1], 4)
                     self.logger.debug("Beta measure: %s " % self.beta)
                     self.logger.debug("Market price change: %s" % market_price_change)
                     self.logger.debug("Stock price change: %s" % stock_price_change)

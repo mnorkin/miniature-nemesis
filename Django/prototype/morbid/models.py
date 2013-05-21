@@ -199,6 +199,9 @@ class FeatureAnalyticTickerCheck(models.Model):
     value = models.FloatField()
     feature_analytic_ticker = models.ForeignKey(FeatureAnalyticTicker)
 
+    def __unicode__(self):
+        return str(self.value)
+
 
 class TargetPriceManager(models.Manager):
     """
