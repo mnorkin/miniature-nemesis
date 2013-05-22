@@ -94,9 +94,8 @@ class App():
                 'name': feature.features[feature_slug]['name'],
                 'unit_id': feature.features[feature_slug]['unit_id'],
                 'position': feature.features[feature_slug]['position'],
-                'display_in_frontpage':
-                feature.features[feature_slug]['display_in_frontpage'],
-                'description': ''
+                'display_in_frontpage': feature.features[feature_slug]['display_in_frontpage'],
+                'description': feature.features[feature_slug]['description']
             }
 
             if rest.send("POST", "/api/features/", data):
@@ -142,9 +141,15 @@ class App():
             Get the most recent target prices
             """
             self.logger.debug('Target price %s of %s' % (
-                target_price['ticker'], target_price['analytic']))
-            ticker_slug = utils.slugify(target_price['ticker'])
-            analytic_slug = utils.slugify(target_price['analytic'])
+                target_price['ticker'],
+                target_price['analytic']
+            ))
+            ticker_slug = utils.slugify(
+                target_price['ticker']
+            )
+            analytic_slug = utils.slugify(
+                target_price['analytic']
+            )
 
             # Check with server if current calculations are required
 
@@ -170,9 +175,13 @@ class App():
                     analytic=target_price['analytic'],
                     ticker=target_price['ticker'])
                 # Getting stock data
-                stock_data = self.stock_quote.get_data(target_price['ticker'])
+                stock_data = self.stock_quote.get_data(
+                    target_price['ticker']
+                )
                 # Receive the beta
-                beta = self.stock_quote.get_beta(target_price['ticker'])
+                beta = self.stock_quote.get_beta(
+                    target_price['ticker']
+                )
                 # Check if stock and beta are okay
                 if stock_data and beta:
                     self.logger.debug('Stock data and beta values are okay')
@@ -195,7 +204,9 @@ class App():
                             self.logger.error('Something went wrong with feature analytic ticker update')
 
                     self.logger.debug("Date %s " % target_price['date'])
-                    target_price_date_timestamp = date.fromtimestamp(target_price['date']).timetuple()
+                    target_price_date_timestamp = date.fromtimestamp(
+                        target_price['date']
+                    ).timetuple()
 
                     matches = (x for x in stock_data if x['date'] == time.mktime(target_price_date_timestamp))
 

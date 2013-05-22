@@ -533,14 +533,22 @@ class Features:
 
         for target_entry in self.local_target_data[-1:]:
             measure = 0
+            market_price_change = 0
+            stock_price_change = 0
             target_date = target_entry[0]
             target_price = target_entry[1]
             try:
                 start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
                 end_index = start_index+2
 
+                start_market_index = next(i for i, x in enumerate(self.market_dates) if x == target_date)
+                end_market_index = start_market_index + 2
+
                 if end_index >= self.stock_dates.__len__():
                     end_index = self.stock_dates.__len__()-1
+
+                if end_market_index >= self.market_dates.__len__():
+                    end_market_index = self.market_dates.__len__() - 1
 
                 if utils.DEBUG:
                     self.logger.debug("Start index: %s" % start_index)
@@ -554,17 +562,23 @@ class Features:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
 
                 for index in range(start_index, end_index):
-                    market_price_change = market_price_change + round((self.market_closes[index-1] - self.market_closes[index])/self.market_closes[index-1], 4)
+                    self.logger.debug("Stock date of consideration: %s" % datetime.datetime.fromtimestamp(self.stock_dates[index]))
                     stock_price_change = stock_price_change + round((self.stock_closes[index-1] - self.stock_closes[index])/self.stock_closes[index-1], 4)
-                    self.logger.debug("Beta measure: %s " % self.beta)
-                    self.logger.debug("Market price change: %s" % market_price_change)
-                    self.logger.debug("Stock price change: %s" % stock_price_change)
-                    self.logger.debug("Stock price should have change: %s" % float(market_price_change*self.beta))
-                    self.logger.debug("Measure: %s" % abs(stock_price_change - market_price_change*self.beta))
-                    measure = measure + abs(stock_price_change - market_price_change*self.beta)
+
+                for index in range(start_market_index, end_market_index):
+                    self.logger.debug("Market date of consideration: %s" % datetime.datetime.fromtimestamp(self.market_dates[index]))
+                    market_price_change = market_price_change + round((self.market_closes[index-1] - self.market_closes[index])/self.market_closes[index-1], 4)
+
+                measure = measure + abs(stock_price_change - market_price_change*self.beta)
             except StopIteration:
                 """Happens, then stock data is newer than the target data"""
                 measure = 0
+
+            self.logger.debug("Beta measure: %s " % self.beta)
+            self.logger.debug("Market price change: %s" % market_price_change)
+            self.logger.debug("Stock price change: %s" % stock_price_change)
+            self.logger.debug("Stock price should have change: %s" % float(market_price_change*self.beta))
+            self.logger.debug("Measure: %s" % abs(stock_price_change - market_price_change*self.beta))
 
             results.append(measure)
 
