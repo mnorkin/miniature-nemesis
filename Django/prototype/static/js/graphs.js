@@ -640,14 +640,15 @@ var graphs = (function () {
 
             $('.in_graph .sear li').click(function(e){
                 return; // disable till better implementation.
-                
-                /* Scroll to selected circle element */
 
-                if($(this).hasClass('active') == false || e.isTrigger == true) { return; }
+                /* Scroll to selected circle element */
+                if ($(this).hasClass('active') === false || e.isTrigger === true) {
+                    return;
+                }
                 var name = $(this).attr('name');
                 var obj = $('#chart svg path[name='+name+']');
-                var nr = parseInt(obj.attr('enumerator'));
-                
+                var nr = parseInt(obj.attr('enumerator'), 10);
+
                 /* TODO: make it work better. */
                 var invert_line_angle_scale = d3.scale.linear().domain([0, _data.length-1]).range([-w / 14, w / 14]);
                 d = { cx: invert_line_angle_scale(nr) };
@@ -826,7 +827,9 @@ var graphs = (function () {
                 .attr('fill', '#ded1c6')
                 .attr('y', 0)
                 .attr('x', function (d, i) {
-                    if(i==0){d = -0.5;}
+                    if (i===0) {
+                        d = -0.5;
+                    }
                     return d / 100 * rhw + r;
             })
                 .attr("stroke", "#ded1c6")
@@ -843,8 +846,10 @@ var graphs = (function () {
                 .style("fill", "#ded1c6")
                 .attr("dy", 18)
                 .attr("dx", function (d, i) {
-                    if(i==0){d = 1.7;}
-                    return d / 100 * rhw + r - (-0.8 + new String(d).length*3.3);
+                    if (i===0) {
+                        d = 1.7;
+                    }
+                    return d / 100 * rhw + r - (-0.8 + String(d).length*3.3);
                 })
                 .text(function (d) {
                 return d;
@@ -853,8 +858,8 @@ var graphs = (function () {
 
             sun.selectAll('#' + _element_id)
                 .data([1, -1]).enter().append("svg:line")
-                .attr('x1', function(d,i){ return (1 / 100 * rhw + r - 4) * d } )
-                .attr('x2', function(d,i){ return (rhw + r) * d } )
+                .attr('x1', function(d,i){ return (1 / 100 * rhw + r - 4) * d; } )
+                .attr('x2', function(d,i){ return (rhw + r) * d; })
                 .attr('y1', 0)
                 .attr('y2', 0)
                 .attr('stroke', '#f1ebe7')

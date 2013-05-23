@@ -12,6 +12,54 @@ var horizontal_slider_top_offset = 0;
 var bottom_of_page = false;
 var search_result = {};
 
+/**
+ * maximum value of accuracy
+ * @type {Number}
+ */
+var MAX_ACCURACY = 100;
+/**
+ * minimum value of accuracy
+ *
+ * value calculated, based on grid type listing
+ * @type {Number}
+ */
+var MIN_ACCURACY = 3.5;
+/**
+ * maximum value of profitability
+ * @type {Number}
+ */
+var MAX_PROFITABILITY = 100;
+/**
+ * minimum value of profitability
+ *
+ * value calculated, based on grid type listing
+ * @type {Number}
+ */
+var MIN_PROFITABILITY = 3.5;
+/**
+ * maximum value of reach time
+ * @type {Number}
+ */
+var MAX_REACH_TIME = 250;
+/**
+ * minimum value of reach time
+ *
+ * value calculated, based on grid type listing
+ * @type {Number}
+ */
+var MIN_REACH_TIME = 8;
+/**
+ * Width of the graph, then the listing type is list
+ * @type {Number}
+ */
+var WIDTH_OF_LIST_TYPE = 135;
+/**
+ * Width of the graph, then the listing type is grid
+ * @type {Number}
+ */
+var WIDTH_OF_GRID_TYPE = 356;
+
+
 
 /* Global access functions */
 return {
@@ -36,11 +84,11 @@ return {
 
         // In analyse page, on document ready, load first property or take from hash!
         var feature = hash_get('feature');
-        if(feature == 'target_prices'){
+        if (feature == 'target_prices') {
             $('.inner_buttons a.ta').trigger('click');
-        }else if(feature.length){
+        } else if(feature.length) {
             $('.analyse_menu div[name='+feature+'] a').trigger('click');
-        }else{
+        } else {
             $('.analyse_menu div:first-child a').trigger('click');
         }
 
@@ -49,7 +97,7 @@ return {
             function() {
                var obj = $(this);
                obj.find('.goust').text(obj.find('.text .slid').text());
-               var left = Math.min(0, (obj.find('.text').width() - 5 - obj.find('.goust').width()) );
+               var left = Math.min(0, (obj.find('.text').width() - 5 - obj.find('.goust').width()));
                obj.find('.text .slid').animate({'left': left}, (left * -15) );
            },
            function(){ $(this).find('.text .slid').stop().css({'left': 0});}
@@ -60,7 +108,7 @@ return {
             var list = $('#popup .list'), elem;
             $.ajax({
                url: '/tickers/',
-               dataType: 'json',
+               dataType: 'json'
             }).done(function(data){
                 $('body').css('overflow', 'hidden');
                 $('#popup').show();
@@ -68,8 +116,10 @@ return {
                 for (var i = 0; i < data.length; i++) {
                     elem = '<a href="'+data[i].url+'">'+data[i].long_name+' ('+data[i].name+')</a>';
                     list.append(elem);
-                    if(i % 2) { list.append('<span></span>'); }
-                };
+                    if(i % 2) {
+                        list.append('<span></span>');
+                    }
+                }
                 list.append('<br class="clear" />');
             });
             return false;
@@ -114,9 +164,13 @@ return {
         var obj = $('#search_inp');
         var url = '/search/'+ obj.val()+'/';
 
-        if (key == 40 || key == 38){ process_search_nav(key); return; }
-        if($(dom_obj).attr('type') == "submit"){ 
-            if($('#search_inp').attr('href') != undefined){ location.href = $('#search_inp').attr('href'); }  
+        if (key == 40 || key == 38){
+            process_search_nav(key); return;
+        }
+        if ($(dom_obj).attr('type') == "submit") {
+            if ($('#search_inp').attr('href') !== undefined) {
+                location.href = $('#search_inp').attr('href');
+            }
             return false;
         }
 
@@ -132,18 +186,25 @@ return {
             search_result = resp;
 
             if(resp.tickers.length){
-                resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'tickers\')" href="">Companies <span>See all</span></a></li>';
+                resp_html += '<li class="inf">' +
+                '<a onclick="return tp.process_search_page(\'tickers\')" href="">' +
+                'Companies <span>See all</span></a></li>';
                 for(i=0; i < resp.tickers.length ; i++){
                     if(i >= 5) { break; }
-                    resp_html += '<li class="entry"><a href="'+resp.tickers[i].url+'">'+resp.tickers[i].name+' ('+resp.tickers[i].ticker+')</a></li>';
+                    resp_html += '<li class="entry"><a href="' +
+                        resp.tickers[i].url+'">'+resp.tickers[i].name +
+                        ' ('+resp.tickers[i].ticker+')</a></li>';
                 }
             }
 
             if(resp.analytics.length) {
-                resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'analytics\')" href="">Analysts<span>See all</span></a></li>';
+                resp_html += '<li class="inf">' +
+                    '<a onclick="return tp.process_search_page(\'analytics\')" href="">' +
+                    'Analysts<span>See all</span></a></li>';
                 for(i=0; i < resp.analytics.length ; i++){
                     if(i >= 5) { break; }
-                    resp_html += '<li class="entry"><a href="'+resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
+                    resp_html += '<li class="entry"><a href="' +
+                    resp.analytics[i].url+'">'+resp.analytics[i].name+'</a></li>';
                 }
             }
 
@@ -158,8 +219,10 @@ return {
         var url = '/test_page_search/'+ obj.val()+'/';
 
         if (key == 40 || key == 38){ process_search_nav(key); return; }
-        if($(dom_obj).attr('type') == "submit"){ 
-            if($('#search_inp').attr('href') != undefined){ location.href = $('#search_inp').attr('href'); }  
+        if($(dom_obj).attr('type') == "submit") {
+            if($('#search_inp').attr('href') !== undefined){
+                location.href = $('#search_inp').attr('href');
+            }
             return false;
         }
 
@@ -175,7 +238,6 @@ return {
             search_result = resp;
 
             if(resp.length){
-                // resp_html += '<li class="inf"><a onclick="return tp.process_search_page(\'tickers\')" href="">Companies <span>See all</span></a></li>';
                 for(i = 0; i < resp.length ; i++){
                     // if(i >= 5) { break; }
                     resp_html += '<li class="entry"><a href="'+resp[i].url+'">' +
@@ -191,12 +253,13 @@ return {
         var response = '', elem, name, search_resul = search_result[type];
 
         for (var i = 0; i < search_resul.length; i++) {
-            name = (type == 'tickers') ? search_resul[i].name + ' ('+search_resul[i].ticker+')' : search_resul[i].name;
+            name = (type == 'tickers') ? search_resul[i].name +
+                ' ('+search_resul[i].ticker+')' : search_resul[i].name;
             elem = '<a href="'+search_resul[i].url+'">'+name+'</a>';
             response += elem;
             if(i % 2) { response += '<span></span>'; }
-        };
-        
+        }
+
         $('#content').html('<div class="search_result"></div>');
         $('#content .search_result').append(response);
         $('#content .search_result').append('<br class="clear" />');
@@ -220,78 +283,222 @@ return {
         }
     }
 
-} 
+};
 
+/** 
+ * Filtering the minimum value of the feature
+ * @param  {[type]} value   [description]
+ * @param  {[type]} feature [description]
+ * @return {[type]}         [description]
+ */
+function filter_minimum_data(value, feature) {
+    /**
+     * Scaling factor defines the difference between the grid type of listing
+     * and list type of listing
+     * 
+     * @type {[type]}
+     */
+    var scaling_factor = WIDTH_OF_GRID_TYPE/WIDTH_OF_LIST_TYPE;
 
+    switch (feature) {
+        case 'accuracy':
+            if (value < MIN_ACCURACY && list_type == 'grid') {
+                value = MIN_ACCURACY;
+            } else if (value < MIN_ACCURACY*scaling_factor && list_type == 'list') {
+                value = MIN_ACCURACY * scaling_factor;
+            }
+            break;
+        case 'profitability':
+            if (value < MIN_PROFITABILITY && list_type == 'grid') {
+                value = MIN_PROFITABILITY;
+            } else if (value < MIN_PROFITABILITY * scaling_factor && list_type == 'list') {
+                value = MIN_PROFITABILITY * scaling_factor;
+            }
+            break;
+        case 'reach_time':
+            if (value < MIN_REACH_TIME && list_type == 'grid') {
+                value = MIN_REACH_TIME;
+            } else if (value < MIN_REACH_TIME * scaling_factor && list_type == 'list') {
+                value = MIN_REACH_TIME * scaling_factor;
+            }
+    }
+    return value;
+}
 
-/* Local access tp (target price) function */
+/**
+ * Filtering the maximum value of the feature
+ * @param  {[type]} value   [description]
+ * @param  {[type]} feature [description]
+ * @return {[type]}         [description]
+ */
+function filter_maximum_data(value, feature) {
+    switch (feature) {
+        case 'accuracy':
+            if (value > MAX_ACCURACY) {
+                value = MAX_ACCURACY;
+            }
+            break;
+        case 'profitability':
+            if (value > MAX_PROFITABILITY) {
+                value = MAX_PROFITABILITY;
+            }
+            break;
+        case 'reach_time':
+            if (value > MAX_REACH_TIME) {
+                value = MAX_REACH_TIME;
+            }
+    }
+    return value;
+}
 
+/**
+ * Filtering the input data to the graphs
+ * @param  {[type]} value   [description]
+ * @param  {[type]} feature [description]
+ * @return {[type]}         [description]
+ */
+function filter_graph_data(value, feature) {
+    value = filter_minimum_data(value, feature);
+    value = filter_maximum_data(value, feature);
+    return value;
+}
+
+/**
+ * Returning the maximum value of the feature
+ * @param  {[type]} feature [description]
+ * @return {[type]}         [description]
+ */
+function filter_maximum_value(feature) {
+    var value = 0;
+     switch (feature) {
+        case 'accuracy':
+            value = filter_maximum_data(10000, feature);
+            break;
+        case 'profitability':
+            value = filter_maximum_data(10000, feature);
+            break;
+        case 'reach_time':
+            value = filter_maximum_data(10000, feature);
+    }
+    return value;
+}
+
+/**
+ * Generating the pies of data
+ * @param  {[type]} id      [description]
+ * @param  {[type]} dataset [description]
+ * @param  {[type]} posName [description]
+ * @return {[type]}         [description]
+ */
 function generate_grid_element(id, dataset, posName) {
+
+    /**
+     * Check the list type
+     */
+    if (typeof(list_type) == "undefined") {
+        list_type = 'grid';
+    }
+
+    /**
+     * The dataset value, injecting to the text field in the tooltip
+     * @type array
+     */
+    var dataset_txt_value = dataset;
+
+    /**
+     * Maximum value of the graph
+     * @type int
+     */
+    var max_value = filter_maximum_value(posName);
+
+    /**
+     * Width of the drawing graph
+     * @type {Number}
+     */
+    var width = 0;
+    if (list_type == 'list') {
+        width = 135;
+    } else {
+        width = 356;
+    }
+
+    // Filtering the data for minimum values
+    dataset = filter_graph_data(dataset, posName);
 
     if (id !== null && dataset > 1) {
         dataset = [dataset];
-        //dataset = [99];
 
-        var width = (typeof(list_type) != "undefined" && list_type == 'list') ? 135 : 356;
-        //var gradiends = {'accuracy': 'url(#first_grad)', 'profitability': 'url(#second_grad)', 'reach_time': 'url(#third_grad)'};
-        var gradiends = {'accuracy': '#8dc3b2', 'profitability': '#aa8dc3', 'reach_time': '#6189b8'};
+        /**
+         * Defined gradients
+         * @type {Object}
+         */
+        var gradiends = {
+            'accuracy': '#8dc3b2',
+            'profitability': '#aa8dc3',
+            'reach_time': '#6189b8'
+        };
 
-        var max_value = null;
-
-        switch(posName){
-            case 'accuracy':
-            max_value = 100; break;
-            case 'reach_time':
-            max_value = 250; break;
-            case 'profitability':
-            max_value = 100; break;
-            default:
-            max_value = 10;
-        }
-
+        /**
+         * X domain scale
+         * @type {[type]}
+         */
         var x = d3.scale.linear()
             .domain([0, max_value])
             .range([0, width]);
 
+        /**
+         * Making the SVG element
+         * @type {[type]}
+         */
         var chart = d3.selectAll("#" + id + ' .'+posName)
             .append('svg')
             .attr('width', width)
             .attr('height', '20')
             .append('g');
 
+        /**
+         * The vertical line
+         */
         chart.selectAll('rect')
             .data(dataset)
             .enter().append('rect')
             .attr('height', 11)
             .attr('y', 0)
             .attr('fill', gradiends[posName])
-            .attr('rx',5)
-            .attr('ry',5)
-            .attr('txt', function(d,i){
-                return (posName == 'reach_time') ? d+' days':  d+'%';
+            .attr('rx', 5)
+            .attr('ry', 5)
+            .attr('txt', function(d,i) {
+                if (posName == 'reach_time') {
+                    return dataset_txt_value + ' days';
+                } else {
+                    return dataset_txt_value + ' %';
+                }
             })
             .transition().duration(1500).attr('width', x)
             .text( String );
 
-        // small circle
-        if((dataset[0] >= 5 && width == 356) || dataset[0] >= 10 ){
-            chart.append('circle')
-                .attr('fill', '#000')
-                .style('opacity', '0.3')
-                .data(dataset)
-                .attr('cy', 5.5)
-                .transition().duration(1500)
-                .attr('r', 3.5)
-                .attr('cx', function(d,i){ return x(d)-6; });
-        }
-
+        /**
+         * The circle
+         */
+        chart.append('circle')
+            .attr('fill', '#000')
+            .style('opacity', '0.3')
+            .data(dataset)
+            .attr('cy', 5.5)
+            .transition().duration(1500)
+            .attr('r', 3.5)
+            .attr('cx', function(d,i){
+                return x(d)-6;
+            });
     } else {
         return;
     }
 }
 
 function generate_pie(id, value) {
-    if (typeof(list_type) != "undefined" && list_type == 'list'){ return; }
+    if (typeof(list_type) != "undefined" && list_type == 'list'){
+        return; // ???
+    }
 
     var percent = Math.abs(value);
         percent = Math.min(percent, 100);
@@ -324,23 +531,25 @@ function generate_pie(id, value) {
         .each(function(d) { this._current = d; }); // store the initial values;
 
     // animate arc with real values
-    path = path.data([angle]).transition().duration(1500).attrTween("d", function(a) {
-         var i = d3.interpolate(this._current, a),
-             k = d3.interpolate(arc.outerRadius()(), 35);
-         this._current = i(0);
-         return function(t) {
-             return arc.innerRadius(35).outerRadius(k(t))(i(t));
-         };
-    }); 
+    path = path.data([angle])
+        .transition().duration(1500)
+        .attrTween("d", function(a) {
+            var i = d3.interpolate(this._current, a);
+            var k = d3.interpolate(arc.outerRadius()(), 35);
+            this._current = i(0);
+            return function(t) {
+                return arc.innerRadius(35).outerRadius(k(t))(i(t));
+            };
+        });
 
-    var get_circle_points = function (radius, angle){
+    var get_circle_points = function (radius, angle) {
         var x = radius*Math.sin(angle*Math.PI/180);
         var y = radius*-Math.cos(angle*Math.PI/180);
         return [x,y];
-    }
+    };
 
     // circle at start and in the end, for safari and mac's stroke-linejoint bug (roundness).
-    if(percent > 1){
+    if (percent > 1) {
         d3.select("#" + id + ' .circle svg').append('g').selectAll('circle')
             .data([0, angle -1.2]).enter()
             .append('circle')
@@ -349,11 +558,11 @@ function generate_pie(id, value) {
             .attr('cx', function(d,i){ return get_circle_points(35, d)[0]; } )
             .attr('cy', function(d,i){ return get_circle_points(35, d)[1]; } )
             .transition().delay(function(d,i){ return i * 1000; })
-            .attr('r', 5.1); 
+            .attr('r', 5.1);
     }
 
     // small dark circle point
-    if(percent > 1){
+    if (percent > 1) {
         d3.select("#" + id + ' .circle svg')
             .append('circle')
             .attr('fill', '#000')
@@ -448,7 +657,7 @@ function generate_pie_OLDVERSION(id, value) {
 
     var ellipse_shadow_sin_scale = d3.scale.linear()
         .domain([0, pi])
-        .range([34, 39])
+        .range([34, 39]);
 
     var svg = d3.select("#" + id + ' .circle').append("svg")
         .attr("width", width)
@@ -771,22 +980,44 @@ function generate_pie_OLDVERSION(id, value) {
         // .attr("d", arc);
 }
 
-/*
- * Draw target price block (call d3js)
+/**
+ * Drawing graph in the target price block
+ * @return {[type]} [description]
  */
-function process_target_prices_blocks(){
-    for(i = 0 ; i < target_prices_list.length ; i++){
-        if(target_prices_list[i].processed) { continue; }
+function process_target_prices_blocks() {
+    for (i=0; i<target_prices_list.length; i++) {
+        if (target_prices_list[i].processed) {
+            continue; // What this does?
+        }
         target_prices_list[i].processed = true;
-        generate_pie(target_prices_list[i].hash, target_prices_list[i].change);
-        generate_grid_element(target_prices_list[i].hash, target_prices_list[i].accuracy, 'accuracy');
-        generate_grid_element(target_prices_list[i].hash, target_prices_list[i].profitability, 'profitability');
-        generate_grid_element(target_prices_list[i].hash, target_prices_list[i].reach_time, 'reach_time');
+        generate_pie(
+            target_prices_list[i].hash,
+            target_prices_list[i].change
+        );
+        generate_grid_element(
+            target_prices_list[i].hash,
+            target_prices_list[i].accuracy,
+            'accuracy'
+        );
+        generate_grid_element(
+            target_prices_list[i].hash,
+            target_prices_list[i].profitability,
+            'profitability'
+        );
+        generate_grid_element(
+            target_prices_list[i].hash,
+            target_prices_list[i].reach_time,
+            'reach_time'
+        );
     }
 }
 
-
-function process_search_nav(key){
+/**
+ * [process_search_nav description]
+ * @param  {[type]} key [description]
+ * @return {[type]}     [description]
+ */
+function process_search_nav(key) {
 
     var list = null;
     var first_time = null;
@@ -801,44 +1032,47 @@ function process_search_nav(key){
     }
 
     // nav button down
-    if(key == 40){
-
+    if (key == 40) {
         list = $('.search_res li');
         first_time = ($('.search_res li.active').length === 0);
-
-        for(i=1 ; i <= list.length ; i++){
-
+        for (i=1; i<=list.length; i++) {
             // fist time, no active elements
-            if(first_time){
+            if (first_time) {
                 _set_active( $('.search_res li:nth-child(2)') );
                 break;
             }
-
-            if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === false){
+            if (
+                $('.search_res li:nth-child('+i+')').hasClass('active') &&
+                $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === false ) {
                 // li nth(i) active and next not have inf class
                 _set_active ( $('.search_res li:nth-child('+(i+1)+')') );
                 break;
-            } else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === true){
+            } else if(
+                $('.search_res li:nth-child('+i+')').hasClass('active') &&
+                $('.search_res li:nth-child('+(i+1)+')').hasClass('inf') === true) {
                 // li nth(i) active and next have inf class     
                 _set_active ( $('.search_res li:nth-child('+(i+2)+')') );
                 break;
             }
         }
 
-    } else if(key == 38) {
-
+    } else if (key == 38) {
         list = $('.search_res li'), first_time = ($('.search_res li.active').length === 0);
-        for(i=1;i <= list.length ; i++){
+        for (i=1; i<=list.length; i++) {
             // going to input element
             if(i == 2 && $('.search_res li:nth-child('+i+')').hasClass('active')){
                 $('.search_res li').removeClass('active');
                 // cursor to end
                 var tmp_val = $('#search_inp').val(); $('#search_inp').val(tmp_val);
-            } else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === false){
+            } else if(
+                $('.search_res li:nth-child('+i+')').hasClass('active') &&
+                $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === false){
                 // li nth(i) active and prev not have inf class 
                 _set_active ( $('.search_res li:nth-child('+(i-1)+')') );
                 break;
-            } else if($('.search_res li:nth-child('+i+')').hasClass('active') && $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === true){
+            } else if(
+                $('.search_res li:nth-child('+i+')').hasClass('active') &&
+                $('.search_res li:nth-child('+(i-1)+')').hasClass('inf') === true){
                 // li nth(i) active and prev have inf class
                 _set_active ( $('.search_res li:nth-child('+(i-2)+')') );
                 break;
@@ -851,7 +1085,7 @@ function process_search_nav(key){
 /**
 * Click on property in inner Analyse 
 ***/
-function open_graph(){
+function open_graph() {
 
     obj = $(this);
     if(obj.hasClass('active')) { return false; }
@@ -875,15 +1109,18 @@ function open_graph(){
     // info box content
     $('.info_box').html( obj.siblings('div').html() );
     show_compare_graph_buttons();
-    hash_set_feature(type)
-    return false; // prevent href
+    hash_set_feature(type);
+    return false; // prevent href (not a good practice)
 }
 
+/**
+ * [set_active_analytic description]
+ */
 function set_active_analytic(){
     // show first target price
-    if($('#bank li.active').length === 0) {
+    if ($('#bank li.active').length === 0) {
         var name = hash_get('company');
-        if(name.length == 0){
+        if (name.length === 0) {
             name = graphs.get_best_analytic().slug;
             console.log('best analytic: '+name);
             hash_set_company(name);
@@ -894,25 +1131,44 @@ function set_active_analytic(){
 }
 
 /** Get from #hash. opt = "company" or opt = "feature" */
-function hash_get(opt){
-    if(location.hash.length !== 0){
+function hash_get(opt) {
+    if (location.hash.length !== 0) {
         var name = location.hash.substr(1);
         var arr = name.split('|', 2);
-        if(opt == 'company'){ return (arr[0] == undefined) ? '' : arr[0]; }
-        else if(opt == 'feature'){ return (arr[1] == undefined) ? '' : arr[1]; }
-    }else{
+        if (opt == 'company') {
+            return (arr[0] === undefined) ? '' : arr[0];
+        } else if(opt == 'feature') {
+            return (arr[1] === undefined) ? '' : arr[1];
+        }
+    } else {
         return '';
     }
 }
+
+/**
+ * [hash_set_company description]
+ * @param  {[type]} name [description]
+ * @return {[type]}      [description]
+ */
 function hash_set_company(name){
     var feature = hash_get('feature');
     location.hash = '#'+name+'|'+feature;
 }
+
+/**
+ * [hash_set_feature description]
+ * @param  {[type]} name [description]
+ * @return {[type]}      [description]
+ */
 function hash_set_feature(name){
     var company = hash_get('company');
     location.hash = '#'+company+'|'+name;
 }
 
+/**
+ * [show_compare_graph_buttons description]
+ * @return {[type]} [description]
+ */
 function show_compare_graph_buttons(){
     var current = $('.analyse_menu a.active').attr('class');
     if (current === undefined) { return; }
@@ -944,9 +1200,15 @@ function show_compare_graph_buttons(){
     });
 }
 
-function load_target_prices(){
+/**
+ * [load_target_prices description]
+ * @return {[type]} [description]
+ */
+function load_target_prices() {
 
-    if($(this).hasClass('active')){ return false; }
+    if($(this).hasClass('active')){
+        return false;
+    }
 
     var url = $(this).attr('href');
     $('.inner_buttons a').removeClass('active');
@@ -963,7 +1225,8 @@ function load_target_prices(){
                 $(this).animate({'opacity':1}, 100);
                 // loaded fresh content, might need to change type to list
                 if (list_type == 'list') {
-                    list_type = 'grid';    change_target_prices_list();
+                    list_type = 'grid';
+                    change_target_prices_list();
                 } else {
                     process_target_prices_blocks();
                     binds_for_target_price_list();
@@ -980,8 +1243,8 @@ function load_target_prices(){
             $('.inner_content').animate({'opacity':1}, 100);
         });
         var feature = $('.analyse_menu a.active');
-        if(feature.length == 0){  
-            $('.analyse_menu div:first-child a').trigger('click'); 
+        if (feature.length === 0) {
+            $('.analyse_menu div:first-child a').trigger('click');
             feature = $('.analyse_menu a.active');
         }
         feature = feature.parent('div').attr('name');
@@ -994,25 +1257,26 @@ function load_target_prices(){
 * Remove content, add to another list 
 * Because need to rerun javascript for graphs
 ***/
-function change_target_prices_list(){
+function change_target_prices_list() {
 
     var content = null;
 
-    list_type = (list_type == 'list') ? 'grid' : 'list';
+    list_type = (list_type == 'list') ? 'grid' : 'list'; // ?????
     $('.latest_target_prices svg').remove();
     target_prices_list = []; // target prices content will be realoded.
     // set list page
-    if($('.latest_target_prices.hidden').hasClass('list')){
-
+    if ($('.latest_target_prices.hidden').hasClass('list')) {
         $('.latest_target_prices.list').removeClass('hidden');
         $('.latest_target_prices.grid').addClass('hidden');
+
         content = $('.latest_target_prices.grid').html();
         $('.latest_target_prices.grid').html('');
         $('.latest_target_prices.list').html(content);
         // set grid page
-    }else{
+    } else {
         $('.latest_target_prices.grid').removeClass('hidden');
         $('.latest_target_prices.list').addClass('hidden');
+
         content = $('.latest_target_prices.list').html();
         $('.latest_target_prices.list').html('');
         $('.latest_target_prices.grid').html(content);
@@ -1025,52 +1289,88 @@ function change_target_prices_list(){
     scroll_style_elements();
 }
 
-
-function binds_for_target_price_list(){
+/**
+ * [binds_for_target_price_list description]
+ * @return {[type]} [description]
+ */
+function binds_for_target_price_list() {
     /* Tooltip (percent info box) */
     $('.chart .bar rect').hover(function(){
         var obj = $(this);
         var chart = obj.closest('.chart');
         var tooltip = chart.children('.bar_tooltip');
 
-        tooltip.text(obj.attr('txt')).css({display:'block', opacity: 0, width:'auto'});
+        tooltip.text(obj.attr('txt')).css({
+            display:'block',
+            opacity: 0,
+            width:'auto'
+        });
         var width = tooltip.width();
 
         /*var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
         var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - width +,
-                            obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7); */
+            obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7); */
 
         var top = obj.offset().top - chart.offset().top - 3.8;
         var left = obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7;
-    
-        var speed = (parseInt(tooltip.css('top'), 10) == parseInt(top,10) && parseInt(tooltip.css('left'),10) == parseInt(left,10)) ? 0 : 200;
 
-        tooltip.css({top:top, left:left, width:0, opacity:1}).animate({width: width}, speed);
-        
-        if(chart.children('.tooltip_point').length == 0){ chart.append('<span class="tooltip_point"></span>'); }
-        chart.children('.tooltip_point').css({left:(left-4), top:(top+5), display:'block'});
+        // These kind of expressions are really hard to understand
+        var speed = (
+            parseInt(tooltip.css('top'), 10) == parseInt(top,10) &&
+            parseInt(tooltip.css('left'),10) == parseInt(left,10)) ? 0 : 200;
+
+        tooltip.css({
+            top: top,
+            left: left,
+            width: 0,
+            opacity: 1
+        }).animate({
+            width: width
+        }, speed);
+
+        if (chart.children('.tooltip_point').length === 0) {
+            chart.append('<span class="tooltip_point"></span>');
+        }
+        chart.children('.tooltip_point').css({
+            left: (left-4),
+            top: (top+5),
+            display: 'block'
+        });
 
     }, function(){});
 
-    $('.chart').hover(function(){}, function(){ $('.bar_tooltip').fadeOut(150); $('.tooltip_point').fadeOut(150); });
+    $('.chart').hover(function(){}, function() {
+        $('.bar_tooltip').fadeOut(150);
+        $('.tooltip_point').fadeOut(150);
+    });
 
     // long company names moving
     $('.title .entry').hover(function() {
-           var obj = $(this);
-           obj.find('.goust').text(obj.find('.text .slid').text());
-           var left = Math.min(0, (165 - obj.find('.goust').width()) );
-           obj.find('.text .slid').animate({'left': left}, (left * -15) );
-       },
-       function(){ $(this).find('.text .slid').stop().css({'left': 0});}
-    );
-    $('.title .entry').click(function(){ location.href = $(this).find('a').attr('href');});
+        var obj = $(this);
+        obj.find('.goust').text(obj.find('.text .slid').text());
+        var left = Math.min(0, (165 - obj.find('.goust').width()) );
+        obj.find('.text .slid').animate({'left': left}, (left * -15) );
+    },
+    function() {
+        $(this).find('.text .slid').stop().css({
+            'left': 0
+        });
+    });
+
+    $('.title .entry').click(function() {
+        location.href = $(this).find('a').attr('href');
+    });
+
     $('.latest_target_prices .toggle').unbind('click').click(change_target_prices_list);
     $('.title.list .pre_info span a').unbind('click').click(sort_target_prices);
 
     // hide company name if it's company page or bank page
-    if($('.inner_target_prices').attr('type') !== undefined && $('.latest_target_prices').length !== 0) {
-       var obj, who =  $('.inner_target_prices').attr('type');
-       $('.inner_target_prices').removeAttr('type');
+    if (
+        $('.inner_target_prices').attr('type') !== undefined &&
+        $('.latest_target_prices').length !== 0
+    ) {
+        var obj, who = $('.inner_target_prices').attr('type');
+        $('.inner_target_prices').removeAttr('type');
         $('#target-price-list .entry').each(function(){
             obj = $(this);
             if(who == 'ticker'){
@@ -1080,12 +1380,19 @@ function binds_for_target_price_list(){
         });
     }
     // to see last target price date
-    $('.target_price_list').css('padding-bottom', $(window).height() - $('.title .entry').outerHeight() -77);
+    $('.target_price_list').css('padding-bottom',
+        $(window).height() - $('.title .entry').outerHeight() -77);
 }
 
-function calculate_minavgmax_block(){
+/**
+ * [calculate_minavgmax_block description]
+ * @return {[type]} [description]
+ */
+function calculate_minavgmax_block() {
     obj = $('.corp_info .avg');
-    if(obj.length === 0) { return; }
+    if(obj.length === 0) {
+        return;
+    }
 
     var min = obj.find('.mn i').text();
     var avg = obj.find('.av i').text();
@@ -1097,9 +1404,15 @@ function calculate_minavgmax_block(){
     obj.find('.av').css('left',percent);
 }
 
-function sort_target_prices(){
+/** 
+ * [sort_target_prices description]
+ * @return {[type]} [description]
+ */
+function sort_target_prices() {
     var obj = $(this);
-    if(obj.hasClass('active')) { return; }
+    if(obj.hasClass('active')) {
+        return;
+    }
     $('.title.list .pre_info span a').removeClass('active');
     obj.addClass('active');
 
@@ -1109,26 +1422,43 @@ function sort_target_prices(){
     $('#target-price-list').html('');
 
     // do sort!
-    target_prices_list = get_sorted_target_prices(target_prices_list, target_price_sort_info);
+    target_prices_list = get_sorted_target_prices(
+        target_prices_list,
+        target_price_sort_info
+    );
 
-    for(i=0 ; i < target_prices_list.length ; i++){
-        $('#target-price-list').append(list_html.find('#'+target_prices_list[i].hash));
+    for (i=0 ; i < target_prices_list.length ; i++) {
+        $('#target-price-list').append(
+            list_html.find('#'+target_prices_list[i].hash));
     }
     binds_for_target_price_list();
 }
 
-function get_sorted_target_prices(list, sort_info){
+/**
+ * [get_sorted_target_prices description]
+ * @param  {[type]} list      [description]
+ * @param  {[type]} sort_info [description]
+ * @return {[type]}           [description]
+ */
+function get_sorted_target_prices(list, sort_info) {
     var new_list = $.extend([], list);
 
-    if(sort_info.direction == 'up'){
-        new_list.sort(function(a,b){return b[sort_info.slug]-a[sort_info.slug]; });
+    if (sort_info.direction == 'up') {
+        new_list.sort(function(a,b) {
+            return b[sort_info.slug]-a[sort_info.slug];
+        });
     } else {
-        new_list.sort(function(a,b){return a[sort_info.slug]-b[sort_info.slug]; });
+        new_list.sort(function(a,b) {
+            return a[sort_info.slug]-b[sort_info.slug];
+        });
     }
     return new_list;
 }
 
-
+/**
+ * [in_graph_click description]
+ * @return {[type]} [description]
+ */
 function in_graph_click(){
     var obj = $(this);
 
@@ -1140,14 +1470,24 @@ function in_graph_click(){
     if(obj.parents().length > 2){
         obj.addClass('tmp');
         obj.addClass('active');
-        $(".in_graph .sear ul").niceScroll({'cursorborder':'0px', 'cursorcolor':'#cdcdcd', 'cursorwidth': '6px'}); // nice scroll
-        $('#ascrail2000, #ascrail2000-hr').css('visibility', 'visible'); // nice scroll
-    }else{
+        $(".in_graph .sear ul").niceScroll({
+            'cursorborder':'0px',
+            'cursorcolor':'#cdcdcd',
+            'cursorwidth': '6px'
+        });
+        // nice scroll
+        $('#ascrail2000, #ascrail2000-hr').css('visibility', 'visible');
+    } else {
         $('.in_graph').removeClass('active');
-        $('#ascrail2000, #ascrail2000-hr').css('visibility', 'hidden'); // nice scroll
+        // nice scroll
+        $('#ascrail2000, #ascrail2000-hr').css('visibility', 'hidden');
     }
 }
 
+/**
+ * [in_graph_entry_click description]
+ * @return {[type]} [description]
+ */
 function in_graph_entry_click(){
     var obj = $(this);
     var name = obj.attr('name');
@@ -1162,7 +1502,12 @@ function in_graph_entry_click(){
     }
 }
 
-function in_graph_entry_hover(e){
+/**
+ * [in_graph_entry_hover description]
+ * @param  {[type]} e [description]
+ * @return {[type]}   [description]
+ */
+function in_graph_entry_hover(e) {
     var obj = $(this);
     var name = obj.attr('name');
     var svg_element = $('#chart svg [name='+name+']');
@@ -1178,6 +1523,10 @@ function in_graph_entry_hover(e){
     }
 }
 
+/**
+ * [in_graph_get_active_elements description]
+ * @return {[type]} [description]
+ */
 function in_graph_get_active_elements(){
     var list = $('.in_graph .sear li');
     var obj, name, active_elements = [];
@@ -1193,6 +1542,10 @@ function in_graph_get_active_elements(){
     //return active_elements;
 }
 
+/**
+ * [in_graph_select_active_elements description]
+ * @return {[type]} [description]
+ */
 function in_graph_select_active_elements(){
     set_active_analytic(); // for first time. if any
 
@@ -1210,20 +1563,23 @@ function in_graph_select_active_elements(){
     });
 }
 
+/**
+ * [in_graph_search description]
+ * @return {[type]} [description]
+ */
 function in_graph_search(){
     var list = $('.in_graph ul li');
     var search_for = new RegExp($(this).val(), 'i');
 
-    list.each(function(){
+    list.each(function() {
         var item = $(this);
-        if(item.text().search(search_for) == -1){
+        if (item.text().search(search_for) == -1) {
             item.hide();
-        }else{
+        } else {
             item.show();
         }
-    })
+    });
 }
-
 
 /**
 * Scroll
@@ -1260,16 +1616,20 @@ function scroll_style_elements() {
         if (
             obj.offset().top <= window_scroll +50 &&
             obj.offset().top + obj.outerHeight() +
-            parseInt(obj.css('margin-bottom'), 10) >= window_scroll +50) {
+            parseInt(obj.css('margin-bottom'), 10) >= window_scroll +50
+        ) {
            $('.now').text(obj.attr('name'));
            exit = true;
         }
 
     });
 
-
 }
 
+/**
+ * [load_more_target_prices description]
+ * @return {[type]} [description]
+ */
 function load_more_target_prices(){
     // don't use in inner, analyse page
     if($('.inner_target_prices').length) { return false; }
@@ -1302,7 +1662,7 @@ function load_more_target_prices(){
             $("#target-price-list").append(data);
             loading_target_prices = false;
             // if one loaded page is not enough, bind and process if no more to load.
-            if(load_more_target_prices() === false){
+            if (load_more_target_prices() === false) {
                 process_target_prices_blocks();
                 binds_for_target_price_list();
             }
@@ -1310,7 +1670,7 @@ function load_more_target_prices(){
             bottom_of_page = true;
         });
         return true; // loaded more target prices
-    }else{
+    } else {
         return false; // not loaded, enough
     }
 }
@@ -1325,4 +1685,5 @@ $(window).scroll(tp.window_scroll);
 $(window).resize(tp.window_resize);
 
 /* Internet Explorer save console.log() */
-if(typeof(console)=="undefined"){var console={log:function(){}};}
+// Why?
+// if (typeof(console)=="undefined"){var console={log:function(){}};}
