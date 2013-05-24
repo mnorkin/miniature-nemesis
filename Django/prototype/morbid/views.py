@@ -133,7 +133,7 @@ def tickers(request):
     """
     Returning all the tickers, in the system
     """
-    _tickers = Ticker.objects.all().order_by('name')
+    _tickers = Ticker.objects.with_display().order_by('name')
     tickers = []
 
     for ticker in _tickers:

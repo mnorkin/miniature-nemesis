@@ -1,5 +1,5 @@
 from django.db import models    # Model description
-from django.conf import settings    # Settings
+# from django.conf import settings    # Settings
 from django.contrib.auth import models as auth_models    # Authentication
 from django.contrib.auth.models import User    # User manager
 from django.contrib.auth.management import create_superuser    # Superuser manager
@@ -88,6 +88,18 @@ class Analytic(models.Model):
         return self.name
 
 
+class TickerManager(models.Manager):
+    """
+    Ticker Manager
+    """
+
+    def with_display(self):
+        """
+        Returning all the tickers, which has positive display field
+        """
+        return Ticker.objects.filter(display=1)
+
+
 class Ticker(models.Model):
     """
     The Ticker (or more precise to call it a company) name
@@ -102,6 +114,9 @@ class Ticker(models.Model):
     consensus_avg = models.FloatField()
     consensus_max = models.FloatField()
     slug = models.SlugField()
+    display = models.BooleanField()
+
+    objects = TickerManager()
 
     def get_absolute_url(self):
         """

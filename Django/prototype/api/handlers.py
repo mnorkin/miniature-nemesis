@@ -393,21 +393,17 @@ class TickerHandler(BaseHandler):
         if ticker_slug:
             return Ticker.objects.get(slug=ticker_slug)
         else:
-            return Ticker.objects.all()
+            return Ticker.objects.with_display()
 
     def create(self, request):
-
         if request.content_type:
-
             data = request.data
-
             ticker = Ticker
 
             try:
                 ticker = self.model.objects.get(slug=data['slug'])
                 return rc.DUPLICATE_ENTRY
             except ticker.DoesNotExist:
-
                 em = self.model(
                     name=data['name'],
                     long_name=data['long_name'],
@@ -416,7 +412,8 @@ class TickerHandler(BaseHandler):
                     consensus_min=data['consensus_min'],
                     consensus_avg=data['consensus_avg'],
                     consensus_max=data['consensus_max'],
-                    slug=data['slug']
+                    slug=data['slug'],
+                    display=data['display']
                 )
 
                 em.save()
@@ -429,19 +426,32 @@ class TickerHandler(BaseHandler):
         if request.content_type:
             data = request.data
 
+            ticker = Ticker
+
             try:
-                em = self.model.objects.get(slug=data['slug'])
-            except em.DoesNotExist:
+                if 'slug' in data:
+                    ticker = Ticker.objects.get(slug=data['slug'])
+                if 'name' in data:
+                    ticker = Ticker.objects.get(name=data['name'])
+            except ticker.DoesNotExist:
                 return rc.NOT_FOUND
 
-            em.name = data['name']
-            em.long_name = data['long_name']
-            em.last_stock_price = data['last_stock_price']
-            em.consensus_min = data['consensus_min']
-            em.consensus_avg = data['consensus_avg']
-            em.consensus_max = data['consensus_max']
+            if 'name' in data:
+                ticker.name = data['name']
+            if 'long_name' in data:
+                ticker.long_name = data['long_name']
+            if 'last_stock_price' in data:
+                ticker.last_stock_price = data['last_stock_price']
+            if 'consensus_min' in data:
+                ticker.consensus_min = data['consensus_min']
+            if 'consensus_avg' in data:
+                ticker.consensus_avg = data['consensus_avg']
+            if 'consensus_max' in data:
+                ticker.consensus_max = data['consensus_max']
+            if 'display' in data:
+                ticker.display = data['display']
 
-            em.save()
+            ticker.save()
 
             return rc.ALL_OK
         else:
