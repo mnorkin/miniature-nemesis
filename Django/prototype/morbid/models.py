@@ -5,6 +5,8 @@ from django.contrib.auth.models import User    # User manager
 from django.contrib.auth.management import create_superuser    # Superuser manager
 from django.db.models import signals    # Signal handling
 import string    # String lib for alphabet
+from datetime import date
+from datetime import timedelta
 
 signals.post_syncdb.disconnect(
     create_superuser,
@@ -64,6 +66,22 @@ class Analytic(models.Model):
         @return: C{string}
         """
         return self.name
+
+    def number_of_companies(self):
+        """
+        Returning the number of companies, analytic does analysis on
+        """
+        return TargetPrice.objects.filter(
+            analytic=self
+        ).distinct('ticker').count()
+
+    def number_of_target_prices(self):
+        """
+        Returning the active number of target prices, which belongs to analytic
+        """
+        return TargetPrice.objects.valid().filter(
+            analytic=self
+        ).count()
 
     def last_target_price(self, _ticker=None):
         """
@@ -138,6 +156,22 @@ class Ticker(models.Model):
         The object return name
         """
         return self.long_name + " (" + self.name + ")"
+
+    def number_of_analytics(self):
+        """
+        Returning the number of analytics of the ticker
+        """
+        return TargetPrice.objects.filter(
+            ticker__name=self.name
+        ).distinct('analytic').count()
+
+    def number_of_target_prices(self):
+        """
+        Returning number of active target prices of ticker
+        """
+        return TargetPrice.objects.valid().filter(
+            ticker__name=self.name
+        ).count()
 
 
 class TargetPriceNumberAnalyticTicker(models.Model):
@@ -234,6 +268,13 @@ class TargetPriceManager(models.Manager):
             results_list.append(row[0])
 
         return self.filter(ticker_id__in=results_list)
+
+    def valid(self):
+        """
+        Returning all the target prices, which are valid
+        """
+        year_ago = date.today() - timedelta(days=356)
+        return TargetPrice.objects.filter(date__gt=year_ago)
 
 
 class TargetPrice(models.Model):
