@@ -36,6 +36,7 @@ class Feature(models.Model):
     name = models.CharField(max_length=200)
     unit = models.ForeignKey(Unit)
     display_in_frontpage = models.BooleanField()
+    display = models.BooleanField()
     description = models.TextField()
     position = models.IntegerField()
     slug = models.SlugField(max_length=200, unique=True)
@@ -51,7 +52,10 @@ class Analytic(models.Model):
     """
     Analysing analytic
     """
-    name = models.CharField(max_length=200)
+    name = models.CharField(
+        db_index=True,
+        max_length=200
+    )
     slug = models.SlugField()
 
     def get_absolute_url(self):
@@ -122,8 +126,14 @@ class Ticker(models.Model):
     """
     The Ticker (or more precise to call it a company) name
     """
-    name = models.CharField(max_length=200)
-    long_name = models.CharField(max_length=200)
+    name = models.CharField(
+        db_index=True,
+        max_length=200
+    )
+    long_name = models.CharField(
+        db_index=True,
+        max_length=200
+    )
     # Last stock group gives information on
     # stock market price change
     last_stock_price = models.FloatField()
@@ -343,9 +353,7 @@ def create_testuser(app, created_models, verbosity, **kwargs):
     try:
         auth_models.User.objects.get(username='test')
     except auth_models.User.DoesNotExist:
-        print '*' * 80
         print 'Creating test user -- login: test, password: test'
-        print '*' * 80
         assert auth_models.User.objects.create_superuser('test', 'x@x.com', 'test')
     else:
         print 'Test user already exists'

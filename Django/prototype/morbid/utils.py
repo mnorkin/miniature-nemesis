@@ -41,6 +41,36 @@ def target_data(ticker=None, analytic=None):
     return tp.return_target_prices(ticker, analytic)
 
 
+def recent_target_data(ticker=None, analytic=None):
+    """
+    The link between the target prices class and utils interface
+
+    ticker -- ticker name
+    analytic -- analytic name
+    """
+    tp = target_prices()
+    return tp.return_recent_target_prices(ticker, analytic)
+
+
+def old_data_exists(ticker=None, analytic=None):
+    """
+    The link between the target prices class and utils interface
+
+    ticker -- ticker name
+    analytic -- analytic name
+    """
+    tp = target_prices()
+    return tp.old_data_exists(ticker, analytic)
+
+
+def ticker_analytics(ticker=None):
+    """
+    Returning all the analytics of ticker
+    """
+    tp = target_prices()
+    return tp.return_ticker_analytics(ticker)
+
+
 class betas():
     """
     Beta bridge
@@ -119,8 +149,6 @@ class target_prices():
                 old data)"""
             self.cursor.execute(query)
             for row in self.cursor.fetchall():
-                change = 0
-
                 # previous_targetprice = self.get_previous_targetprice(row[3], row[4], row[0])
                 # Change is calculated in the app, because it needs the
                 # Target price data
@@ -145,6 +173,83 @@ class target_prices():
             return results
         else:
             return None
+
+    def return_recent_target_prices(self, ticker=None, analytic=None):
+        """
+        Returning recent target prices
+
+        Which are not older than a year
+        """
+        if analytic and ticker:
+            results = []
+            query = "SELECT DISTINCT pub_date, price0, analytic, ticker \
+                FROM entries \
+                WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
+                AND pub_date > NOW() - interval '1 year';" % (
+                    re.escape(analytic),
+                    re.escape(ticker))
+
+            self.cursor.execute(query)
+            for row in self.cursor.fetchall():
+                item = {
+                    'date_timestamp': time.mktime(row[0].timetuple()),
+                    'date': str(row[0]),
+                    'date_next': (
+                        datetime.strptime(str(row[0]), '%Y-%m-%d') + timedelta(days=356)
+                    ).strftime('%Y-%m-%d'),
+                    'price': row[1],
+                    'analytic': row[2],
+                    'ticker': row[3]
+                }
+                """Forming the dict"""
+                results.append(item)
+
+            return results
+        else:
+            return None
+
+    def return_ticker_analytics(self, ticker=None):
+        """
+        Returning all the analytic, which analyses the ticker
+        """
+        if ticker:
+            results = []
+            query = "SELECT DISTINCT analytic \
+                FROM entries \
+                WHERE ticker='%s' AND price0 != 0 \
+                GROUP BY analytic" % (
+                    re.escape(ticker))
+
+            self.cursor.execute(query)
+            for row in self.cursor.fetchall():
+                item = {
+                    'analytic': row[0]
+                }
+                results.append(item)
+
+            return results
+        else:
+            return None
+
+    def old_data_exists(self, ticker=None, analytic=None):
+        """
+        Checking if old data exists in the database (older than 12months)
+        """
+        if ticker and analytic:
+            query = "SELECT DISTINCT pub_date, price0, analytic, ticker \
+                FROM entries \
+                WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
+                AND pub_date < NOW() - interval '1 year';" % (
+                    re.escape(analytic),
+                    re.escape(ticker))
+            self.cursor.execute(query)
+
+            if self.cursor.rowcount > 0:
+                return True
+            else:
+                return False
+        else:
+            return False
 
 
 def feature_data(ticker=None):

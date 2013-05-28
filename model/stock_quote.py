@@ -60,6 +60,13 @@ class stock_quote():
                             'low': entry['price_low']
                         }
                         data.append(item)
+
+                    if data[0]['date'] > data[len(data)-1]['date']:
+                        """
+                        Data should start from the 2001 to 2013 or in similar
+                        style -- from old to new
+                        """
+                        data.reverse()
                     return data
                 return None
         except IOError:

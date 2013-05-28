@@ -95,6 +95,7 @@ class App():
                 'unit_id': feature.features[feature_slug]['unit_id'],
                 'position': feature.features[feature_slug]['position'],
                 'display_in_frontpage': feature.features[feature_slug]['display_in_frontpage'],
+                'display': feature.features[feature_slug]['display'],
                 'description': feature.features[feature_slug]['description']
             }
 
@@ -190,7 +191,6 @@ class App():
                         target_data=target_data,
                         stock_data=stock_data,
                         beta=beta,
-                        plot=False,
                         calculate=True
                     )
                     features_values = features.values()

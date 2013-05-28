@@ -10,10 +10,11 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+# Front end database access
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'fp4-morbid',                      # Or path to database file if using sqlite3.
+        'NAME': 'fp5-morbid',                      # Or path to database file if using sqlite3.
         'USER': 'postgres',
         'PASSWORD': 'sWAgu4e7',
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -21,6 +22,7 @@ DATABASES = {
     }
 }
 
+# Target price database access
 TP_DATABASE = {
     'NAME': 'tp-morbid',
     'USER': 'postgres',
@@ -178,3 +180,8 @@ LOGGING = {
 PISTON_IGNORE_DUPE_MODELS = True
 STOCK_DATA_PATH = '/home/maksim/Work/Morbid/data'
 FC_DIR = '/home/maksim/Work/Morbid/miniature-nemesis/model'
+
+# Fixture dir, the place where Django will look up for the initial data
+FIXTURE_DIRS = (
+    '/home/maksim/Work/Morbid/backups/prototype'
+)

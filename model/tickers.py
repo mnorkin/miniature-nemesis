@@ -54,6 +54,7 @@ class Tickers:
                 'consensus_min': consensus_min,
                 'consensus_avg': consensus_avg,
                 'consensus_max': consensus_max,
+                'display': 0,
                 'slug': slug
             }
             return data

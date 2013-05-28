@@ -219,11 +219,11 @@ class database:
         """
         if analytic and ticker:
             results = []
-            query = "SELECT pub_date, price0, analytic, ticker \
+            query = "SELECT DISTINCT pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
                 AND pub_date < NOW() - interval '1 year' \
-                ORDER BY pub_date" % (
+                ORDER BY pub_date ASC" % (
                     re.escape(analytic),
                     re.escape(ticker))
             """Query for the target prices, which are older than the maximum date
@@ -232,11 +232,9 @@ class database:
             self.cursor.execute(query)
             for row in self.cursor.fetchall():
                 change = 0
-
                 # previous_targetprice = self.get_previous_targetprice(row[3], row[4], row[0])
                 # Change is calculated in the app, because it needs the
                 # Target price data
-                change = 0
 
                 item = {
                     'date': time.mktime(row[0].timetuple()),
@@ -247,10 +245,11 @@ class database:
                     'ticker': row[3],
                     'change': round(change, 2)
                 }
-                """Forming the dict"""
-                if item not in results:
-                    """Escaping possible duplicates"""
-                    results.append(item)
+                """Escaping possible duplicates"""
+                results.append(item)
+
+            # if results[0]['date_datetime'] < results[len(results)-1]['date_datetime']:
+            #     results.reverse()
 
             return results
         else:
@@ -263,7 +262,7 @@ class database:
         On of the ideas is to use the yeild operator to speed things up
         """
         if analytic and ticker:
-            query = "SELECT pub_date, price0, analytic, ticker \
+            query = "SELECT DISTINCT pub_date, price0, analytic, ticker \
                 FROM entries \
                 WHERE analytic=E'%s' AND ticker='%s' AND price0 != 0 \
                 AND pub_date < NOW() - interval '1 year' \

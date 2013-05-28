@@ -4,7 +4,6 @@
 file_path = strcat('target_data/', ticker, '.json');
 if exist(file_path{:}, 'file')
     targets = loadjson(file_path{:});
-
     banks = unique({targets(:).analytic});
 
     % Sorting mechanism
@@ -51,7 +50,7 @@ if exist(file_path{:}, 'file')
             start_index = find(stocks_date==bank_date);
             end_index = start_index + 250;
             if end_index > length(stocks_date)
-                    end_index = length(stocks_date);
+                end_index = length(stocks_date);
             end
             till_bank_date = stocks_date(end_index);
 

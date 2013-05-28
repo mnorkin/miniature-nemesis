@@ -464,12 +464,22 @@ def django_production_backup():
         deploy_path=env.deploy_django_production_path,
         version=env.version
     )
+    # Activating the virtualenv
+    env.activate = 'source %(deploy_path)s/bin/activate' % opts
+    # SQL data backup
     sudo('touch %(deploy_path)s/%(release)s.sql' % opts)
     sudo('chmod 777 %(deploy_path)s/%(release)s.sql' % opts)
     sudo('pg_dump fp%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
     local('mkdir -p ../backups/production')
     get('%(deploy_path)s/%(release)s.sql' % opts, '../backups/production/%(release)s.sql' % opts)
     sudo('rm %(deploy_path)s/%(release)s.sql' % opts)
+    # JSON data backup
+    sudo('touch %(deploy_path)s/%(release)s.json' % opts)
+    sudo('chmod 777 %(deploy_path)s/%(release)s.json' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py dumpdata morbid --indent=4 > \
+        %(deploy_path)s/%(release)s.json' % opts)
+    get('%(deploy_path)s/%(release)s.json' % opts, '%(what_to_send_path)s/morbid/fixtures/initial_data.json' % opts)
+    sudo('rm %(deploy_path)s/%(release)s.json' % opts)
 
 
 def django_production_update():

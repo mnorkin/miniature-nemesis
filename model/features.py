@@ -23,7 +23,6 @@ class Features:
     stock_highs = array.array('f')
     stock_lows = array.array('f')
     stock_closes = array.array('f')
-    _plot = None
     _show_plot = False
     calculated_feature_data = []
     beta = 1
@@ -48,43 +47,55 @@ class Features:
         {
             'name': 'Accuracy',
             'display_in_frontpage': 1,
+            'display': 1,
             'unit_id': 1,
-            'position': 1
+            'position': 1,
+            'description': ''
         },
         'proximity':
         {
             'name': 'Proximity',
             'display_in_frontpage': 0,
+            'display': 1,
             'unit_id': 1,
-            'position': 2
+            'position': 2,
+            'description': ''
         },
         'profitability':
         {
             'name': 'Profitability',
             'display_in_frontpage': 1,
+            'display': 1,
             'unit_id': 1,
-            'position': 3
+            'position': 3,
+            'description': ''
         },
         'aggressiveness':
         {
             'name': 'Aggressiveness',
             'display_in_frontpage': 0,
+            'display': 1,
             'unit_id': 1,
-            'position': 4
+            'position': 4,
+            'description': ''
         },
         'reach_time':
         {
             'name': 'Reach time',
             'display_in_frontpage': 1,
+            'display': 1,
             'unit_id': 2,
-            'position': 5
+            'position': 5,
+            'description': ''
         },
         'impact_to_market':
         {
             'name': 'Impact to market',
             'display_in_frontpage': 0,
+            'display': 1,
             'unit_id': 1,
-            'position': 6
+            'position': 6,
+            'description': ''
         }
     }
 
@@ -93,7 +104,6 @@ class Features:
         target_data=None,
         stock_data=None,
         beta=None,
-        plot=False,
         calculate=False
     ):
         """
@@ -123,9 +133,6 @@ class Features:
             self.market_lows = [self.market_data[i]['low'] for i in range(0, self.market_data.__len__())]
 
             self.beta = beta
-
-        if plot:
-            self._show_plot = True
 
         if calculate:
             self.calculated_feature_data = []
@@ -246,10 +253,6 @@ class Features:
         results = []
         self.logger.debug("Proximity")
 
-        if self._show_plot:
-            self._plot.plot_continue([[self.stock_data[i]['date'], self.stock_data[i]['high']] for i in range(0, self.stock_data.__len__())], 'g')
-            self._plot.plot_continue([[self.stock_data[i]['date'], self.stock_data[i]['low']] for i in range(0, self.stock_data.__len__())], 'b')
-
         # Looping through the target data
         for index, target_entry in enumerate(self.local_target_data):
             measure = 0
@@ -258,35 +261,33 @@ class Features:
             # Second field of target entry is the price
             target_price = target_entry[1]
             try:
-                self.logger.debug('Stock dates format %s ' % self.stock_dates[1])
-                self.logger.debug('Target date format %s ' % target_date)
                 start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
                 end_index = start_index+249
 
-                if index < self.local_target_data.__len__()-1:
+                if index < len(self.local_target_data)-1:
                     next_start_index = next(i for i, x in enumerate(self.stock_dates) if x == self.local_target_data[index+1][0])
                 else:
-                    next_start_index = self.stock_dates.__len__()-1
+                    next_start_index = len(self.stock_dates)-1
 
-                if end_index >= next_start_index:
+                if end_index > next_start_index:
                     end_index = next_start_index
 
-                self.logger.debug("Start index: %s" % start_index)
-                self.logger.debug("End Index: %s" % end_index)
-                self.logger.debug("Next start index: %s " % next_start_index)
-                self.logger.debug("From: %s" % datetime.datetime.fromtimestamp(
-                    self.stock_dates[start_index]))
-                self.logger.debug("To: %s" % datetime.datetime.fromtimestamp(
-                    self.stock_dates[end_index]))
-                self.logger.debug("Stock from: %s" % datetime.datetime.fromtimestamp(
-                    self.stock_dates[0]))
-                self.logger.debug("Stock to: %s" % datetime.datetime.fromtimestamp(
-                    self.stock_dates[self.stock_dates.__len__()-1]))
+                self.logger.debug("From date: %s" % (
+                    datetime.datetime.fromtimestamp(self.stock_dates[start_index])))
+                self.logger.debug("To date: %s" % (
+                    datetime.datetime.fromtimestamp(self.stock_dates[end_index])))
+                self.logger.debug("Next start date: %s" % (
+                    datetime.datetime.fromtimestamp(self.stock_dates[next_start_index])))
+                self.logger.debug("Stock start price: %s" % (
+                    self.stock_highs[start_index]))
+                self.logger.debug("Stock end price: %s" % (
+                    self.stock_highs[end_index]))
+                self.logger.debug("Bank price %s" % (target_price))
 
                 if self._show_plot:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
 
-                number_of_entries = range(start_index, end_index).__len__()
+                number_of_entries = len(range(start_index, end_index))
                 self.logger.debug("Number of entries: %s" % number_of_entries)
 
                 for j in range(start_index, end_index):
@@ -294,7 +295,9 @@ class Features:
                         measure = measure + abs(float(self.stock_highs[j] - target_price))/number_of_entries
                     elif target_price < self.stock_lows[j] and target_price < self.stock_highs[j]:
                         measure = measure + abs(float(self.stock_lows[j] - target_price))/number_of_entries
+                    self.logger.debug("%s %s" % (self.stock_highs[j], round(measure, 4)))
 
+                self.logger.debug('Measure: %s' % measure)
                 results.append(measure)
             except StopIteration:
                 """
@@ -310,7 +313,7 @@ class Features:
                 ))
                 results.append(float(0))
 
-        result = float(sum(results)/self.local_target_data.__len__())
+        result = float(sum(results)/len(results))
 
         self.logger.debug("Proximity measure")
         self.logger.debug("Results: %s" % results)
@@ -389,15 +392,15 @@ class Features:
             target_price = target_entry[1]
             try:
                 start_index = next(i for i, x in enumerate(self.stock_dates) if x == target_date)
-                end_index = start_index+249
+                end_index = start_index+250
 
                 if end_index >= self.stock_dates.__len__():
                     end_index = self.stock_dates.__len__()-1
 
                 self.logger.debug("Start index: %s " % start_index)
                 self.logger.debug("End Index: %s" % end_index)
-                self.logger.debug("From: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
-                self.logger.debug("To: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
+                self.logger.debug("Start date: %s" % datetime.datetime.fromtimestamp(self.stock_dates[start_index]))
+                self.logger.debug("End date: %s" % datetime.datetime.fromtimestamp(self.stock_dates[end_index]))
                 self.logger.debug("Stock from: %s" % datetime.datetime.fromtimestamp(self.stock_dates[0]))
                 self.logger.debug("Stock to: %s" % datetime.datetime.fromtimestamp(self.stock_dates[self.stock_dates.__len__()-1]))
 
@@ -406,6 +409,8 @@ class Features:
 
                 start_close_price = self.stock_closes[start_index]
                 end_close_price = self.stock_closes[end_index]
+                self.logger.debug("Start price: %s" % start_close_price)
+                self.logger.debug("End price: %s" % end_close_price)
                 if target_price > start_close_price:
                     """Long"""
                     measure = (end_close_price - start_close_price)/start_close_price
@@ -413,6 +418,9 @@ class Features:
                     """Short"""
                     measure = (start_close_price - end_close_price)/start_close_price
 
+                # measure = round(measure, 5)
+
+                self.logger.debug('Measure: %s' % measure)
                 results.append(measure)
             except StopIteration:
                 self.logger.debug("Stopped iteration on %s %s " % (
@@ -425,7 +433,7 @@ class Features:
                 ))
                 results.append(float(0))
 
-        result = float(sum(results)/self.local_target_data.__len__()) * 100
+        result = float(sum(results)/len(results)) * 100
 
         self.logger.debug("Profitability measure")
         self.logger.debug("Results: %s" % results)
@@ -531,7 +539,8 @@ class Features:
             self._plot.plot_continue([[self.market_data[i]['date'], self.market_data[i]['high']] for i in range(0, self.market_data.__len__())], 'y')
             self._plot.plot_continue([[self.market_data[i]['date'], self.market_data[i]['low']] for i in range(0, self.market_data.__len__())], 'r')
 
-        for target_entry in self.local_target_data[-1:]:
+        # for target_entry in self.local_target_data[-1:]:  # DAFAC ?
+        for target_entry in self.local_target_data:
             measure = 0
             market_price_change = 0
             stock_price_change = 0
@@ -562,12 +571,14 @@ class Features:
                     self._plot.plot_continue([[self.stock_dates[start_index], target_price], [self.stock_dates[end_index], target_price]])
 
                 for index in range(start_index, end_index):
-                    self.logger.debug("Stock date of consideration: %s" % datetime.datetime.fromtimestamp(self.stock_dates[index]))
-                    stock_price_change = stock_price_change + round((self.stock_closes[index-1] - self.stock_closes[index])/self.stock_closes[index-1], 4)
+                    self.logger.debug("Stock date: %s" % datetime.datetime.fromtimestamp(self.stock_dates[index]))
+                    self.logger.debug("Stock close price: %s" % self.stock_closes[index])
+                    stock_price_change = stock_price_change + abs((self.stock_closes[index-1] - self.stock_closes[index])/self.stock_closes[index-1])
 
                 for index in range(start_market_index, end_market_index):
-                    self.logger.debug("Market date of consideration: %s" % datetime.datetime.fromtimestamp(self.market_dates[index]))
-                    market_price_change = market_price_change + round((self.market_closes[index-1] - self.market_closes[index])/self.market_closes[index-1], 4)
+                    self.logger.debug("Market date: %s" % datetime.datetime.fromtimestamp(self.market_dates[index]))
+                    self.logger.debug("Market close price: %s" % self.market_closes[index])
+                    market_price_change = market_price_change + abs((self.market_closes[index-1] - self.market_closes[index])/self.market_closes[index-1])
 
                 measure = measure + abs(stock_price_change - market_price_change*self.beta)
             except StopIteration:
@@ -582,7 +593,8 @@ class Features:
 
             results.append(measure)
 
-        result = round(float(sum(results))*100, 2)
+        # result = round(float(sum(results))*100, 2)
+        result = round(float(sum(results))/len(results)*100, 2)
 
         self.logger.debug("Impact to the market measure")
         self.logger.debug("Results: %s" % results)
@@ -662,7 +674,17 @@ class Features:
                         measure = j-start_index
 
                 if measure is not 0:
+                    """
+                    Checking if the measure is zero or not
+
+                    If not zero -- substract one from the result (calculations)
+                    """
                     results.append(float(measure)-1)
+                else:
+                    """
+                    if measure is zero -- do not substract anything
+                    """
+                    results.append(0)
             except StopIteration:
                 self.logger.debug("Stopped iteration on %s %s" % (
                     datetime.datetime.fromtimestamp(target_date),
@@ -672,7 +694,7 @@ class Features:
                     datetime.datetime.fromtimestamp(self.stock_dates[0]),
                     datetime.datetime.fromtimestamp(self.stock_dates[-1])
                 ))
-                # results.append(float(0))
+                results.append(float(0))
 
         try:
             result = float(sum(results)/len(results))

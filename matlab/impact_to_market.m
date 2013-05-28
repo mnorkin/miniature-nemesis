@@ -44,7 +44,7 @@ for bank=1:length(banks)
         end
 
         for j = start_market_index:end_market_index
-            if strcmp(bank_name{:}, 'Bernstein') == 1
+            if strcmp(bank_name{:}, 'Bank of America') == 1
                 disp(['Markets date ', datestr(markets_date(j), 'yyyy-mm-dd')]);
                 disp(['Markets close ', num2str(markets_close(j))]);
             end
@@ -55,7 +55,7 @@ for bank=1:length(banks)
         zeta = abs(stock_change - market_change*beta_value);
         % fprintf('%f & %f & %f & %2.4f\n', stock_change, market_change, zeta, zeta*100);
         
-        if strcmp(bank_name{:}, 'Bernstein') == 1
+        if strcmp(bank_name{:}, 'Bank of America') == 1
             disp(['Bank ', bank_name{:}]);
             disp(['Stock change ', num2str(stock_change)]);
             disp(['Market change ', num2str(market_change)]);

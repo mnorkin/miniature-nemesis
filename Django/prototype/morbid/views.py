@@ -371,18 +371,39 @@ def search(self, search_me):
     analytics = []
     tickers = []
 
-    # analytics = Analytic.objects.filter(name__icontains=search_me ).values('name', 'slug')
-    raw_analytics = Analytic.objects.filter(name__icontains=search_me)
+    raw_analytics = Analytic.objects.filter(
+        Q(name=search_me) | Q(name__icontains=search_me)
+    )[:5]
 
-    # tickers = Ticker.objects.filter( Q(name__icontains=search_me) | Q(long_name__icontains=search_me) ).values('name', 'slug')
-    raw_tickers = Ticker.objects.filter(Q(name__icontains=search_me) | Q(long_name__icontains=search_me))
+    raw_tickers_names = Ticker.objects.filter(
+        Q(name=search_me) | Q(name__icontains=search_me)
+    ).extra(select={'length': 'Length(name)'}).order_by('length')[:5]
+
+    raw_tickers_long_names = Ticker.objects.filter(
+        Q(long_name=search_me) | Q(long_name__icontains=search_me)
+    ).extra(select={'length': 'Length(name)'}).order_by('length')[:5]
 
     for analytic in raw_analytics:
-        item = {'name': analytic.name, 'url': analytic.get_absolute_url()}
+        item = {
+            'name': analytic.name,
+            'url': analytic.get_absolute_url()
+        }
         analytics.append(item)
 
-    for ticker in raw_tickers:
-        item = {'name': ticker.long_name, 'ticker': ticker.name, 'url': ticker.get_absolute_url()}
+    for ticker in raw_tickers_names:
+        item = {
+            'name': ticker.long_name,
+            'ticker': ticker.name,
+            'url': ticker.get_absolute_url()
+        }
+        tickers.append(item)
+
+    for ticker in raw_tickers_long_names:
+        item = {
+            'name': ticker.long_name,
+            'ticker': ticker.name,
+            'url': ticker.get_absolute_url()
+        }
         tickers.append(item)
 
     results['tickers'] = list(tickers)
@@ -551,7 +572,9 @@ def test_page_search(self, search_me):
 
     results = []
 
-    raw_tickers = Ticker.objects.filter(Q(name__icontains=search_me) | Q(long_name__icontains=search_me))
+    raw_tickers = Ticker.objects.filter(
+        Q(name__icontains=search_me) | Q(long_name__icontains=search_me)
+    )
 
     for ticker in raw_tickers:
         target_prices = TargetPrice.objects.filter(ticker=ticker).distinct('analytic')
