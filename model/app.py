@@ -187,6 +187,19 @@ class App():
                 if stock_data and beta:
                     self.logger.debug('Stock data and beta values are okay')
 
+                    _date = datetime.datetime.fromtimestamp(
+                        target_price['date']
+                    )
+                    data = {
+                        'date': _date.strftime('%Y-%m-%d'),
+                        'price': target_price['price'],
+                        'ticker_slug': ticker_slug,
+                        'analytic_slug': analytic_slug,
+                        'change': target_price['change']
+                    }
+
+                    targetprices.send(data)
+
                     features = Features(
                         target_data=target_data,
                         stock_data=stock_data,
@@ -222,19 +235,6 @@ class App():
                         self.logger.debug('Ticker %s' % ticker_slug)
                         self.logger.error('No target price stock date found')
                         target_price['change'] = 0
-
-                    _date = datetime.datetime.fromtimestamp(
-                        target_price['date']
-                    )
-                    data = {
-                        'date': _date.strftime('%Y-%m-%d'),
-                        'price': target_price['price'],
-                        'ticker_slug': ticker_slug,
-                        'analytic_slug': analytic_slug,
-                        'change': target_price['change']
-                    }
-
-                    targetprices.send(data)
 
                     # Submitting results to the server
                     # There are entries in the server about the ticker
