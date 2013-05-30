@@ -116,7 +116,20 @@ class stock_quote():
         """
         PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
         url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=nb3x&e=.csv' % (ticker)
-        f = u.urlopen(url, proxies={})
+        self.logger.debug("Url: %s" % url)
+        try:
+            f = u.urlopen(url, proxies={})
+        except IOError:
+            """
+            Reset of connection
+            """
+            item = {
+                "long_name": "",
+                "last_stock_price": 0,
+                "stock_exchange": None
+            }
+            return item
+
         rows = f.readlines()
         r = rows[0]
         """Get the first entry"""

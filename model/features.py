@@ -292,8 +292,10 @@ class Features:
 
                 for j in range(start_index, end_index):
                     if target_price > self.stock_lows[j] and target_price > self.stock_highs[j]:
+                        self.logger.debug("Difference: %s %s" % (abs(float(self.stock_highs[j] - target_price)), number_of_entries))
                         measure = measure + abs(float(self.stock_highs[j] - target_price))/number_of_entries
                     elif target_price < self.stock_lows[j] and target_price < self.stock_highs[j]:
+                        self.logger.debug("Difference: %s %s" % (abs(float(self.stock_lows[j] - target_price)), number_of_entries))
                         measure = measure + abs(float(self.stock_lows[j] - target_price))/number_of_entries
                     self.logger.debug("%s %s" % (self.stock_highs[j], round(measure, 4)))
 

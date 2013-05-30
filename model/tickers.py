@@ -38,10 +38,12 @@ class Tickers:
         """
         if ticker:
             ticker_consensus = self.database.get_consensus(ticker)
-            ticker_yahoo = self.stock_quote.get_ticker_data(ticker)
+            # ticker_yahoo = self.stock_quote.get_ticker_data(ticker)
             name = ticker
-            long_name = ticker_yahoo['long_name']
-            last_stock_price = ticker_yahoo['last_stock_price']
+            long_name = ''
+            # long_name = ticker_yahoo['long_name']
+            # last_stock_price = ticker_yahoo['last_stock_price']
+            last_stock_price = 0
             consensus_min = ticker_consensus['min']
             consensus_avg = ticker_consensus['avg']
             consensus_max = ticker_consensus['max']

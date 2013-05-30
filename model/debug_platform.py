@@ -2,8 +2,8 @@ from database import database
 from stock_quote import stock_quote
 from features import Features
 
-_ticker = 'AAPL'
-_analytic = 'Sterne Agee'
+_ticker = 'NFLX'
+_analytic = 'Janney Capital'
 
 database = database()
 stock_quote = stock_quote()
