@@ -112,8 +112,9 @@ class crawler():
         """Tor support"""
         cooki_support = urllib2.HTTPCookieProcessor()
         """Cookies support"""
-        opener = urllib2.build_opener(cooki_support, proxy_support)
+        # opener = urllib2.build_opener(cooki_support, proxy_support)
         # opener = urllib2.build_opener(proxy_support)
+        opener = urllib2.build_opener(cooki_support)
         opener.addheaders = [('User-agent', 'Mozilla/5.0')]  # Hacking
         urllib2.install_opener(opener)
 
@@ -579,18 +580,19 @@ cra.baklazanas.lt, sleeping')
             logging.debug("Current login: %s " % self.login_username)
             return False
 
-        login_form.action = self.url + '/' + login_form.action
+        login_form.action = 'http://www.stocktargetprices.com/login?mode=login'
         login_form.fields['username'] = self.login_username
         login_form.fields['password'] = self.login_password
 
-        submit_values = {'submit': login_form.fields['Login']}
+        submit_values = {'input': login_form.fields['Login']}
 
         submit_form(
             login_form,
-            extra_values=submit_values, open_http=self.open_http
+            extra_values=submit_values,
+            open_http=self.open_http
         )
 
-        return self.login_check()
+        # return self.login_check()
 
     def login_check(self):
         """

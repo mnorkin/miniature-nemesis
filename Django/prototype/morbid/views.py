@@ -18,8 +18,10 @@ from morbid.utils import beta_data
 import re
 import json
 import urllib as u
+from django.views.decorators.cache import cache_page
 
 
+@cache_page(60 * 15)
 def index(request, page=0):
     """
     Index page
@@ -29,13 +31,11 @@ def index(request, page=0):
 
     dates = [tp['date'] for tp in TargetPrice.objects.with_count().order_by('-date').distinct('date').values()]
 
-    page = int(page)
-
-    if page > dates.__len__() or page >= 12:
+    if page > dates.__len__() or page >= 1:
         raise Http404
 
     latest_target_prices = TargetPrice.objects.with_count().filter(
-        date=dates[page]
+        date__range=(dates[4], dates[0])
     ).order_by('-id')
 
     feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
@@ -77,6 +77,7 @@ def index(request, page=0):
     return HttpResponse(t.render(c))
 
 
+@cache_page(60 * 15)
 def ticker(request, slug):
     """
     Ticker page
@@ -129,6 +130,7 @@ def ticker(request, slug):
     return HttpResponse(t.render(c))
 
 
+@cache_page(60 * 15)
 def tickers(request):
     """
     Returning all the tickers, in the system
@@ -147,6 +149,7 @@ def tickers(request):
     return HttpResponse(json.dumps(tickers, indent=4))
 
 
+@cache_page(60 * 15)
 def ticker_data(request, ticker):
     PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
     url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b3c6p&e=.csv' % (ticker.upper())
@@ -195,6 +198,7 @@ def ticker_data(request, ticker):
     return HttpResponse(json.dumps(item))
 
 
+@cache_page(60 * 15)
 def analytic(request, slug):
     """
     Analytic page
@@ -246,6 +250,7 @@ def analytic(request, slug):
     return HttpResponse(t.render(c))
 
 
+@cache_page(60 * 15)
 def target_prices(self, analytic_slug=None, ticker_slug=None):
 
     target_price_list = []
@@ -303,6 +308,7 @@ def target_prices(self, analytic_slug=None, ticker_slug=None):
     return HttpResponse(t.render(c))
 
 
+@cache_page(60 * 15)
 def feature_by_ticker(self, slug, feature_id):
     """
     The feature return management on the Ticker page
@@ -333,6 +339,7 @@ def feature_by_ticker(self, slug, feature_id):
     return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))
 
 
+@cache_page(60 * 15)
 def feature_by_analytic(self, slug, feature_id):
     """
     The feature return management on the analytic page
@@ -358,6 +365,7 @@ def feature_by_analytic(self, slug, feature_id):
     return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))
 
 
+@cache_page(60 * 15)
 def search(self, search_me):
     """
     The search of the page
