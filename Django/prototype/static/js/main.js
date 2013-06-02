@@ -382,8 +382,31 @@ var tp = (function() {
      */
 
     function filter_graph_data(value, feature) {
+        /**
+         * Storing the original value to be able to restore the sign of the value
+         * 
+         * @type {[type]}
+         */
+        var initial_value = value;
+        /**
+         * Rounding to perform the maximum/minimum part
+         * 
+         * @type {[type]}
+         */
+        value = Math.abs(value);
+
         value = filter_minimum_data(value, feature);
         value = filter_maximum_data(value, feature);
+
+        /**
+         * Checking if we have negative or positive value from the start
+         */
+        if (initial_value < 0) {
+            return -value;
+        }
+        /**
+         * Return appropriate value otherwise
+         */
         return value;
     }
 
@@ -432,6 +455,13 @@ var tp = (function() {
         var dataset_txt_value = dataset;
 
         /**
+         * Boolean variable to indicate if the property is negative or not
+         * 
+         * @type {Boolean}
+         */
+        var negative = false;
+
+        /**
          * Maximum value of the graph
          * @type int
          */
@@ -448,10 +478,14 @@ var tp = (function() {
             width = 356;
         }
 
+        if (dataset_txt_value < 0) {
+            negative = true;
+        }
+
         // Filtering the data for minimum values
         dataset = filter_graph_data(dataset, posName);
 
-        if (id !== null && dataset > 1) {
+        if (id !== null) {
             dataset = [dataset];
 
             /**
@@ -461,16 +495,24 @@ var tp = (function() {
             var gradiends = {
                 'accuracy': '#8dc3b2',
                 'profitability': '#aa8dc3',
-                'reach_time': '#6189b8'
+                'reach_time': '#6189b8',
+                'negative': '#ea251d'
             };
 
             /**
              * X domain scale
              * @type {[type]}
              */
-            var x = d3.scale.linear()
-                .domain([0, max_value])
-                .range([0, width]);
+            var x = null;
+            if (negative === true) {
+                x = d3.scale.linear()
+                    .domain([0, -max_value])
+                    .range([0, width]);
+            } else {
+                x = d3.scale.linear()
+                    .domain([0, max_value])
+                    .range([0, width]);
+            }
 
             /**
              * Making the SVG element
@@ -485,21 +527,31 @@ var tp = (function() {
             /**
              * The vertical line
              */
+            var y = 0;
+            if (negative === true) {
+                posName = 'negative';
+            }
+
             chart.selectAll('rect')
                 .data(dataset)
                 .enter().append('rect')
                 .attr('height', 11)
-                .attr('y', 0)
+                .attr('y', y)
                 .attr('fill', gradiends[posName])
                 .attr('rx', 5)
                 .attr('ry', 5)
+                .attr('transform', function() {
+                    if (negative === true) {
+                        return 'translate('+width+',11) rotate(180)';
+                    }
+                })
                 .attr('txt', function(d, i) {
-                if (posName == 'reach_time') {
-                    return dataset_txt_value + ' days';
-                } else {
-                    return dataset_txt_value + ' %';
-                }
-            })
+                    if (posName == 'reach_time') {
+                        return dataset_txt_value + ' days';
+                    } else {
+                        return dataset_txt_value + ' %';
+                    }
+                })
                 .transition().duration(1500).attr('width', x)
                 .text(String);
 
@@ -510,12 +562,20 @@ var tp = (function() {
                 .attr('fill', '#000')
                 .style('opacity', '0.3')
                 .data(dataset)
+                .attr('transform', function() {
+                    if (negative === true) {
+                        return 'translate('+width+',11) rotate(180)';
+                    }
+                })
                 .attr('cy', 5.5)
                 .transition().duration(1500)
                 .attr('r', 3.5)
                 .attr('cx', function(d, i) {
-                return x(d) - 6;
-            });
+                    if (negative === true) {
+                        return x(d)-6;
+                    }
+                    return x(d)-6;
+                });
         } else {
             return;
         }
@@ -1373,7 +1433,7 @@ var tp = (function() {
             var width = tooltip.width();
 
             /*var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
-        var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - width +,
+            var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - width +,
             obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7); */
 
             var top = obj.offset().top - chart.offset().top - 3.8;
