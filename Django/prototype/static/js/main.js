@@ -73,9 +73,11 @@ var tp = (function() {
 
             $('body').click(in_graph_click);
             $('.in_graph').click(in_graph_click);
+            $('.in_graph').hover(in_graph_click);
             $('.in_graph .sear li').click(in_graph_entry_click);
             $('.in_graph .sear li').hover(in_graph_entry_hover);
             $('.in_graph .sear input').keyup(in_graph_search);
+            $('.in_graph').mouseleave(in_graph_leave);
             // to clear search proposals
             $('body').click(function() {
                 $('.search_res').html('');
@@ -1527,6 +1529,7 @@ var tp = (function() {
      */
 
     function in_graph_click() {
+        console.log('In graph click');
         var obj = $(this);
 
         if ($('.in_graph').hasClass('tmp')) {
@@ -1534,6 +1537,7 @@ var tp = (function() {
             return;
         }
 
+        // Adding something ??
         if (obj.parents().length > 2) {
             obj.addClass('tmp');
             obj.addClass('active');
@@ -1549,6 +1553,17 @@ var tp = (function() {
             // nice scroll
             $('#ascrail2000, #ascrail2000-hr').css('visibility', 'hidden');
         }
+    }
+
+    /**
+     * Hiding the in_graph menu
+     * 
+     * @return {[type]} [description]
+     */
+    function in_graph_leave() {
+        $('.in_graph').removeClass('active');
+        // Nice scroll
+        $('#ascrail2000, #ascrail2000-hr').css('visibility', 'hidden');
     }
 
     /**
