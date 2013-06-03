@@ -151,6 +151,18 @@ class App():
             analytic_slug = utils.slugify(
                 target_price['analytic']
             )
+            _date = datetime.datetime.fromtimestamp(
+                target_price['date']
+            )
+            data = {
+                'date': _date.strftime('%Y-%m-%d'),
+                'price': target_price['price'],
+                'ticker_slug': ticker_slug,
+                'analytic_slug': analytic_slug,
+                'change': target_price['change']
+            }
+
+            targetprices.send(data)
 
             # Check with server if current calculations are required
 
@@ -186,19 +198,6 @@ class App():
                 # Check if stock and beta are okay
                 if stock_data and beta:
                     self.logger.debug('Stock data and beta values are okay')
-
-                    _date = datetime.datetime.fromtimestamp(
-                        target_price['date']
-                    )
-                    data = {
-                        'date': _date.strftime('%Y-%m-%d'),
-                        'price': target_price['price'],
-                        'ticker_slug': ticker_slug,
-                        'analytic_slug': analytic_slug,
-                        'change': target_price['change']
-                    }
-
-                    targetprices.send(data)
 
                     features = Features(
                         target_data=target_data,

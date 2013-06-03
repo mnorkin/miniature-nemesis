@@ -123,7 +123,7 @@ class Daemon:
                     sys.exit(1)
 
         # os.system('pkill gunicorn')
-        os.system("ps aux | grep '127.0.0.1:9090' | awk '{print $2}' | xargs -r kill -9")
+        os.system("ps aux | grep '127.0.0.1:10000' | awk '{print $2}' | xargs -r kill -9")
         # Filtering-out the process, which takes in `dev_targetprice` directory and kill it !
         """A fast and robust way to kill gunicorn server, otherwise not killable"""
 
@@ -144,16 +144,16 @@ class Daemon:
 class guniron_daemon(Daemon):
     def run(self):
         # Development version binds on 9000 port
-        os.system('cd /var/www/dev3_targetprice/releases/current/; \
-            gunicorn --bind=127.0.0.1:9090 prototype.wsgi')
+        os.system('cd /var/www/dev4_targetprice/releases/current/; \
+            gunicorn --bind=127.0.0.1:10000 prototype.wsgi')
 
 if __name__ == '__main__':
     """
     The run
     """
     log_date = datetime.datetime.now().strftime('%Y-%m-%d')
-    log_path = "/var/log/dev3-gunicorn_everything_" + log_date + ".log"
-    deamon = guniron_daemon('/tmp/dev3-gunicorn-deamon.pid', '/dev/null', log_path, log_path)
+    log_path = "/var/log/dev4-gunicorn_everything_" + log_date + ".log"
+    deamon = guniron_daemon('/tmp/dev4-gunicorn-deamon.pid', '/dev/null', log_path, log_path)
 
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
