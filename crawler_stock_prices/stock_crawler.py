@@ -39,11 +39,12 @@ class stock_crawler():
         """
         The main guy in the field
         """
-        for item in self.get_data():
-            if self.rest("/api/stock_prices/", "PUT", item):
-                print item['ticker'], ' send'
-            else:
-                print item['ticker'], ' fail'
+        for items in self.get_data():
+            for item in items:
+                if self.rest("/api/stock_prices/", "PUT", item):
+                    print item, ' send'
+                else:
+                    print item, ' fail'
 
     def get_tickers(self):
         """
@@ -53,12 +54,22 @@ class stock_crawler():
         """
         response_data = self.rest('/api/tickers/', 'GET')
         if response_data:
-            return "+".join((ticker['name'] for ticker in response_data))
+            results = []
+            for i in range(0, int(round(len(response_data)/200)+1)):
+                j = i + 1
+                print "that one [%s %s] -- %s" % (i, j*200, len(response_data))
+                if j*200 > len(response_data):
+                    print "this one"
+                    results.append("+".join((ticker['name'] for ticker in response_data[i*200:len(response_data)-1])))
+                else:
+                    results.append("+".join((ticker['name'] for ticker in response_data[i*200:j*200])))
+            return results
+        return None
 
-    def get_data(self):
+    def yahoo_quote(self, ticker_group=None):
+        results = []
         PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
-        url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b2c6s&e=.csv' % (
-            self.get_tickers())
+        url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b2c6sn&e=.csv' % (ticker_group)
         f = u.urlopen(url, proxies={})
         rows = f.readlines()
         for row in rows:
@@ -88,20 +99,30 @@ class stock_crawler():
                 item = {
                     "ticker": row[2].replace('"', ''),
                     "last_stock_price": last_stock_price,
-                    "last_stock_change": change
+                    "last_stock_change": change,
+                    "name": row[3]
                 }
-                yield item
+                results.append(item)
             except ValueError:
                 """
                 Do nothing if the value error was returned
                 """
                 pass
+
+        return results
                 # item = {
                 #     'ticker': row[3],
                 #     'last_stock_price': 0,
                 #     'last_stock_change': 0
                 # }
                 # yield item
+
+    def get_data(self):
+        results = []
+        for ticker_group in self.get_tickers():
+            print ticker_group
+            results.append(self.yahoo_quote(ticker_group))
+        return results
 
     def rest(self, url, request, data=None, cycle=1):
         """

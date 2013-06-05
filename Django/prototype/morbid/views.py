@@ -53,9 +53,11 @@ def index(request, page=0):
             analytic=target_price.analytic,
             ticker=target_price.ticker
         ).order_by('-feature').distinct('feature')
-        if sum(target_price.fap.values_list('value', flat=True)) > 0:
-            target_price.sum = sum(target_price.fap.values_list('value', flat=True))
-            target_price_list.append(target_price)
+        # if sum(target_price.fap.values_list('value', flat=True)) > 0:
+        #     target_price.sum = sum(target_price.fap.values_list('value', flat=True))
+        #     target_price_list.append(target_price)
+        target_price.sum = sum(target_price.fap.values_list('value', flat=True))
+        target_price_list.append(target_price)
 
     t = loader.get_template('morbid/index.html')
 

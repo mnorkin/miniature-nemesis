@@ -11,12 +11,12 @@
   <span class="date">{{ target.date|date:"M. d, Y" }}</span>
 
   <span class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
-    <strong>{{ target.change|floatformat:1|cut:"-"|cut:".0" }}%</strong>
+    <strong>{{ target.get_change|floatformat:1|cut:"-"|cut:".0" }}%</strong>
   </span>
 
   <script type="text/javascript">
     var tmp_target_price = {'hash': "{{ target.hash }}01", 'name': "{{target.ticker}}", 'processed' : false};
-    tmp_target_price['change'] = "{{target.change}}";
+    tmp_target_price['change'] = "{{target.get_change}}";
     {% for fap in target.fap %}
       tmp_target_price['{{fap.feature.slug}}'] = "{{fap.value}}";
     {% endfor %}

@@ -163,7 +163,7 @@ class TargetPriceHandler(BaseHandler):
 
     def read(self, request):
         if request.content_type:
-            return rc.NOT_IMPLEMENTED
+            return TargetPrice.objects.all()
         else:
             super(TargetPrice, self).create(request)
 

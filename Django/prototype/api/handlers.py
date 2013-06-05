@@ -442,6 +442,8 @@ class TickerHandler(BaseHandler):
                 ticker.long_name = data['long_name']
             if 'last_stock_price' in data:
                 ticker.last_stock_price = data['last_stock_price']
+            if 'last_stock_change' in data:
+                ticker.last_stock_change = data['last_stock_change']
             if 'consensus_min' in data:
                 ticker.consensus_min = data['consensus_min']
             if 'consensus_avg' in data:

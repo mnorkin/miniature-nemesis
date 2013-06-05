@@ -308,6 +308,13 @@ class TargetPrice(models.Model):
         price_hash = "".join([all_letters[int(letter)] for letter in str(self.price).replace(".", "")])
         return price_hash + self.analytic.slug + self.ticker.slug + id_hash
 
+    def get_change(self):
+        last_stock_price = Ticker.objects.get(id=self.ticker_id).last_stock_price
+        try:
+            return float(last_stock_price - self.price)/last_stock_price*100
+        except ZeroDivisionError:
+            return 0
+
     def target_price_number_analytic_ticker(self):
         return TargetPriceNumberAnalyticTicker.objects.get(
             ticker=self.ticker,
