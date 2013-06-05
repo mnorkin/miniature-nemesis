@@ -145,6 +145,11 @@ class App():
                 target_price['ticker'],
                 target_price['analytic']
             ))
+            # Only then the data is available -- upload the analytic and
+            # ticker data to the server
+            analytics.collect_and_send(target_price['analytic'])
+            tickers.collect_and_send(target_price['ticker'])
+
             ticker_slug = utils.slugify(
                 target_price['ticker']
             )
@@ -161,7 +166,6 @@ class App():
                 'analytic_slug': analytic_slug,
                 'change': target_price['change']
             }
-
             targetprices.send(data)
 
             # Check with server if current calculations are required
@@ -171,10 +175,6 @@ class App():
                 target_price['ticker']
             )
             if target_data:
-                # Only then the data is available -- upload the analytic and
-                # ticker data to the server
-                analytics.collect_and_send(target_price['analytic'])
-                tickers.collect_and_send(target_price['ticker'])
                 self.logger.debug(
                     "Enough data for %s ticker, analytic %s" %
                     (target_price['ticker'], target_price['analytic'])

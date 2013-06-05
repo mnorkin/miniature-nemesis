@@ -1,6 +1,6 @@
 # Database configuration
 db_config = {
-    'db_name': 'tp-morbid',
+    'db_name': 'tp3-morbid',
     'db_username': 'postgres',
     'db_password': 'sWAgu4e7',
     'db_host': 'localhost'
