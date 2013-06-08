@@ -276,8 +276,18 @@ class TargetPriceManager(models.Manager):
         results_list = []
         for row in cursor.fetchall():
             results_list.append(row[0])
-
         return self.filter(ticker_id__in=results_list)
+
+    def target_prices(self):
+        """
+        Return recent target prices
+        """
+        from django.db import connection
+        cursor = connection.cursor()
+        query_date_start = "SELECT DISTINCT date FROM morbid_targetprice ORDER BY date DESC LIMIT 1"
+        query_date_end = "SELECT DISTINCT date FROM morbid_targetprice ORDER BY date DESC LIMIT 1 OFFSET 4"
+        query = "SELECT date, price, change FROM morbid_targetprice WHERE date <= %s AND date > %s" % (query_date_start, query_date_end)
+        cursor.execute(query)
 
     def valid(self):
         """

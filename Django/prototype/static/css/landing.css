@@ -1,0 +1,250 @@
+@font-face {
+    font-family: 'Nasa';
+    src: url('../fonts/Nasa.ttf');
+}
+@font-face {
+    font-family: 'Open Sans';
+    src: url('../fonts/OpenSans-Regular.ttf');
+}
+@font-face {
+    font-family: 'Open Sans Light';
+    src: url('../fonts/OpenSans-Light.ttf');
+}
+
+body {
+    font-family: 'Open Sans Light';
+    font-weight: 300;
+    margin: 0;
+    padding: 0;
+    background: #fffbfa;
+    color: #3e3e3e;
+    font-size: 18px;
+}
+
+a {
+    color: #e95201;
+    text-decoration: none;
+}
+
+p {
+    line-height: 22px;
+}
+
+input {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-weight: 300;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+form input[type="email"], form input[type="text"] {
+    width: 75%;
+}
+
+input[type="email"], input[type="text"] {
+    border: 1px solid #e5dbd2;
+    padding: 11px 0 11px 11px;
+}
+
+input[type="submit"], input[type="button"] {
+    position: relative;
+    bottom: 1px;
+    border: 0;
+    padding: 0;
+    background: #e95201;
+    color: #ffffff;
+    width: 81px;
+    height: 43px;
+    font-weight: bold;
+}
+
+input[type="email"]:focus, input[type="text"]:focus {
+    border: 1px solid #e95200;
+}
+
+h1 {
+    padding: 0;
+    margin: 0;
+    font-weight: 200;
+    font-size: 42px;
+    font-family: 'Open Sans'
+}
+
+h2 {
+    margin: 0 0 21px 0;
+}
+
+header {
+    width: 100%;
+    background: #ffffff;
+    text-align: center;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    margin: 0 auto;
+}
+
+.logo {
+    color: #ea5101;
+    font-family: Nasa;
+    font-size: 26px;
+}
+
+.container-large {
+    background: url('../images/landing/bg.jpg') top repeat-x #fffbfa;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 1010px;
+}
+.container-separator {
+    height: 294px;
+    border-bottom: 1px solid #f6f1eb;
+    margin-bottom: 22px;
+}
+
+/**
+ * Header contents
+ */
+.promo {
+    padding-top: 62px;
+    margin: 0 20px auto;
+    text-align: center;
+}
+
+.cta-option {
+    margin-top: 46px;
+}
+
+.description {
+    max-width: 920px;
+    margin: 10px auto 0;
+}
+
+/**
+ * Entry contents
+ */
+.entry {
+    margin-left: 97px;
+    margin-right: 92px;
+}
+
+.entry-description {
+    padding-top: 127px;
+    float: left;
+}
+
+.entry-image {
+    position: relative;
+    float: right;
+    height: 294px;
+    width: 300px;
+}
+.entry-image img {
+    position: absolute;
+    bottom: 0;
+    right: -14px;
+}
+.entry-analysis img {
+    right: -132px;
+}
+
+.entry-right .entry-description {
+    float: right;
+}
+.entry-right .entry-image {
+    float: left;
+}
+
+.short-description {
+    padding-bottom: 20px;
+    margin: 0;
+    height: 85px;
+    width: 386px;
+}
+
+
+/**
+ * Responsive design implementation
+ *
+ * 480px - 620px
+ * @type {[type]}
+ */
+@media only screen and (max-width: 620px) {
+    .entry {
+        margin-left: 10px;
+    }
+    .entry-left {
+        margin-left: 10px;
+    }
+}
+
+@media only screen and (min-width: 620px) and (max-width: 800px) {
+}
+
+@media only screen and (max-width: 1024px) {
+    .entry {
+        margin-left: 10px;
+    }
+    .entry-left {
+        margin-left: 10px;
+    }
+    .entry-right {
+        margin-left: 10px;
+    }
+    .entry-right .entry-description, .entry-description {
+        float: none;
+        padding-top: 35px;
+    }
+    .entry-image img {
+        float: none;
+        position: static;
+    }
+    .entry-right .entry-image, .entry-image {
+        position: relative;
+        bottom: -6px;
+        float: none;
+        width: 100%;
+        text-align: center;
+        height: auto;
+    }
+    .short-description {
+        width: 100%;
+    }
+    .container-separator {
+        height: auto;
+        width: 100%;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    
+}
+
+/**
+ * Form part
+ */
+.form-inputs {
+    margin: 0 auto;
+    max-width: 500px;
+}
+/**
+ * Email Input
+ */
+.email-input {
+    width: 75%;
+    margin-right: 13px;
+}
+
+/**
+ * Footer
+ */
+footer {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 28px;
+    font-size: 14px;
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-weight: 300;
+}

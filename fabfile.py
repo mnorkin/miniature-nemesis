@@ -410,7 +410,7 @@ def model_update():
     )
     archive_git_and_put(opts)
     model_configuration(opts)
-    restart_deamon(opts)
+    # restart_deamon(opts)
 
 
 def model_deploy():
@@ -544,12 +544,22 @@ def django_sink_backup():
         deploy_path=env.deploy_django_sink_path,
         createdb=False
     )
+    # Activate environment
+    env.activate = 'source %(deploy_path)s/bin/activate' % opts
+    # SQL backup
     sudo('touch %(deploy_path)s/%(release)s.sql' % opts)
     sudo('chmod 777 %(deploy_path)s/%(release)s.sql' % opts)
     sudo('pg_dump cra-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
     local('mkdir -p ../backups/sink')
     get('%(deploy_path)s/%(release)s.sql' % opts, '../backups/sink/%(release)s.sql' % opts)
     sudo('rm %(deploy_path)s/%(release)s.sql' % opts)
+    # JSON data backup
+    sudo('touch %(deploy_path)s/%(release)s.json' % opts)
+    sudo('chmod 777 %(deploy_path)s/%(release)s.json' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py dumpdata sink --indent=4 > \
+        %(deploy_path)s/%(release)s.json' % opts)
+    get('%(deploy_path)s/%(release)s.json' % opts, '../backups/sink/%(release)s.json' % opts)
+    sudo('rm %(deploy_path)s/%(release)s.json' % opts)
 
 
 def django_sink_update():

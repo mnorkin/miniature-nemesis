@@ -20,6 +20,18 @@ import json
 import urllib as u
 
 
+def landing_page(request):
+    """
+    Landing Page
+    """
+
+    t = loader.get_template('landing/base.html')
+
+    c = Context()
+
+    return HttpResponse(t.render(c))
+
+
 def index(request, page=0):
     """
     Index page
@@ -27,11 +39,13 @@ def index(request, page=0):
     @return: Http Response
     """
 
-    dates = [tp['date'] for tp in TargetPrice.objects.with_count().order_by('-date').distinct('date').values()]
+    dates = [tp['date'] for tp in TargetPrice.objects.with_count().order_by('-date').distinct('date').values()[0:5]]
+    # dates = TargetPrice.objects.recent_dates()
 
-    if page > dates.__len__() or page >= 1:
+    if page > 0:
         raise Http404
 
+    # latest_target_prices = TargetPrice.objects.date_in_range(dates)
     latest_target_prices = TargetPrice.objects.with_count().filter(
         date__range=(dates[4], dates[0])
     ).order_by('-id')
@@ -53,25 +67,16 @@ def index(request, page=0):
             analytic=target_price.analytic,
             ticker=target_price.ticker
         ).order_by('-feature').distinct('feature')
-        # if sum(target_price.fap.values_list('value', flat=True)) > 0:
-        #     target_price.sum = sum(target_price.fap.values_list('value', flat=True))
-        #     target_price_list.append(target_price)
         target_price.sum = sum(target_price.fap.values_list('value', flat=True))
         target_price_list.append(target_price)
 
     t = loader.get_template('morbid/index.html')
 
-    date = dates[page]
-
-    if page == 0:
-        extends_template = 'morbid/base.html'
-    else:
-        extends_template = 'morbid/base_page.html'
+    extends_template = 'morbid/base.html'
 
     c = Context({
         'latest_target_prices': target_price_list,
         'extends_template': extends_template,
-        'date': date
     })
 
     return HttpResponse(t.render(c))
