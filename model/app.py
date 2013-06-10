@@ -147,15 +147,21 @@ class App():
             ))
             # Only then the data is available -- upload the analytic and
             # ticker data to the server
-            analytics.collect_and_send(target_price['analytic'])
-            tickers.collect_and_send(target_price['ticker'])
+            analytics.collect_and_send(
+                target_price['analytic']
+            )
+            tickers.collect_and_send(
+                target_price['ticker']
+            )
 
+            # Constants
             ticker_slug = utils.slugify(
                 target_price['ticker']
             )
             analytic_slug = utils.slugify(
                 target_price['analytic']
             )
+
             _date = datetime.datetime.fromtimestamp(
                 target_price['date']
             )
@@ -168,8 +174,7 @@ class App():
             }
             targetprices.send(data)
 
-            # Check with server if current calculations are required
-
+            # Return the all target prices
             target_data = self.database.return_targetprices(
                 target_price['analytic'],
                 target_price['ticker']
