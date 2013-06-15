@@ -94,6 +94,11 @@ header {
     background: url('../images/landing/bg.jpg') top repeat-x #fffbfa;
 }
 
+.container-small {
+    margin: 0 auto;
+    max-width: 400px;
+}
+
 .container {
     margin: 0 auto;
     max-width: 1010px;
@@ -117,9 +122,29 @@ header {
     margin-top: 46px;
 }
 
+.cta-share {
+    margin-top: 62px;
+    font-size: 16px;
+}
+
 .description {
     max-width: 920px;
     margin: 10px auto 0;
+}
+
+.share-items {
+    text-align: center;
+    width: 400px;
+    height: 155px;
+    display: table-cell;
+    vertical-align:middle;
+}
+
+.share-item {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 22px;
+    margin-right: 22px;
 }
 
 /**

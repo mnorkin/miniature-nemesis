@@ -1,4 +1,6 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns
+from django.conf.urls import include
+from django.conf.urls import url
 from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication
 from api.handlers import FeatureAnalyticTickerHandler
@@ -9,7 +11,6 @@ ad = {'authentication': auth}
 
 feature_analytic_ticker_resource = Resource(handler=FeatureAnalyticTickerHandler, **ad)
 
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
@@ -20,16 +21,19 @@ urlpatterns = patterns(
     url(r'^testing/(?P<ticker_slug>[\w-]+)$', 'morbid.views.test'),
     url(r'^testing/(?P<analytic_slug>[\w-]+)$', 'morbid.views.test'),
     url(r'^testing/(?P<ticker_slug>[\w-]+)/(?P<analytic_slug>[\w-]+)$', 'morbid.views.test'),
-    # url(r'^$', 'morbid.views.index'),
-    url(r'^$', 'morbid.views.landing_page'),
+    url(r'^$', 'morbid.views.index'),
+
     url(r'^analytic/target_prices/(?P<analytic_slug>[^/]+)/$', 'morbid.views.target_prices'),
     url(r'^ticker/target_prices/(?P<ticker_slug>[^/]+)/$', 'morbid.views.target_prices'),
     url(r'^analytic/(?P<slug>[^/]+)/$', 'morbid.views.analytic'),
     url(r'^ticker/(?P<slug>[^/]+)/$', 'morbid.views.ticker'),
     url(r'^tickers/$', 'morbid.views.tickers'),
+    url(r'^targets/(?P<sort_by>[^/]+)/(?P<sort_direction>[^/]+)$', 'morbid.views.target_prices_sort'),
+    url(r'^targets/(?P<sort_by>[^/]+)/(?P<sort_direction>[^/]+)/(?P<page>\d+)/$', 'morbid.views.target_prices_sort'),
     url(r'^get_ticker_data/(?P<ticker>[^/]+)/$', 'morbid.views.ticker_data'),
-    url(r'^graph_03/$', 'morbid.views.graph_03'),
-    url(r'^graph_01/$', 'morbid.views.graph_01'),
+
+    url(r'^subscribe/$', 'accounts.views.account_subscribe'),
+    url(r'^thanks/$', 'accounts.views.account_subscribe_after'),
 
     url(r'^feature_by_ticker/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_ticker'),  # JSON only
     url(r'^feature_by_analytic/(?P<slug>[^/]+)/(?P<feature_id>\d+)/$', 'morbid.views.feature_by_analytic'),  # JSON only

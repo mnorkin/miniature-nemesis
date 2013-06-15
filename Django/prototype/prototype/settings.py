@@ -19,6 +19,9 @@ DATABASES = {
         'PASSWORD': 'sWAgu4e7',
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'OPTIONS': {
+            'autocommit': True,
+        }
     }
 }
 
@@ -91,6 +94,8 @@ STATICFILES_FINDERS = (
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'c7i^3fqd=ki8p9ic#&amp;)lj*qb#9ddj^na20qb-f4r(3404u+-a-'
 
@@ -107,9 +112,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
+
+INTERNAL_IPS = ('127.0.0.1',)
 
 # Set your DSN value
 RAVEN_CONFIG = {
@@ -142,8 +150,23 @@ INSTALLED_APPS = (
     'gunicorn',
     'apikey',
     'morbid',
+    'accounts',
     'south',
-    'raven.contrib.django.raven_compat'
+    'raven.contrib.django.raven_compat',
+    'debug_toolbar',
+    # 'pipeline'
+)
+
+DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.template.TemplateDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
 )
 
 # APIKEY
@@ -185,3 +208,18 @@ FC_DIR = '/home/maksim/Work/Morbid/miniature-nemesis/model'
 FIXTURE_DIRS = (
     '/home/maksim/Work/Morbid/backups/prototype'
 )
+
+# PIPELINE_JS = {
+#     'master': {
+#         'source_filenames': (
+#             'static/js/d3.v3.min.js',
+#             'static/js/jquery.nicescroll.min.js',
+#             'static/js/main.js',
+#             'static/js/graphs.js',
+#             'static/js/jquery-1.9.1.min.js',
+#         ),
+#         'output_filename': 'js/master.js',
+#     }
+# }
+
+# PIPELINE_JS_COMPRESSOR = False

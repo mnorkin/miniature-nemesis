@@ -1,0 +1,35 @@
+{% extends "landing/base.html" %}
+
+{% block content %}
+
+<div class="container-large">
+    <div class="container">
+        <div class="promo">
+            <h1>Know who to listen to in the financial world.</h1>
+            <p class="description">Since dozens of analysts provide different investment advice for the same stock, it is hard to decide whom to trust. Anavest gives you answers by analysing thousands of investment recommendations made in the past.</p>
+            <div class="cta-share">
+                <div class="container-small">
+                    <p class="description">Spread the news about us and get an invitation sooner. Everyone who shares or makes a tweet will get priority. Thank You in advance!</p>
+                    <div class="share-items">
+                        <div class="share-item">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u=anavest.com" target="_blank">
+                                <img src="/static/images/landing/facebook.jpg" alt="Share on facebook" />
+                            </a>
+                        </div>
+                        <div class="share-item">
+                            <a href="https://twitter.com/share?url=http://avanest.com/&lang=en&text=Know who to listen to in the financial world" data-lang="en">
+                                <img src="/static/images/landing/twitter.jpg" alt="Share on twitter" />
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block afterbody %}
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="https://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+{% endblock %}

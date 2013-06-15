@@ -1,7 +1,7 @@
 <li name="{{ target.date|date:'M. d, Y'}}" class="entry chart" id="{{ target.hash }}01">
-  <a class="ticket sliding" href="{{ target.ticker.get_absolute_url }}#{{ target.analytic.slug }}">
+  <a class="ticket sliding" href="{{ target.url }}#{{ target.analytic_slug }}">
     <span class="text">
-      <span class="slid">{{ target.ticker.long_name }} ({{ target.ticker.name }}) </span>
+      <span class="slid">{{ target.ticker_long_name }} ({{ target.ticker_name }}) </span>
       <span class="bliur">&nbsp;</span>
       <span class="goust">&nbsp;</span>
     </span>
@@ -11,21 +11,25 @@
   <span class="date">{{ target.date|date:"M. d, Y" }}</span>
 
   <span class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
-    <strong>{{ target.get_change|floatformat:1|cut:"-"|cut:".0" }}%</strong>
+    <strong>{{ target.change|floatformat:1|cut:"-"|cut:".0" }}%</strong>
   </span>
 
   <script type="text/javascript">
-    var tmp_target_price = {'hash': "{{ target.hash }}01", 'name': "{{target.ticker}}", 'processed' : false};
-    tmp_target_price['change'] = "{{target.get_change}}";
-    {% for fap in target.fap %}
-      tmp_target_price['{{fap.feature.slug}}'] = "{{fap.value}}";
+    var tmp_target_price = {
+      'hash': "{{ target.hash }}01",
+      'name': "{{ target.ticker }}",
+      'processed' : false
+    };
+    tmp_target_price['change'] = "{{ target.change }}";
+    {% for feature in target.features %}
+      tmp_target_price['{{feature.slug}}'] = "{{ feature.value }}";
     {% endfor %}
     tp.append_target_price_list(tmp_target_price);
   </script>
   
   <ul class="bar">
-    {% for fap in target.fap %}
-    <li class="feature {{fap.feature.slug}}"><span>{{fap.feature.name}}</span></li>
+    {% for feature in target.features %}
+    <li class="feature {{ feature.slug }}"><span>{{ feature.name }}</span></li>
     {% endfor %}
   </ul>
 

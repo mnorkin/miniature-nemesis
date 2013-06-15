@@ -498,7 +498,11 @@ class TargetPriceHandler(BaseHandler):
                 return rc.NOT_FOUND
 
             try:
-                targetprice = TargetPrice.objects.get(analytic=analytic, ticker=ticker, date=data['date'])
+                targetprice = TargetPrice.objects.get(
+                    analytic=analytic,
+                    ticker=ticker,
+                    date=data['date']
+                )
             except targetprice.DoesNotExist:
 
                 em = self.model(

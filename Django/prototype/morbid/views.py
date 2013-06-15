@@ -20,63 +20,31 @@ import json
 import urllib as u
 
 
-def landing_page(request):
-    """
-    Landing Page
-    """
-
-    t = loader.get_template('landing/base.html')
-
-    c = Context()
-
-    return HttpResponse(t.render(c))
-
-
 def index(request, page=0):
     """
     Index page
 
+    Revision done 2013-06-13
+
     @return: Http Response
     """
 
-    dates = [tp['date'] for tp in TargetPrice.objects.with_count().order_by('-date').distinct('date').values()[0:5]]
-    # dates = TargetPrice.objects.recent_dates()
+    target_price_list = TargetPrice.objects.recent_target_prices(page)
 
-    if page > 0:
+    if len(target_price_list) < 1:
         raise Http404
-
-    # latest_target_prices = TargetPrice.objects.date_in_range(dates)
-    latest_target_prices = TargetPrice.objects.with_count().filter(
-        date__range=(dates[4], dates[0])
-    ).order_by('-id')
-
-    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-        analytic_id__in=latest_target_prices.values_list(
-            'analytic_id',
-            flat=True
-        ).distinct,
-        ticker_id__in=latest_target_prices.values_list(
-            'ticker_id',
-            flat=True
-        ).distinct,
-        feature__display_in_frontpage=True)
-    target_price_list = []
-
-    for target_price in latest_target_prices:
-        target_price.fap = feature_analytic_tickers.filter(
-            analytic=target_price.analytic,
-            ticker=target_price.ticker
-        ).order_by('-feature').distinct('feature')
-        target_price.sum = sum(target_price.fap.values_list('value', flat=True))
-        target_price_list.append(target_price)
 
     t = loader.get_template('morbid/index.html')
 
-    extends_template = 'morbid/base.html'
+    if page == 0:
+        extends_template = 'morbid/base.html'
+    else:
+        extends_template = 'morbid/base_page.html'
 
     c = Context({
         'latest_target_prices': target_price_list,
         'extends_template': extends_template,
+        'date': target_price_list[0]['date']
     })
 
     return HttpResponse(t.render(c))
@@ -99,27 +67,28 @@ def ticker(request, slug):
     except ticker.DoesNotExist:
         raise Http404
 
-    # Load target orice info
-    latest_target_prices = TargetPrice.objects.filter(
-        ticker_id=ticker.id
-    ).order_by('analytic', 'date').reverse().distinct('analytic')
+    # Load target price info
+    # latest_target_prices = TargetPrice.objects.filter(
+    #     ticker_id=ticker.id
+    # ).order_by('analytic', 'date').reverse().distinct('analytic')
 
-    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-        analytic_id__in=latest_target_prices.values_list(
-            'analytic_id',
-            flat=True
-        ).distinct,
-        ticker_id=ticker.id)
+    # feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+    #     analytic_id__in=latest_target_prices.values_list(
+    #         'analytic_id',
+    #         flat=True
+    #     ).distinct,
+    #     ticker_id=ticker.id)
 
-    target_price_list = []
+    # target_price_list = []
 
-    for target_price in latest_target_prices:
+    # for target_price in latest_target_prices:
 
-        target_price.fap = feature_analytic_tickers.filter(
-            analytic_id=target_price.analytic_id
-        )
-        target_price_list.append(target_price)
+    #     target_price.features = feature_analytic_tickers.filter(
+    #         analytic_id=target_price.analytic_id
+    #     )
+    #     target_price_list.append(target_price)
 
+    target_price_list = TargetPrice.objects.ticker_target_prices(ticker.slug)
     # Load feature info
     list_of_features = Feature.objects.all()
 
@@ -132,7 +101,6 @@ def ticker(request, slug):
     })
 
     return HttpResponse(t.render(c))
-
 
 
 def tickers(request):
@@ -152,6 +120,14 @@ def tickers(request):
 
     return HttpResponse(json.dumps(tickers, indent=4))
 
+
+def target_prices_sort(request, sort_by='accuracy', sort_direction='down', page=0):
+    """
+    Returning sorted tickers
+    """
+    target_prices = TargetPrice.objects.sorted(sort_by, sort_direction, page)
+
+    return HttpResponse(json.dumps(target_prices, indent=4))
 
 
 def ticker_data(request, ticker):
@@ -200,7 +176,6 @@ def ticker_data(request, ticker):
     }
 
     return HttpResponse(json.dumps(item))
-
 
 
 def analytic(request, slug):
@@ -254,53 +229,66 @@ def analytic(request, slug):
     return HttpResponse(t.render(c))
 
 
-
-def target_prices(self, analytic_slug=None, ticker_slug=None):
+def target_prices(self, analytic_slug=None, ticker_slug=None, page=0):
 
     target_price_list = []
 
     if analytic_slug:
 
-        analytic = Analytic
+        # analytic = Analytic
+        # try:
+        #     analytic = Analytic.objects.get(slug=analytic_slug)
+        #     target_prices = TargetPrice.objects.filter(analytic=analytic)
+        #     feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+        #         analytic=analytic, feature__display_in_frontpage=True)
+
+        #     for target_price in target_prices:
+        #         target_price.fap = feature_analytic_tickers.filter(
+        #             analytic=target_price.analytic,
+        #             ticker=target_price.ticker
+        #         )
+        #         target_price_list.append(target_price)
+
+        # except analytic.DoesNotExist:
+        #     raise Http404
         try:
-            analytic = Analytic.objects.get(slug=analytic_slug)
-            target_prices = TargetPrice.objects.filter(analytic=analytic)
-            feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-                analytic=analytic, feature__display_in_frontpage=True)
-
-            for target_price in target_prices:
-                target_price.fap = feature_analytic_tickers.filter(
-                    analytic=target_price.analytic,
-                    ticker=target_price.ticker
-                )
-                target_price_list.append(target_price)
-
-        except analytic.DoesNotExist:
+            target_price_list = TargetPrice.objects.analytic_target_prices(
+                analytic_slug,
+                page
+            )
+        except DatabaseError:
             raise Http404
 
     elif ticker_slug:
 
-        ticker = Ticker
+        # ticker = Ticker
+        # try:
+        #     ticker = Ticker.objects.get(slug=ticker_slug)
+        #     target_prices = TargetPrice.objects.filter(ticker=ticker)
+        #     feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+        #         ticker=ticker, feature__display_in_frontpage=True)
+
+        #     for target_price in target_prices:
+        #         target_price.fap = feature_analytic_tickers.filter(
+        #             analytic=target_price.analytic,
+        #             ticker=target_price.ticker
+        #         )
+        #         target_price_list.append(target_price)
+
+        # except ticker.DoesNotExist:
+        #     raise Http404
         try:
-            ticker = Ticker.objects.get(slug=ticker_slug)
-            target_prices = TargetPrice.objects.filter(ticker=ticker)
-            feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-                ticker=ticker, feature__display_in_frontpage=True)
-
-            for target_price in target_prices:
-                target_price.fap = feature_analytic_tickers.filter(
-                    analytic=target_price.analytic,
-                    ticker=target_price.ticker
-                )
-                target_price_list.append(target_price)
-
-        except ticker.DoesNotExist:
+            target_price_list = TargetPrice.objects.ticker_target_prices(
+                ticker_slug,
+                page
+            )
+        except DatabaseError:
             raise Http404
 
     else:
         raise Http404
 
-    date = target_price_list[0].date
+    date = target_price_list[0]['date']
 
     t = loader.get_template('morbid/target_prices.html')
 

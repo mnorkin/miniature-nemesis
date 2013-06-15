@@ -76,9 +76,15 @@
 						</a>
 					</span> 
 					<span class="date">{{ target.date }}</span>
-					<span class="number">{{ target.price|cut:'.0' }} <strong>Last target price</strong> </span>
-					<span class="number">{{ target.target_price_number_analytic_ticker.number }}<strong>No of target prices</strong> </span>
-					<span class="number">{{ target.volatility.number }}/{{ target.volatility.total }}<strong>Volatility</strong> </span>
+					<span class="number">
+                        {{ target.price|cut:'.0' }} <strong>Last target price</strong>
+                    </span>
+					<span class="number">
+                        {{ target.target_price_number_analytic_ticker.number }}<strong>No of target prices</strong>
+                    </span>
+					<span class="number">
+                        {{ target.volatility.number }}/{{ target.volatility.total }}<strong>Volatility</strong>
+                    </span>
 				</li>
 			{% endfor %}
 		</ul>
@@ -89,7 +95,7 @@
 				<input type="text" name="sear" placeholder="Search" />
 				<ul>
 					{% for target in target_prices %}
-					<li name="{{target.analytic.slug}}">{{target.analytic.name}}</li>
+					<li name="{{target.analytic_slug}}">{{target.analytic}}</li>
 					{% endfor %}
 				</ul>
 			</div>

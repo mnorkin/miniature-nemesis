@@ -10,4 +10,4 @@ db_config = {
 data_dir = '/home/agurkas/data'
 
 # REST interface URL
-rest_url = 'dev3.baklazanas.lt'
+rest_url = 'dev4.baklazanas.lt'

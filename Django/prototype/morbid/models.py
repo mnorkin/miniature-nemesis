@@ -1,5 +1,4 @@
 from django.db import models    # Model description
-# from django.conf import settings    # Settings
 from django.contrib.auth import models as auth_models    # Authentication
 from django.contrib.auth.models import User    # User manager
 from django.contrib.auth.management import create_superuser    # Superuser manager
@@ -7,6 +6,12 @@ from django.db.models import signals    # Signal handling
 import string    # String lib for alphabet
 from datetime import date
 from datetime import timedelta
+from morbid.queries import front_page_query
+from morbid.queries import target_prices_for_ticker_query
+from morbid.queries import target_prices_for_analytic_query
+from morbid.queries import sort_by_features_query
+from morbid.queries import target_prices_query
+from morbid.queries import features_query
 
 signals.post_syncdb.disconnect(
     create_superuser,
@@ -146,11 +151,14 @@ class Ticker(models.Model):
 
     objects = TickerManager()
 
-    def get_absolute_url(self):
+    def get_absolute_url(self, slug=None):
         """
         Generating absolute url
         """
-        return "/ticker/%s/" % self.slug
+        if slug is None:
+            return "/ticker/%s/" % self.slug
+        else:
+            return "/ticker/%s/" % slug
 
     def natural_key(self):
         """
@@ -198,10 +206,10 @@ class TargetPriceNumberAnalyticTicker(models.Model):
         """
         return str(self.number)
 
-
 class TargetPriceAnalyticTicker(models.Model):
     """
-    This is the calculator storage, to validate the calculated features and skip
+    This is the calculator storage, to validate the calculated
+    features and skip
     calculations if the data is already available
     """
     analytic = models.ForeignKey(Analytic)
@@ -266,28 +274,214 @@ class TargetPriceManager(models.Manager):
     """
     Custom Target Price Manager
     """
+    def dictfetchall(self, cursor):
+        "Returns all rows from a cursor as a dict"
+        desc = cursor.description
+        return [
+            dict(zip([col[0] for col in desc], row))
+            for row in cursor.fetchall()
+        ]
+
     def with_count(self):
         """
         Return the target prices with more than repeatable number defined
         """
         from django.db import connection
         cursor = connection.cursor()
-        cursor.execute("SELECT ticker_id FROM morbid_targetprice GROUP BY ticker_id HAVING COUNT(ticker_id) > 1")
+        query = " \
+            SELECT ticker_id \
+            FROM morbid_targetprice  \
+            GROUP BY ticker_id  \
+            HAVING COUNT(ticker_id) > 1 \
+        "
+        cursor.execute(query)
         results_list = []
         for row in cursor.fetchall():
             results_list.append(row[0])
         return self.filter(ticker_id__in=results_list)
 
-    def target_prices(self):
+    def construct_hash(self, row):
         """
-        Return recent target prices
+        Construction of hash
+        """
+        all_letters = string.lowercase
+        id_hash = "".join(
+            [all_letters[int(letter)] for letter in str(row['date']).replace("-", "")]
+        )
+        price_hash = "".join(
+            [all_letters[int(letter)] for letter in str(row['price']).replace(".", "")]
+        )
+        return price_hash + row['analytic_slug'] + row['ticker_slug'] + id_hash
+
+    def construct_change(self, row):
+        """
+        Construction of change
+        """
+        try:
+            return float(row['price'] - row['last_stock_price'])/row['price']*100
+        except ZeroDivisionError:
+            return 0
+
+    def construct_features(self, row):
+        """
+        Construction of features
         """
         from django.db import connection
+        features_cursor = connection.cursor()
+        features_cursor.execute(features_query, [row['ticker_id'], row['analytic_id']])
+        features = []
+        for feature in self.dictfetchall(features_cursor):
+            features.append({
+                'name': feature['name'],
+                'value': feature['value'],
+                'slug': feature['slug']
+            })
+        return features
+
+    def construct_targets(self, cursor):
+        """
+        Constructing target prices
+        """
+        results_list = []
+        for row in self.dictfetchall(cursor):
+            """
+            Append the results
+            """
+            results_list.append({
+                'date': row['date'],
+                'ticker_name': row['ticker_name'],
+                'ticker_long_name': row['ticker_long_name'],
+                'analytic': row['analytic_name'],
+                'analytic_slug': row['analytic_slug'],
+                'price': row['price'],
+                'hash': self.construct_hash(row),
+                'features': self.construct_features(row),
+                'change': self.construct_change(row),
+                'url': '/ticker/' + row['ticker_slug'] + '/',
+            })
+        return results_list
+
+    def recent_target_prices(self, page=0, entries_per_page=20):
+        """
+        Return recent target prices
+
+        This took a lot of my blood, but it looks like it is working
+        """
+        from django.db import connection
+
+        """
+        Define offset
+        """
+        offset = 0
+        if page != 0:
+            offset = (int(page)*entries_per_page)+1
+
+        """
+        Connection cursors
+        """
         cursor = connection.cursor()
-        query_date_start = "SELECT DISTINCT date FROM morbid_targetprice ORDER BY date DESC LIMIT 1"
-        query_date_end = "SELECT DISTINCT date FROM morbid_targetprice ORDER BY date DESC LIMIT 1 OFFSET 4"
-        query = "SELECT date, price, change FROM morbid_targetprice WHERE date <= %s AND date > %s" % (query_date_start, query_date_end)
-        cursor.execute(query)
+        """
+        Describe queries
+        """
+        cursor.execute(front_page_query, [entries_per_page, offset])
+        return self.construct_targets(cursor)
+
+    def analytic_target_prices(self, analytic_slug=None, page=0, entries_per_page=20):
+        """
+        Target prices, which belongs to particular analytic
+        """
+        from django.db import connection
+
+        """
+        Define offset
+        """
+        offset = 0
+        if page != 0:
+            offset = (int(page)*entries_per_page)+1
+
+        """
+        Connection cursors
+        """
+        cursor = connection.cursor()
+        cursor.execute(target_prices_for_analytic_query, [
+            analytic_slug, entries_per_page, offset
+        ])
+        return self.construct_targets(cursor)
+
+    def ticker_target_prices(self, ticker_slug=None, page=0, entries_per_page=20):
+        """
+        Target prices, which belongs to particular ticker
+        """
+        from django.db import connection
+
+        """
+        Define offset
+        """
+        offset = 0
+        if page != 0:
+            offset = (int(page)*entries_per_page)+1
+
+        """
+        Connection cursors
+        """
+        cursor = connection.cursor()
+        cursor.execute(target_prices_for_ticker_query, [
+            ticker_slug, entries_per_page, offset
+        ])
+        return self.construct_targets(cursor)
+
+    def sorted(self, feature_slug='accuracy', sort_direction='ASC', page=0, entries_per_page=20):
+        """
+        Sorted target prices
+        """
+        from django.db import connection
+        """
+        Define offset
+        """
+        offset = 0
+        if page != 0:
+            offset = (int(page)*entries_per_page)+1
+
+        """
+        Pre-define lists
+        """
+        results_list = []
+
+        if sort_direction == 'up':
+            sort_direction = 'DESC'
+        else:
+            sort_direction = 'ASC'
+
+        sort_cursor = connection.cursor()
+        sort_cursor.execute(sort_by_features_query % {
+            'feature_slug': feature_slug,
+            'sort_direction': sort_direction,
+            'limit': entries_per_page,
+            'offset': offset
+        })
+        cursor = connection.cursor()
+
+        for sort_row in self.dictfetchall(sort_cursor):
+            """
+            Appending results
+            """
+            cursor.execute(target_prices_query, [sort_row['target_id']])
+            row = self.dictfetchall(cursor)[0]
+
+            results_list.append({
+                'date': str(row['date']),
+                'ticker_name': row['ticker_name'],
+                'ticker_long_name': row['ticker_long_name'],
+                'analytic': row['analytic_name'],
+                'analytic_slug': row['analytic_slug'],
+                'price': row['price'],
+                'hash': self.construct_hash(row),
+                'features': self.construct_features(row),
+                'change': self.construct_change(row),
+                'url': '/ticker/' + row['ticker_slug'] + '/',
+            })
+
+        return results_list
 
     def valid(self):
         """
@@ -311,7 +505,7 @@ class TargetPrice(models.Model):
 
     def hash(self):
         """
-        Unique identification of particular targe price
+        Unique identification of particular target price
         """
         all_letters = string.lowercase
         id_hash = "".join([all_letters[int(letter)] for letter in str(self.date).replace("-", "")])

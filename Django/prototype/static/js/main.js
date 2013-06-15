@@ -267,6 +267,12 @@ var tp = (function() {
             });
         },
 
+        /**
+         * Processing Search
+         * 
+         * @param  {[type]} type [description]
+         * @return {[type]}      [description]
+         */
         process_search_page: function(type) {
             var response = '',
                 elem, name, search_resul = search_result[type];
@@ -287,10 +293,21 @@ var tp = (function() {
             return false;
         },
 
+        /**
+         * In Graph Select Active Elements
+         * 
+         * @return {[type]} [description]
+         */
         in_graph_select_active_elements: function() {
             in_graph_select_active_elements();
         },
 
+        /**
+         * Updating ticker stock
+         * 
+         * @param  {[type]} ticker [description]
+         * @return {[type]}        [description]
+         */
         update_ticker_stock: function(ticker) {
             if ($(".price_detail") !== undefined) {
                 var format_text = '';
@@ -312,7 +329,6 @@ var tp = (function() {
      * @param  {[type]} feature [description]
      * @return {[type]}         [description]
      */
-
     function filter_minimum_data(value, feature) {
         /**
          * Scaling factor defines the difference between the grid type of listing
@@ -581,6 +597,13 @@ var tp = (function() {
         }
     }
 
+    /**
+     * Generation of PIE
+     * 
+     * @param  {[type]} id    [description]
+     * @param  {[type]} value [description]
+     * @return {[type]}       [description]
+     */
     function generate_pie(id, value) {
         if (typeof(list_type) != "undefined" && list_type == 'list') {
             return; // ???
@@ -675,421 +698,10 @@ var tp = (function() {
         }
     }
 
-    function generate_pie_OLDVERSION(id, value) {
-
-        if (typeof(list_type) != "undefined" && list_type == 'list') {
-            return;
-        }
-
-        var percent = value;
-        var dataset = [percent];
-        var false_dataset = [50];
-
-        var width = 90,
-            height = 90,
-            radius = Math.min(width, height) / 2;
-
-        var pi = Math.PI;
-
-        var fill_color = "#b7cd44";
-
-        if (value < 0) {
-            fill_color = "#da1e1e";
-        }
-
-        var colors = [fill_color, 'transparent'];
-
-        var pie = d3.layout.pie()
-            .sort(null);
-
-        var arc = d3.svg.arc()
-            .innerRadius(30)
-            .outerRadius(40)
-            .startAngle(0)
-            .endAngle(function(d, i) {
-            return 2 * pi * (d.value - 100) / 100;
-        });
-
-        var arc2 = d3.svg.arc()
-            .innerRadius(0)
-            .outerRadius(30)
-            .startAngle(0)
-            .endAngle(function(d, i) {
-            return 2 * pi * (d.value - 100) / 100;
-        });
-
-        var arc3 = d3.svg.arc()
-            .innerRadius(40)
-            .outerRadius(45)
-            .startAngle(0)
-            .endAngle(function(d, i) {
-            return 2 * pi * (d.value - 100) / 100;
-        });
-
-        var m_arc = d3.svg.arc()
-            .innerRadius(30)
-            .outerRadius(40)
-            .startAngle(0)
-            .endAngle(function(d, i) {
-            return 2 * pi * (d.value) / 100;
-        });
-
-        var ellipse_shadow_arc = d3.svg.arc()
-            .innerRadius(0)
-            .outerRadius(10)
-            .startAngle(0)
-            .endAngle(function(d, i) {
-            return -pi;
-        });
-        var ellipse_shadow_arc2 = d3.svg.arc()
-            .innerRadius(0)
-            .outerRadius(10)
-            .startAngle(0)
-            .endAngle(function(d, i) {
-            return pi;
-        });
-
-        var angle_scale = d3.scale.linear()
-            .domain([0, 100])
-            .range([0, pi]);
-
-        var ellipse_shadow_cos_scale = d3.scale.linear()
-            .domain([0, pi])
-            .range([-35, -35]);
-
-        var ellipse_shadow_sin_scale = d3.scale.linear()
-            .domain([0, pi])
-            .range([34, 39]);
-
-        var svg = d3.select("#" + id + ' .circle').append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-
-        var gradient = svg.append('radialGradient')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 40)
-            .attr('fx', '0%')
-            .attr('fy', '0%')
-            .attr('id', 'gradient')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        gradient.append('stop')
-            .attr('offset', '60%')
-            .attr('style', "stop-color: #b6c64a; stop-opacity: 1");
-
-        gradient.append('stop')
-            .attr('offset', '100%')
-            .attr('style', 'stop-color: #c3d75a; stop-opacity: 1');
-
-        var gradient_data_inner = svg.append('radialGradient')
-            .attr('cx', 2)
-            .attr('cy', 3)
-            .attr('r', 40)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'gradient_data_inner')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        gradient_data_inner.append('stop')
-            .attr('offset', '70%')
-            .attr('style', "stop-color: #fff; stop-opacity: 0.8");
-
-        gradient_data_inner.append('stop')
-            .attr('offset', '100%')
-            .attr('style', 'stop-color: #333; stop-opacity: 1');
-
-        var gradient_data_outer = svg.append('radialGradient')
-            .attr('cx', 2)
-            .attr('cy', 5)
-            .attr('r', 39)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'gradient_data_outer')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        gradient_data_outer.append('stop')
-            .attr('offset', '60%')
-            .attr('style', 'stop-color: #333; stop-opacity: 1');
-
-        gradient_data_outer.append('stop')
-            .attr('offset', '100%')
-            .attr('style', 'stop-color: #fff; stop-opacity: 1');
-
-        var gradient3 = svg.append('radialGradient')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 45)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'gradient3')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        gradient3.append('stop')
-            .attr('offset', '0%')
-            .attr('style', "stop-color: #333; stop-opacity: 1");
-
-        gradient3.append('stop')
-            .attr('offset', '100%')
-            .attr('style', 'stop-color: #000; stop-opacity: 0');
-
-        var gradient_inner_empty_down = svg.append('radialGradient')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 45)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'gradient_inner_empty_down')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        gradient_inner_empty_down.append('stop')
-            .attr('offset', '50%')
-            .attr('style', "stop-color: #333; stop-opacity: 1");
-
-        gradient_inner_empty_down.append('stop')
-            .attr('offset', '80%')
-            .attr('style', 'stop-color: #d6c4ae; stop-opacity: 0');
-
-        var gradient_inner_empty_out = svg.append('radialGradient')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 45)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'gradient_inner_empty_out')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        gradient_inner_empty_out.append('stop')
-            .attr('offset', '80%')
-            .attr('style', 'stop-color: #d6c4ae; stop-opacity: 0');
-
-        gradient_inner_empty_out.append('stop')
-            .attr('offset', '100%')
-            .attr('style', "stop-color: #333; stop-opacity: 1");
-
-        /* Ellipse gradient */
-        var ellipse_gradient = svg.append('radialGradient')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 40)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'ellipse_gradient')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        ellipse_gradient.append('stop')
-            .attr('offset', '70%')
-            .attr('style', 'stop-color: #b6c64a; stop-opacity: 1');
-
-        ellipse_gradient.append('stop')
-            .attr('offset', '100%')
-            .attr('style', "stop-color: #c3d75a; stop-opacity: 1");
-
-        var ellipse_shadow_gradient = svg.append('radialGradient')
-            .attr('cx', 2)
-            .attr('cy', 1)
-            .attr('r', 7)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'ellipse_shadow_gradient')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        ellipse_shadow_gradient.append('stop')
-            .attr('offset', '40%')
-            .attr('style', 'stop-color: #333; stop-opacity: 0.4');
-
-        ellipse_shadow_gradient.append('stop')
-            .attr('offset', '100%')
-            .attr('style', 'stop-color: #000; stop-opacity: 0');
-
-        var ellipse_shadow_gradient2 = svg.append('radialGradient')
-            .attr('cx', 2)
-            .attr('cy', 1)
-            .attr('r', 6)
-            .attr('fx', 0)
-            .attr('fy', 0)
-            .attr('id', 'ellipse_shadow_gradient2')
-            .attr('gradientUnits', 'userSpaceOnUse');
-
-        ellipse_shadow_gradient2.append('stop')
-            .attr('offset', '40%')
-            .attr('style', 'stop-color: #333; stop-opacity: 0.4');
-
-        ellipse_shadow_gradient2.append('stop')
-            .attr('offset', '100%')
-            .attr('style', 'stop-color: #000; stop-opacity: 0');
-
-        /* outer shadow */
-        svg
-            .append('circle')
-            .attr('cx', 0)
-            .attr('cy', 2)
-            .attr('r', 42)
-            .attr('stroke-width', 0)
-            .attr('fill', 'url(#gradient_data_outer)');
-
-
-        /* Layer 1 -- global shadow */
-        svg
-            .append('circle')
-            .attr('cx', 0)
-            .attr('cy', 2)
-            .attr('r', 39)
-            .attr('stroke-width', 1)
-            .attr('fill', 'url(#gradient3)');
-
-        /* Layer 2 -- Data visualization */
-        svg
-            .append('circle')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 40.1)
-            .attr('stroke-width', 0)
-            .attr('fill', 'url(#gradient)');
-
-        /* Layer 4 -- overlap data visualization  */
-        svg.selectAll('path')
-            .data(pie(dataset))
-            .enter().append('path')
-            .attr('fill', '#d6c4ae')
-            .attr('d', arc);
-
-        /* Inner shadows */
-        svg.selectAll('path2')
-            .data(pie(dataset))
-            .enter().append('path')
-            .attr('fill', 'url(#gradient_inner_empty_down)')
-            .attr('d', arc);
-
-        svg.selectAll('path3')
-            .data(pie(dataset))
-            .enter().append('path')
-            .attr('fill', 'url(#gradient_inner_empty_out)')
-            .attr('d', arc);
-
-        /* Layer 5 -- inner circle, to hide the Data visualization main circle */
-        svg
-            .append('circle')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 30)
-            .attr('stroke-width', 0)
-            .attr('fill', '#fff');
-
-        /* Layer 3 -- Data inner gradient */
-        svg
-            .append('circle')
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('r', 30)
-            .attr('stroke-width', 0)
-            .attr('fill', 'url(#gradient_data_inner)');
-
-        /* Filling inner gradient space */
-        svg.selectAll('path4')
-            .data(pie(dataset))
-            .enter().append('path')
-            .attr('fill', '#fff')
-            .attr('d', arc2);
-
-        /* Filling outer gradient fill */
-        svg.selectAll('path6')
-            .data(pie(dataset))
-            .enter().append('path')
-            .attr('fill', '#fff')
-            .attr('d', arc3);
-
-        /* Shadow for the ellipse */
-        svg.selectAll('path5')
-            .data(pie(false_dataset))
-            .enter().append('path')
-            .attr('fill', 'url(#ellipse_shadow_gradient)')
-            .attr('d', ellipse_shadow_arc)
-            .attr('transform', 'translate(0, -34)');
-
-        /* Shadow for the ellipse */
-        svg.selectAll('path5')
-            .data(pie(dataset))
-            .enter().append('path')
-            .attr('fill', 'url(#ellipse_shadow_gradient2)')
-            .attr('d', ellipse_shadow_arc2)
-            .attr('transform', function(d) {
-            var value = 2 * pi * (d.value) / 100;
-            var sin_angle = ellipse_shadow_sin_scale(value % pi) * Math.sin(value);
-            var cos_angle = ellipse_shadow_cos_scale(value % pi) * Math.cos(value);
-            return 'translate(' + sin_angle + ', ' + cos_angle + ') rotate(' + (57 * value) + ')';
-            // return 'translate('+sin_angle+', '+cos_angle+')';
-        });
-
-        /* Ellipses to hide the bulky borders in the start and the end */
-        svg
-            .append('ellipse')
-            .attr('cx', 0)
-            .attr('cy', -35)
-            .attr('rx', 4)
-            .attr('ry', 5)
-            .attr('fill', 'url(#ellipse_gradient)');
-
-        /* Second ellipse on the end of the data */
-        svg.selectAll('ellipse2').data(pie(dataset)).enter()
-            .append('ellipse')
-            .attr('cx', 0)
-            .attr('cy', -35)
-            .attr('rx', 4)
-            .attr('ry', 5)
-            .attr('fill', 'url(#ellipse_gradient)')
-            .attr('transform', function(d) {
-            console.log(d.value, angle_scale(d.value));
-            var value = 360 * (d.value) / 100;
-            return 'rotate(' + value + ')';
-        });
-
-        /* Text */
-        svg.selectAll('text').data(dataset)
-            .enter().append('text')
-            .attr('text-anchor', 'middle')
-            .attr('y', 5)
-            .attr('x', 0)
-            .attr('font-size', '18px')
-            .attr('fill', '#b9d240')
-            .text(function(d) {
-            console.log(d);
-            return Math.round(d).toString() + '%';
-        });
-
-        /* Shadow for the ellipse2 */
-        // svg.selectAll('path7')
-        //     .append('path')
-        //     .attr('fill', 'url(#ellipse_shadow_gradient')
-        //     .attr('d', ellipse_shadow_arc)
-        //     .attr('transform', function(d) {
-        //         var value = 360*(d.value)/100;
-        //         return 'rotate(' + value + ')';
-        //     });
-
-
-        // var path_bottom = svg.selectAll("path")
-        //     .data(pie(dataset))
-        //     .enter().append("path")
-        //     .attr("stroke", function(d, i) { return colors[i]; })
-        //     .attr('style', 'fill:#000;stroke-width:10; stroke-linejoin:round;')
-        //     .attr("d", arc);
-
-        // var path_top = svg.selectAll("path")
-        // .data(pie(dataset))
-        // .enter().append("path")
-        // .attr("stroke", function(d, i) { return colors[i]; })
-        // .attr('style', 'fill:none;stroke-width:10; stroke-linejoin:round;')
-        // .attr("d", arc);
-    }
-
     /**
      * Drawing graph in the target price block
      * @return {[type]} [description]
      */
-
     function process_target_prices_blocks() {
         for (i = 0; i < target_prices_list.length; i++) {
             if (target_prices_list[i].processed) {
@@ -1185,11 +797,11 @@ var tp = (function() {
         }
     }
 
-
     /**
      * Click on property in inner Analyse
-     ***/
-
+     * 
+     * @return {[type]} [description]
+     */
     function open_graph() {
 
         obj = $(this);
@@ -1221,9 +833,8 @@ var tp = (function() {
     }
 
     /**
-     * [set_active_analytic description]
+     * Setting Active analytic
      */
-
     function set_active_analytic() {
         // show first target price
         if ($('#bank li.active').length === 0) {
@@ -1239,7 +850,6 @@ var tp = (function() {
     }
 
     /** Get from #hash. opt = "company" or opt = "feature" */
-
     function hash_get(opt) {
         if (location.hash.length !== 0) {
             var name = location.hash.substr(1);
@@ -1318,7 +928,6 @@ var tp = (function() {
      * [load_target_prices description]
      * @return {[type]} [description]
      */
-
     function load_target_prices() {
 
         if ($(this).hasClass('active')) {
@@ -1378,9 +987,8 @@ var tp = (function() {
 
     /**
      * Remove content, add to another list
-     * Because need to rerun javascript for graphs
-     ***/
-
+     * Because need to rerun JavaScript for graphs
+     */
     function change_target_prices_list() {
 
         var content = null;
@@ -1417,7 +1025,6 @@ var tp = (function() {
      * [binds_for_target_price_list description]
      * @return {[type]} [description]
      */
-
     function binds_for_target_price_list() {
         /* Tooltip (percent info box) */
         $('.chart .bar rect').hover(function() {
@@ -1534,54 +1141,82 @@ var tp = (function() {
      * [sort_target_prices description]
      * @return {[type]} [description]
      */
-
     function sort_target_prices() {
+        var data = Object;
         var obj = $(this);
         if (obj.hasClass('active')) {
-            return;
+            return; // This is bad style
         }
         $('.title.list .pre_info span a').removeClass('active');
         obj.addClass('active');
 
-        target_price_sort_info.direction = (obj.hasClass('up')) ? 'up' : 'down';
-        target_price_sort_info.slug = $(this).parent('span').attr('name');
-        var list_html = $('#target-price-list').clone();
-        $('#target-price-list').html('');
-
-        // do sort!
-        target_prices_list = get_sorted_target_prices(
-            target_prices_list,
-            target_price_sort_info);
-
-        for (i = 0; i < target_prices_list.length; i++) {
-            $('#target-price-list').append(
-                list_html.find('#' + target_prices_list[i].hash)
-            );
+        data.direction = 'up';
+        if (obj.hasClass('down')) {
+            data.direction = 'down';
         }
-        binds_for_target_price_list();
+        data.slug = $(this).parent('span').attr('name');
+
+        $.getJSON('/targets/' + data.slug + '/' + data.direction, function(data) {
+            console.log(data);
+        });
+
+        // var list_html = $('#target-price-list').clone();
+        // $('#target-price-list').html('');
+        // // do sort!
+        // target_prices_list = get_sorted_target_prices(
+        //     target_prices_list,
+        //     target_price_sort_info
+        // );
+
+        // for (i = 0; i < target_prices_list.length; i++) {
+        //     $('#target-price-list').append(
+        //         list_html.find('#' + target_prices_list[i].hash)
+        //     );
+        // }
+        // binds_for_target_price_list();
     }
 
     /**
-     * [get_sorted_target_prices description]
+     * Returning sorted target prices
+     *
+     * List format
+     *
+     * - accuracy: @string
+     * - change: @string
+     * - hash: @string
+     * - name: @string
+     * - processed: @boolean
+     * - profitability: @string
+     * - reach_time: @string
+     * 
      * @param  {[type]} list      [description]
      * @param  {[type]} sort_info [description]
      * @return {[type]}           [description]
      */
 
-    function get_sorted_target_prices(list, sort_info) {
-        var new_list = $.extend([], list);
-
-        if (sort_info.direction == 'up') {
-            new_list.sort(function(a, b) {
-                return b[sort_info.slug] - a[sort_info.slug];
-            });
-        } else {
-            new_list.sort(function(a, b) {
-                return a[sort_info.slug] - b[sort_info.slug];
-            });
-        }
-        return new_list;
-    }
+    // function get_sorted_target_prices(list, sort_info) {
+    //     var new_list = [];
+    //     var url = '/targets/'+ sort_info.slug +'/' + sort_info.direction;
+    //     $.getJSON(url , function(data) {
+    //         data.each(function(element) {
+    //             new_list.push({
+    //                 'hash': element.hash,
+    //                 'price': element.price
+    //             });
+    //         });
+    //         return new_list;
+    //     });
+    //     if (sort_info.direction == 'up') {
+    //         new_list.sort(function(a, b) {
+    //             return b[sort_info.slug] - a[sort_info.slug];
+    //         });
+    //     } else {
+    //         new_list.sort(function(a, b) {
+    //             return a[sort_info.slug] - b[sort_info.slug];
+    //         });
+    //     }
+    //     return new_list;
+    // }
 
     /**
      * [in_graph_click description]

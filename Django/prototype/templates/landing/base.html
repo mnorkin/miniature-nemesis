@@ -5,14 +5,15 @@
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
-        <link rel="stylesheet" href="static/css/landing.css" />
+        <link rel="stylesheet" href="/static/css/landing.css" />
     </head>
     <body>
         <header>
             <div class="logo">
-                <img src="static/images/landing/logo.jpg" alt="Anavest" />
+                <img src="/static/images/landing/logo.jpg" alt="Anavest" />
             </div>
         </header>
+        {% block content %}
         <div class="container-large">
             <div class="container">
                 <div class="promo">
@@ -21,8 +22,9 @@
                     <div class="cta-option">
                         <p class="description">Leave us your email address to be notified when we launch.</p>
                         <div class="form-inputs">
-                            <form action="/" method="POST">
-                                <input type="email" name="email" value="Write your email address" /><input type="submit" value="Send" />
+                            <form action="{{ action }}" method="POST">{% csrf_token %}
+                                <script class="{{form.email.id_for_label}}" type="text/x-jquery-template">{{form.email.help_text}}</script>
+                                {{form.email}}<input type="submit" value="Send" />
                             </form>
                         </div>
                     </div>
@@ -36,7 +38,7 @@
                     <p class="short-description">Get the newest investment recommendations from hundreds of analysts everyday.</p>
                 </div>
                 <div class="entry-image">
-                    <img src="static/images/landing/information.jpg" alt="Inforamtion" />
+                    <img src="/static/images/landing/information.jpg" alt="Inforamtion" />
                 </div>
             </div>
         </div>
@@ -47,7 +49,7 @@
                     <p class="short-description">Know which banks make the most accurate and profitable investment recommendations for any stock.</p>
                 </div>
                 <div class="entry-image">
-                    <img src="static/images/landing/analysis.jpg" alt="Analysis" />
+                    <img src="/static/images/landing/analysis.jpg" alt="Analysis" />
                 </div>
             </div>
         </div>
@@ -58,13 +60,18 @@
                     <p class="short-description">Find the hottest new companies spotted by the best analysts.</p>
                 </div>
                 <div class="entry-image">
-                    <img src="static/images/landing/discover.jpg" alt="Discover" />
+                    <img src="/static/images/landing/discover.jpg" alt="Discover" />
                 </div>
             </div>
         </div>
+        {% endblock %}
         <div class="container">
             <footer>Investor relations and media inquires <a href="#">info@anavest.com</a></footer>
         </div>
     </body>
-    <script src="/static/js/respond.src.js"></script>
+    {% block afterbody %}
+    {% endblock %}
+    <script src="/static/js/respond.min.js"></script>
+    <script src="/static/js/jquery-1.9.1.min.js"></script>
+    <script src="/static/js/landing.js"></script>
 </html>
