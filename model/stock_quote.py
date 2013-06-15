@@ -48,7 +48,10 @@ class stock_quote():
         try:
             with open('%s/%s.json' % (self.data_dir, ticker)):
                 f = open('%s/%s.json' % (self.data_dir, ticker), 'r')
-                entries = json.loads(f.read())
+                try:
+                    entries = json.loads(f.read())
+                except ValueError:
+                    return None
                 if type(entries) is list:
                     self.logger.debug('Returning %s stock data' % ticker)
                     for entry in entries:
