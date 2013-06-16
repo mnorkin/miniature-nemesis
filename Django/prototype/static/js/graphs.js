@@ -280,9 +280,6 @@ var graphs = (function () {
             return graphs;
         },
 
-
-
-
         draw_proximity: function () {
             /**
              * Method to draw proximity graphic

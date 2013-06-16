@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.views.decorators.cache import cache_control
 from piston.resource import Resource
 from api.handlers import AnalyticHandler
 from api.handlers import TickerHandler
@@ -14,6 +15,8 @@ from api.handlers import StockPriceHandler
 from api.handlers import TargetPriceAnalyticTickerHandler
 from api.handlers import StockHandler
 
+cached_resource = cache_control(public=True, maxage=30, s_maxage=300)
+
 # feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler, authentication=ApiKeyAuthentication())
 feature_analytic_ticker_handler = Resource(FeatureAnalyticTickerHandler)
 
@@ -23,7 +26,7 @@ analytic_handler = Resource(AnalyticHandler)
 # ticker_handler = Resource(TickerHandler, authentication=ApiKeyAuthentication())
 ticker_handler = Resource(TickerHandler)
 # target_price_handler = Resource(TargetPriceHandler, authentication=ApiKeyAuthentication())
-target_price_handler = Resource(TargetPriceHandler)
+target_price_handler = cached_resource(Resource(TargetPriceHandler))
 # feature_handler = Resource(FeatureHandler, authentication=ApiKeyAuthentication())
 feature_handler = Resource(FeatureHandler)
 # unit_handler = Resource(UnitHandler, authentication=ApiKeyAuthentication())
@@ -47,6 +50,10 @@ urlpatterns = patterns(
     url(r'^target_prices/$', target_price_handler),
     url(
         r'^target_prices/(?P<ticker_slug>[\w-]+)/(?P<analytic_slug>[\w-]+)/$',
+        target_price_handler
+    ),
+    url(
+        r'^target_prices/(?P<page>\d+)/$',
         target_price_handler
     ),
     url(r'^features/$', feature_handler),

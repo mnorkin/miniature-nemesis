@@ -14,7 +14,7 @@
     </div>
     <ul class="target_price_list" id="target-price-list" name="{{date|date:'M. d, Y'}}">
         {% for target in target_prices  %}
-        {% include "morbid/target_price_card.html" %}
+            {% include "morbid/target_price_card.html" %}
         {% endfor %}
         <br class="clear"/>
     </ul>
@@ -24,3 +24,7 @@
 </div>
 
 <div class="latest_target_prices title list hidden"></div>
+
+<script id="target_price_template" type="text/x-jquery-template">
+    {% include "morbid/card_template.html" %}
+</script>

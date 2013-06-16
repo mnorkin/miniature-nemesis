@@ -156,7 +156,7 @@ var tp = (function() {
             if ($('.horizontal_slider').length !== 0 && horizontal_slider_top_offset === 0) {
                 horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
             }
-            load_more_target_prices();
+            // load_more_target_prices();
             scroll_style_elements();
         },
 

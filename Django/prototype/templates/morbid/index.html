@@ -10,7 +10,6 @@
             <a class="toggle">Compare</a>
         </div>
 
-     {% if latest_target_prices %}
        <div class="pre_info">
         <span class="ch" name="change"><a class="up"></a><a class="down"></a></span>
         <span class="ac" name="accuracy">Accuracy<a class="up"></a><a class="down"></a></span>
@@ -18,18 +17,16 @@
         <span class="re" name="reach_time">Reach time<a class="up"></a><a class="down"></a></span>
      </div>
      <ul class="target_price_list" id="target-price-list">
-         {% for target in latest_target_prices  %}
-            {% include "morbid/target_price_card.html" %}
-         {% endfor %}
          <br class="clear"/>
      </ul>
-     {% else %}
-     <p>Error, no target prices</p>
-     {% endif %}
  </div>
 
  <div class="latest_target_prices title list hidden"></div>
 
 </div>
+
+<script id="target_price_template" type="text/x-jquery-template">
+    {% include "morbid/card_template.html" %}
+</script>
 
 {% endblock %}

@@ -29,22 +29,10 @@ def index(request, page=0):
     @return: Http Response
     """
 
-    target_price_list = TargetPrice.objects.recent_target_prices(page)
-
-    if len(target_price_list) < 1:
-        raise Http404
-
     t = loader.get_template('morbid/index.html')
 
-    if page == 0:
-        extends_template = 'morbid/base.html'
-    else:
-        extends_template = 'morbid/base_page.html'
-
     c = Context({
-        'latest_target_prices': target_price_list,
-        'extends_template': extends_template,
-        'date': target_price_list[0]['date']
+        'extends_template': 'morbid/base.html'
     })
 
     return HttpResponse(t.render(c))

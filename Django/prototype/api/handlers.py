@@ -471,13 +471,18 @@ class TargetPriceHandler(BaseHandler):
     allowed_methods = ('GET', 'POST', 'PUT')
     model = TargetPrice
 
-    def read(self, request, ticker_slug=None, analytic_slug=None):
+    def read(
+        self, request, ticker_slug=None, analytic_slug=None,
+        page=0, sort_by=None, sort_direction=None
+    ):
         if ticker_slug and analytic_slug:
             ticker = Ticker.objects.get(slug=ticker_slug)
             analytic = Analytic.objects.get(slug=analytic_slug)
             return target_data(ticker.name, analytic.name)
+        elif sort_by and sort_direction:
+            return TargetPrice.objects.sorted(sort_by, sort_direction, page)
         else:
-            return TargetPrice.objects.all()
+            return TargetPrice.objects.recent_target_prices(page)
 
     def create(self, request):
         if request.content_type:

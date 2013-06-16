@@ -317,10 +317,21 @@ class TargetPriceManager(models.Manager):
         """
         Construction of change
         """
+        value = 0
+        direction = 'up'
         try:
-            return float(row['price'] - row['last_stock_price'])/row['price']*100
+            value = round(float(row['price'] - row['last_stock_price'])/row['price']*100*10)/10
         except ZeroDivisionError:
-            return 0
+            pass
+
+        if value < 0:
+            direction = 'down'
+
+        return {
+            'abs_value': abs(value),
+            'value': value,
+            'direction': direction
+        }
 
     def construct_features(self, row):
         """
@@ -353,7 +364,7 @@ class TargetPriceManager(models.Manager):
                 'ticker_long_name': row['ticker_long_name'],
                 'analytic': row['analytic_name'],
                 'analytic_slug': row['analytic_slug'],
-                'price': row['price'],
+                'price': round(row['price']*10)/10,
                 'hash': self.construct_hash(row),
                 'features': self.construct_features(row),
                 'change': self.construct_change(row),
@@ -430,7 +441,7 @@ class TargetPriceManager(models.Manager):
         ])
         return self.construct_targets(cursor)
 
-    def sorted(self, feature_slug='accuracy', sort_direction='ASC', page=0, entries_per_page=20):
+    def sorted(self, feature_slug='accuracy', sort_direction='down', page=0, entries_per_page=20):
         """
         Sorted target prices
         """
