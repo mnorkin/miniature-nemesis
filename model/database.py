@@ -168,10 +168,10 @@ class database:
         results = []
 
         if not analytic:
-            self.cursor.execute("SELECT DISTINCT(ticker) FROM entries")
+            self.cursor.execute("SELECT DISTINCT(ticker) ticker FROM entries")
             """Fetch all existing tickers from the database"""
         else:
-            self.cursor.execute("SELECT DISTINCT(ticker) FROM entries WHERE analytic='%s'" % re.escape(analytic))
+            self.cursor.execute("SELECT DISTINCT(ticker) ticker FROM entries WHERE analytic='%s'" % re.escape(analytic))
             """Fetch tickers which analytic works with from the database"""
 
         for row in self.cursor.fetchall():
