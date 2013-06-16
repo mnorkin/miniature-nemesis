@@ -68,7 +68,6 @@ var render = (function() {
     return {
 
         document_ready: function() {
-            console.log('Render');
             $("script").each(function() {
                 var new_replaced_txt = $(this).text().replace(/\[\[/g, "{{").replace(/\]\]/g, "}}");
                 $(this).text(new_replaced_txt);
@@ -95,7 +94,6 @@ var render = (function() {
                     data[i].change.value
                 );
                 for (j=0; j < data[i].features.length; j++) {
-                    console.log(j);
                     render.feature(
                         data[i].hash + '01',
                         data[i].features[j].value,
@@ -103,6 +101,7 @@ var render = (function() {
                     );
                 }
             }
+            render.tooltips();
         },
         /** 
          * Filtering the minimum value of the feature
@@ -477,6 +476,158 @@ var render = (function() {
                 })
                     .transition().delay(1000).duration(500)
                     .attr('r', 3.5);
+            }
+        },
+        /**
+         * [binds_for_target_price_list description]
+         * @return {[type]} [description]
+         */
+        tooltips: function() {
+            /* Tooltip (percent info box) */
+            $('.chart .bar rect').hover(function() {
+                var obj = $(this);
+                var chart = obj.closest('.chart');
+                var tooltip = chart.children('.bar_tooltip');
+
+                tooltip.text(obj.attr('txt')).css({
+                    display: 'block',
+                    opacity: 0,
+                    width: 'auto'
+                });
+                var width = tooltip.width();
+
+                /*var bar_cont_width = ($('.latest_target_prices.list.hidden').length) ? 347 : 133;
+                var left = Math.min(obj.offset().left - chart.offset().left + bar_cont_width - width +,
+                obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) -2.7); */
+
+                var top = obj.offset().top - chart.offset().top - 3.8;
+                var left = obj.offset().left - chart.offset().left + parseInt(obj.attr('width'), 10) - 2.7;
+
+                // These kind of expressions are really hard to understand
+                var speed = (
+                    parseInt(tooltip.css('top'), 10) == parseInt(top, 10) &&
+                    parseInt(tooltip.css('left'), 10) == parseInt(left, 10)) ? 0 : 200;
+
+                tooltip.css({
+                    top: top,
+                    left: left,
+                    width: 0,
+                    opacity: 1
+                }).animate({
+                    width: width
+                }, speed);
+
+                if (chart.children('.tooltip_point').length === 0) {
+                    chart.append('<span class="tooltip_point"></span>');
+                }
+                chart.children('.tooltip_point').css({
+                    left: (left - 4),
+                    top: (top + 5),
+                    display: 'block'
+                });
+
+            }, function() {});
+
+            $('.chart').hover(function() {}, function() {
+                $('.bar_tooltip').fadeOut(150);
+                $('.tooltip_point').fadeOut(150);
+            });
+
+            // long company names moving
+            $('.title .entry').hover(function() {
+                var obj = $(this);
+                obj.find('.goust').text(obj.find('.text .slid').text());
+                var left = Math.min(0, (165 - obj.find('.goust').width()));
+                obj.find('.text .slid').animate({
+                    'left': left
+                }, (left * -15));
+            }, function() {
+                $(this).find('.text .slid').stop().css({
+                    'left': 0
+                });
+            });
+
+            $('.title .entry').click(function() {
+                location.href = $(this).find('a').attr('href');
+            });
+
+            $('.latest_target_prices .toggle').unbind('click').click(
+                render.change_target_prices_list
+            );
+            $('.title.list .pre_info span a').unbind('click').click(
+                render.sort_target_prices
+            );
+
+            // hide company name if it's company page or bank page
+            if (
+                $('.inner_target_prices').attr('type') !== undefined &&
+                $('.latest_target_prices').length !== 0) {
+                var obj, who = $('.inner_target_prices').attr('type');
+                $('.inner_target_prices').removeAttr('type');
+                $('#target-price-list .entry').each(function() {
+                    obj = $(this);
+                    if (who == 'ticker') {
+                        obj.find('.text .slid').text(obj.find('.analytic').text());
+                    }
+                    obj.find('.analytic').text(obj.find('.date').text());
+                });
+            }
+            // to see last target price date
+            $('.target_price_list').css('padding-bottom',
+                $(window).height() - $('.title .entry').outerHeight() - 77);
+        },
+
+        /**
+         * Sorting target prices
+         * 
+         * @return {[type]} [description]
+         */
+        sort_target_prices: function() {
+            var data = Object;
+            var obj = $(this);
+            if (obj.hasClass('active')) {
+                return; // This is bad style
+            }
+            $('.title.list .pre_info span a').removeClass('active');
+            obj.addClass('active');
+
+            data.direction = 'up';
+            if (obj.hasClass('down')) {
+                data.direction = 'down';
+            }
+            data.slug = $(this).parent('span').attr('name');
+            /**
+             * Remove the previous data
+             */
+            $('.latest_target_prices svg').remove();
+            $('#target-price-list').html('');
+            /**
+             * Pass the information to loader
+             */
+            loader.sorted(data.slug, data.direction, 0);
+        },
+        /**
+         * Remove content, add to another list
+         * Because need to rerun JavaScript for graphs
+         */
+        change_target_prices_list: function() {
+
+            var content = null;
+
+            list_type = (list_type == 'list') ? 'grid' : 'list'; // ?????
+            $('.latest_target_prices svg').remove();
+            if ($('#latest-target-price-list').hasClass('list')) {
+                $('#latest-target-price-list').removeClass('list');
+                $('#latest-target-price-list').addClass('grid');
+                /* Reload target prices */
+                $('#target-price-list').html('');
+                loader.target_prices(0);
+            } else {
+                $('#latest-target-price-list').removeClass('grid');
+                $('#latest-target-price-list').addClass('list');
+                /* Reload target prices */
+                $('#target-price-list').html('');
+                loader.target_prices(0);
             }
         }
     };

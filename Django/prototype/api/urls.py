@@ -56,6 +56,10 @@ urlpatterns = patterns(
         r'^target_prices/(?P<page>\d+)/$',
         target_price_handler
     ),
+    url(
+        r'^target_prices/(?P<sort_by>[\w-]+)/(?P<sort_direction>[\w-]+)/(?P<page>\d+)/$',
+        target_price_handler
+    ),
     url(r'^features/$', feature_handler),
     url(r'^features/(?P<feature_id>\d+)/$', feature_handler),
     url(r'^check/$', feature_analytic_ticker_check_handler),
