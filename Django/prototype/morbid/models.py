@@ -206,6 +206,7 @@ class TargetPriceNumberAnalyticTicker(models.Model):
         """
         return str(self.number)
 
+
 class TargetPriceAnalyticTicker(models.Model):
     """
     This is the calculator storage, to validate the calculated

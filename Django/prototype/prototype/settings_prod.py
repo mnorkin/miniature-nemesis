@@ -141,6 +141,7 @@ INSTALLED_APPS = (
     'gunicorn',
     'apikey',
     'morbid',
+    'accounts',
     'south',
     'raven.contrib.django.raven_compat'
 )

@@ -53,6 +53,7 @@ class stock_crawler():
         * Make the json response happen
         """
         response_data = self.rest('/api/tickers/', 'GET')
+        print response_data
         if response_data:
             results = []
             for i in range(0, int(round(len(response_data)/200)+1)):
@@ -131,13 +132,18 @@ class stock_crawler():
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("cra.baklazanas.lt")
-        conn = httplib.HTTPConnection("localhost:8000")
+        # conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection("dev4.baklazanas.lt")
         logging.debug(url)
         logging.debug(headers)
         logging.debug(params)
         conn.request(request.upper(), url, params, headers)
+        print request.upper()
+        print url
+        print params
+        print headers
         response = conn.getresponse()
-        conn.close()
+        print response.status
         if response.status != 502:
             # ALL_OK
             if response.status == 200 and request.upper() == 'GET':
@@ -161,6 +167,8 @@ class stock_crawler():
                 return self.rest(url, request, data, cycle + 1)
             else:
                 return False
+
+        conn.close()
 
 if __name__ == '__main__':
     sc = stock_crawler()
