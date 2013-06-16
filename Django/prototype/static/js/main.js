@@ -89,7 +89,7 @@ var tp = (function() {
             // In analyse page, on document ready, load first property or take from hash!
             var feature = hash_get('feature');
             if (feature == 'target_prices') {
-                $('.inner_buttons a.ta').trigger('click');
+                // $('.inner_buttons a.ta').trigger('click');
             } else if (feature.length) {
                 $('.analyse_menu div[name=' + feature + '] a').trigger('click');
             } else {
@@ -935,6 +935,7 @@ var tp = (function() {
         }
 
         var url = $(this).attr('href');
+        var that = this;
         $('.inner_buttons a').removeClass('active');
         $(this).addClass('active');
 
@@ -944,22 +945,26 @@ var tp = (function() {
                 'opacity': 0
             }, 50, function() {
                 $(this).addClass('hidden');
+                $('.inner_target_prices').removeClass('hidden');
+                // console.log('Loading TP');
+                // console.log(that.getAttribute('data-ticker'));
+                loader.ticker_target_prices(that.getAttribute('data-ticker'), 0);
                 // clear target_prices list
-                target_prices_list = [];
-                $('.inner_target_prices').load(url, function() {
-                    $(this).removeClass('hidden');
-                    $(this).animate({
-                        'opacity': 1
-                    }, 100);
-                    // loaded fresh content, might need to change type to list
-                    if (list_type == 'list') {
-                        list_type = 'grid';
-                        change_target_prices_list();
-                    } else {
-                        process_target_prices_blocks();
-                        binds_for_target_price_list();
-                    }
-                });
+                // target_prices_list = [];
+                // $('.inner_target_prices').load(url, function() {
+                //     $(this).removeClass('hidden');
+                //     $(this).animate({
+                //         'opacity': 1
+                //     }, 100);
+                //     // loaded fresh content, might need to change type to list
+                //     if (list_type == 'list') {
+                //         list_type = 'grid';
+                //         change_target_prices_list();
+                //     } else {
+                //         process_target_prices_blocks();
+                //         binds_for_target_price_list();
+                //     }
+                // });
             });
             hash_set_feature('target_prices');
             // sets Analysis html back from container

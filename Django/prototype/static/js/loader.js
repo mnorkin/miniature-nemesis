@@ -61,6 +61,64 @@ var loader = (function() {
             page = page + 1;
         },
         /**
+         * Ticker target prices
+         * 
+         * @param  {[type]} _ticker [description]
+         * @param  {[type]} _page   [description]
+         * @return {[type]}         [description]
+         */
+        ticker_target_prices: function(_ticker, _page) {
+            if (_ticker === undefined) {
+                ticker = 'aapl';
+            } else {
+                ticker = _ticker;
+            }
+            if (_page === undefined) {
+                page = 0;
+            } else {
+                page = _page;
+            }
+
+            $.getJSON('/api/target_prices/tickers/' + ticker + '/' + page + '/', function(data) {
+                if (data.length < 1) {
+                    loading = true;
+                } else {
+                    render.target_prices(data);
+                    loading = false;
+                }
+            });
+            page = page + 1;
+        },
+        /**
+         * Analytic pages
+         * 
+         * @param  {[type]} _analytic [description]
+         * @param  {[type]} _page     [description]
+         * @return {[type]}           [description]
+         */
+        analytic_target_prices: function(_analytic, _page) {
+            if (_analytic === undefined) {
+                analytic = 'aapl';
+            } else {
+                analytic = _analytic;
+            }
+            if (_page === undefined) {
+                page = 0;
+            } else {
+                page = _page;
+            }
+
+            $.getJSON('/api/target_prices/analytics/' + analytic + '/' + page + '/', function(data) {
+                if (data.length < 1) {
+                    loading = true;
+                } else {
+                    render.target_prices(data);
+                    loading = false;
+                }
+            });
+            page = page + 1;
+        },
+        /**
          * Load listing of target prices
          * 
          * @param  {[type]} _page [description]
@@ -71,6 +129,7 @@ var loader = (function() {
                 page = _page;
             }
             type = 'grid';
+
             $.getJSON('/api/target_prices/' + page + '/', function(data) {
                 /**
                  * No more data from the server -- kill the loader
@@ -101,6 +160,3 @@ var loader = (function() {
         }
     };
 })();
-
-$(document).ready(loader.document_ready);
-$(window).scroll(loader.scroll_happend);

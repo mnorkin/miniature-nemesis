@@ -59,4 +59,10 @@
         </div>
     </div>
 </body>
+{% block afterbody %}
+<script type="text/javascript">
+    $(document).ready(loader.document_ready);
+    $(window).scroll(loader.scroll_happend);
+</script>
+{% endblock %}
 </html>

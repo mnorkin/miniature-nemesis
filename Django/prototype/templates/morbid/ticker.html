@@ -1,6 +1,5 @@
 {% extends "morbid/base.html" %}
 
-
 {% block sidebar %}
 	<div class="inner">
         <a href="/"><img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  /></a>
@@ -40,7 +39,8 @@
 	</ul>
 	
 	<div class="inner_buttons">
-		<a href="/ticker/target_prices/{{ ticker.slug }}/" class="ta">Target prices</a>
+		<a href="/ticker/target_prices/{{ ticker.slug }}/" data-ticker={{ ticker.slug }} class="ta">Target prices</a>
+        <!-- <a href="" class="ta" data-ticker={{ ticker.slug }}>Target prices</a> -->
 		<a href="" class="active an">Analysis</a>
 		<br class="clear" />
 		<div class="line"></div>
@@ -105,12 +105,36 @@
 	
 	<br class="clear" />
 	</div>
-	<div type='ticker' class="inner_target_prices hidden"></div>
+
+	<div type='ticker' class="inner_target_prices hidden">
+        <div class="latest_target_prices title grid" id="latest-target-price-list">
+        <div class="horizontal_slider absolute">
+            <div class="now">{{date|date:"M. d, Y"}}</div>
+            <a class="toggle">Compare</a>
+        </div>
+
+        <div class="pre_info">
+            <span class="ch" name="change"><a class="up"></a><a class="down"></a></span>
+            <span class="ac" name="accuracy">Accuracy<a class="up"></a><a class="down"></a></span>
+            <span class="pr" name="profitability">Profitability<a class="up"></a><a class="down"></a></span>
+            <span class="re" name="reach_time">Reach time<a class="up"></a><a class="down"></a></span>
+        </div>
+        <ul class="target_price_list" id="target-price-list">
+        <br class="clear"/>
+        </ul>
+    </div>
+    </div>
 
     <script type="text/javascript">
         tp.update_ticker_stock("{{ticker.name}}")
     </script>
 
+    <script id="target_price_template" type="text/x-jquery-template">
+        {% include "morbid/card_template.html" %}
+    </script>
+
 	{% endif %}
 {% endblock %}
 
+{% block afterbody %}
+{% endblock %}

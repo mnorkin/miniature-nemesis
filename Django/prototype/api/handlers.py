@@ -480,6 +480,10 @@ class TargetPriceHandler(BaseHandler):
             ticker = Ticker.objects.get(slug=ticker_slug)
             analytic = Analytic.objects.get(slug=analytic_slug)
             return target_data(ticker.name, analytic.name)
+        elif ticker_slug and not analytic_slug:
+            return TargetPrice.objects.ticker_target_prices(ticker_slug, page)
+        elif not ticker_slug and analytic_slug:
+            return TargetPrice.objects.analytic_target_prices(analytic_slug, page)
         elif sort_by and sort_direction:
             return TargetPrice.objects.sorted(sort_by, sort_direction, page)
         else:
