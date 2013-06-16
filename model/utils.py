@@ -21,8 +21,12 @@ def slugify(name):
     name = re.sub(r'\W+', '-', name)
 
     # Just to be on the safe side
-    if name[name.__len__()-1] == '-':
-        name = name[:-1]
+    try:
+        if name[name.__len__()-1] == '-':
+            name = name[:-1]
+    except IndexError:
+        return None
+
     return name
 
 
