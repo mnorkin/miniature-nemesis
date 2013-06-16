@@ -132,9 +132,9 @@ class database:
         """
 
         if not ticker:
-            self.cursor.execute("SELECT DISTINCT ON (analytic) FROM entries")
+            self.cursor.execute("SELECT DISTINCT ON (analytic) analytic FROM entries")
         else:
-            self.cursor.execute("SELECT DISTINCT ON (analytic) FROM entries WHERE ticker='%s'" % re.escape(ticker))
+            self.cursor.execute("SELECT DISTINCT ON (analytic) analytic FROM entries WHERE ticker='%s'" % re.escape(ticker))
 
         for row in self.cursor.fetchall():
             yield row[0]
