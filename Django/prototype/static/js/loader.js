@@ -8,7 +8,16 @@ var loader = (function() {
     var last_offset = 0;
     var page = 0;
     var loading = false;
-    var type = 'grid';
+    var config = {
+        'type': 'grid', // grid or list
+        'ticker': null,
+        'analytic': null,
+        'sort': { // Sorting matters
+            'slug': null,
+            'direction': null
+        },
+        'page': 0 // page number
+    };
     var sort_direction = null;
     var sort_slug = null;
 
@@ -20,6 +29,7 @@ var loader = (function() {
             }
             loader.target_prices();
         },
+
         /**
          * Loading sorted 
          * 
@@ -27,7 +37,7 @@ var loader = (function() {
          * @param  {[type]} direction [description]
          * @return {[type]}           [description]
          */
-        sorted: function(_sort_slug, _sort_direction, _page) {
+        sorted: function(_config) {
             /**
              * Check input
              */
@@ -46,11 +56,12 @@ var loader = (function() {
                 sort_direction = _sort_direction;
             }
             if (_page !== undefined) {
-                page = _page;
+                config.page = _page;
             }
-            type = 'list';
 
-            $.getJSON('/api/target_prices/' + sort_slug + '/' + sort_direction + '/' + page + '/', function(data) {
+            config.type = 'list';
+
+            $.getJSON('/api/target_prices/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/', function(data) {
                 if (data.length < 1) {
                     loading = true;
                 } else {
@@ -58,65 +69,7 @@ var loader = (function() {
                     loading = false;
                 }
             });
-            page = page + 1;
-        },
-        /**
-         * Ticker target prices
-         * 
-         * @param  {[type]} _ticker [description]
-         * @param  {[type]} _page   [description]
-         * @return {[type]}         [description]
-         */
-        ticker_target_prices: function(_ticker, _page) {
-            if (_ticker === undefined) {
-                ticker = 'aapl';
-            } else {
-                ticker = _ticker;
-            }
-            if (_page === undefined) {
-                page = 0;
-            } else {
-                page = _page;
-            }
-
-            $.getJSON('/api/target_prices/tickers/' + ticker + '/' + page + '/', function(data) {
-                if (data.length < 1) {
-                    loading = true;
-                } else {
-                    render.target_prices(data);
-                    loading = false;
-                }
-            });
-            page = page + 1;
-        },
-        /**
-         * Analytic pages
-         * 
-         * @param  {[type]} _analytic [description]
-         * @param  {[type]} _page     [description]
-         * @return {[type]}           [description]
-         */
-        analytic_target_prices: function(_analytic, _page) {
-            if (_analytic === undefined) {
-                analytic = 'aapl';
-            } else {
-                analytic = _analytic;
-            }
-            if (_page === undefined) {
-                page = 0;
-            } else {
-                page = _page;
-            }
-
-            $.getJSON('/api/target_prices/analytics/' + analytic + '/' + page + '/', function(data) {
-                if (data.length < 1) {
-                    loading = true;
-                } else {
-                    render.target_prices(data);
-                    loading = false;
-                }
-            });
-            page = page + 1;
+            config.page = config.page + 1;
         },
         /**
          * Load listing of target prices
@@ -124,13 +77,43 @@ var loader = (function() {
          * @param  {[type]} _page [description]
          * @return {[type]}       [description]
          */
-        target_prices: function(_page) {
-            if (_page !== undefined) {
-                page = _page;
+        target_prices: function(_config) {
+            if (_config !== undefined) {
+                config = _config;
             }
-            type = 'grid';
 
-            $.getJSON('/api/target_prices/' + page + '/', function(data) {
+            url = null;
+            if (config.analytic !== null) {
+                /**
+                 * Analytic target prices
+                 * 
+                 * @type {String}
+                 */
+                url = '/api/target_prices/analytics/' + config.analytic + '/' + config.page + '/';
+            } else if (config.ticker !== null) {
+                /**
+                 * Ticker target prices
+                 * 
+                 * @type {String}
+                 */
+                url = '/api/target_prices/tickers/' + config.ticker + '/' + config.page + '/';
+            } else if (config.sort.slug !== null && config.sort.direction !== null) {
+                /**
+                 * Sorted target prices
+                 * 
+                 * @type {String}
+                 */
+                url = '/api/target_prices/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
+            } else {
+                /**
+                 * Default 
+                 * 
+                 * @type {String}
+                 */
+                url = '/api/target_prices/' + config.page + '/';
+            }
+
+            $.getJSON(url, function(data) {
                 /**
                  * No more data from the server -- kill the loader
                  */
@@ -141,7 +124,13 @@ var loader = (function() {
                     loading = false;
                 }
             });
-            page = page + 1;
+            if (config.page === 0) {
+                console.log('Reload now value from loader');
+                render.now_reload_enable();
+            } else {
+                render.now_reload_disable();
+            }
+            config.page = config.page + 1;
         },
 
         scroll_happend: function() {
@@ -149,9 +138,10 @@ var loader = (function() {
                 this.last_offset = $('.target_price_list > li:nth-last-of-type(1)').offset().top;
             }
             if ( $(window).scrollTop() + $(window).height() >= this.last_offset && loading === false ) {
+                console.log(config);
                 loading = true;
                 /* Check the view */
-                if (type == 'grid') {
+                if (config.type == 'grid') {
                     loader.target_prices();
                 } else {
                     loader.sorted();

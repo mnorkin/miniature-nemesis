@@ -5,6 +5,20 @@
 var render = (function() {
 
     /**
+     * Boolean value for the loader to set, if there was a reload of the page
+     * 
+     * @type {Boolean}
+     */
+    var reload_now_value = false;
+
+    /**
+     * Previous date, to load the separator of entries
+     * 
+     * @type {[type]}
+     */
+    var previous_date = null;
+
+    /**
      * Target price template
      * 
      * @type {[type]}
@@ -76,7 +90,38 @@ var render = (function() {
         },
 
         /**
+         * Method to set the current target price date in the scrolls
+         * 
+         * @return {[type]} [description]
+         */
+        set_now_value: function() {
+            if (reload_now_value === true) {
+                console.log('Reload now value');
+                $('.now').text($('.entry').attr('name'));
+            }
+        },
+
+        /**
+         * Enable reload of now value
+         * 
+         * @return {[type]} [description]
+         */
+        now_reload_enable: function() {
+            reload_now_value = true;
+        },
+
+        /**
+         * Disable reload of now value
+         * 
+         * @return {[type]} [description]
+         */
+        now_reload_disable: function() {
+            reload_now_value = false;
+        },
+
+        /**
          * Render target prices
+         * 
          * @param  {[type]} data [description]
          * @return {[type]}      [description]
          */
@@ -87,6 +132,14 @@ var render = (function() {
             var graph_data = null;
             target_price_template = $("#target_price_template").html();
             for (i=0; i < data.length; i++) {
+                if (previous_date === null) {
+                    previous_date = data[i].date;
+                } else {
+                    if (previous_date != data[i].date) {
+                        previous_date = data[i].date;
+                        $("#target-price-list").append("<br class='clear' />");
+                    }
+                }
                 element = Mustache.to_html(target_price_template, data[i]);
                 $("#target-price-list").append(element);
                 render.change(
@@ -102,6 +155,8 @@ var render = (function() {
                 }
             }
             render.tooltips();
+            render.set_now_value();
+
         },
         /** 
          * Filtering the minimum value of the feature

@@ -946,9 +946,15 @@ var tp = (function() {
             }, 50, function() {
                 $(this).addClass('hidden');
                 $('.inner_target_prices').removeClass('hidden');
-                // console.log('Loading TP');
-                // console.log(that.getAttribute('data-ticker'));
-                loader.ticker_target_prices(that.getAttribute('data-ticker'), 0);
+                config = {
+                    'display': 'grid',
+                    'analytic': null,
+                    'ticker': that.getAttribute('data-ticker'),
+                    'page': 0
+                };
+                loader.target_prices(config);
+
+                // loader.ticker_target_prices(config);
                 // clear target_prices list
                 // target_prices_list = [];
                 // $('.inner_target_prices').load(url, function() {
