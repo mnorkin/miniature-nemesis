@@ -476,7 +476,11 @@ class TargetPriceHandler(BaseHandler):
         ticker_slug=None, analytic_slug=None,
         page=0, sort_by=None, sort_direction=None
     ):
-        if ticker_slug and analytic_slug:
+        if ticker_slug and sort_by and sort_direction:
+            return TargetPrice.objects.sorted_ticker_target_prices(ticker_slug, sort_by, sort_direction, page)
+        elif analytic_slug and sort_by and sort_direction:
+            return TargetPrice.objects.sorted_analytic_target_prices(analytic_slug, sort_by, sort_direction, page)
+        elif ticker_slug and analytic_slug:
             ticker = Ticker.objects.get(slug=ticker_slug)
             analytic = Analytic.objects.get(slug=analytic_slug)
             return target_data(ticker.name, analytic.name)

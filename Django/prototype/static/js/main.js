@@ -837,6 +837,7 @@ var tp = (function() {
      */
     function set_active_analytic() {
         // show first target price
+        console.log('Set Active Analytic');
         if ($('#bank li.active').length === 0) {
             var name = hash_get('company');
             if (name.length === 0) {
@@ -844,6 +845,7 @@ var tp = (function() {
                 console.log('best analytic: ' + name);
                 hash_set_company(name);
             }
+            console.log('#bank li[name=' + name + ']');
             $('#bank li[name=' + name + ']').addClass('active').removeClass('passive');
             $('.in_graph li[name=' + name + ']').addClass('active');
         }
@@ -949,29 +951,16 @@ var tp = (function() {
                 config = {
                     'display': 'grid',
                     'analytic': null,
-                    'ticker': that.getAttribute('data-ticker'),
+                    'ticker': $('.ta').attr('data-ticker'),
+                    'sort': {
+                        'slug': null,
+                        'direction': null
+                    },
                     'page': 0
                 };
                 loader.target_prices(config);
-
-                // loader.ticker_target_prices(config);
-                // clear target_prices list
-                // target_prices_list = [];
-                // $('.inner_target_prices').load(url, function() {
-                //     $(this).removeClass('hidden');
-                //     $(this).animate({
-                //         'opacity': 1
-                //     }, 100);
-                //     // loaded fresh content, might need to change type to list
-                //     if (list_type == 'list') {
-                //         list_type = 'grid';
-                //         change_target_prices_list();
-                //     } else {
-                //         process_target_prices_blocks();
-                //         binds_for_target_price_list();
-                //     }
-                // });
             });
+
             hash_set_feature('target_prices');
             // sets Analysis html back from container
         } else {

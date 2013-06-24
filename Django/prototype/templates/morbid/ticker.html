@@ -48,93 +48,96 @@
 
 
 	<div class="inner_content">
-	<div class="left">
-		<div class="analyse_menu">
-			{% for feature in features %}
-				<div name="{{ feature.slug }}">
-					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}/" class="{{ feature.slug }}">{{ feature.name }}</a>
-					<span></span>
-					<div class="info_box_content">
-						{{feature.description|safe}}
-						{% if feature.slug != 'profitability' %}<img src="/static/images/mini_graphs/{{feature.slug}}.png">{% endif %}
-					</div>
-				</div>
-			{% endfor %}
-		</div>
-		<div class="info_box"></div>
-	</div>
-	
-	<div class="analyser">
-		<ul class="bank" id="bank">
-			{% for target in target_prices %}
-				<li name="{{ target.analytic.slug }}" class="passive">
-					<span class="corp sliding">
-						<a class="text" href="{{target.analytic.get_absolute_url}}">
-							<span class="slid">{{ target.analytic }} </span>
-							<span class="bliur">&nbsp;</span>
-			    			<span class="goust">&nbsp;</span>
-						</a>
-					</span> 
-					<span class="date">{{ target.date }}</span>
-					<span class="number">
-                        {{ target.price|cut:'.0' }} <strong>Last target price</strong>
-                    </span>
-					<span class="number">
-                        {{ target.target_price_number_analytic_ticker.number }}<strong>No of target prices</strong>
-                    </span>
-					<span class="number">
-                        {{ target.volatility.number }}/{{ target.volatility.total }}<strong>Volatility</strong>
-                    </span>
-				</li>
-			{% endfor %}
-		</ul>
-		
-		<div class="in_graph">
-            <button class="btn">In graph analysis</button>
-			<div class="sear">
-				<input type="text" name="sear" placeholder="Search" />
-				<ul>
-					{% for target in target_prices %}
-					<li name="{{target.analytic_slug}}">{{target.analytic}}</li>
-					{% endfor %}
-				</ul>
-			</div>
-		</div>
-	</div>
-	<div id="chart" class="graph"></div>
-	
-	<br class="clear" />
-	</div>
+	   <div class="left">
+    		<div class="analyse_menu">
+    			{% for feature in features %}
+    				<div name="{{ feature.slug }}">
+    					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}/" class="{{ feature.slug }}">{{ feature.name }}</a>
+    					<span></span>
+    					<div class="info_box_content">
+    						{{feature.description|safe}}
+    						{% if feature.slug != 'profitability' %}<img src="/static/images/mini_graphs/{{feature.slug}}.png">{% endif %}
+    					</div>
+    				</div>
+    			{% endfor %}
+    		</div>
+    		<div class="info_box"></div>
+    	</div>
+    	
+    	<div class="analyser">
+    		<ul class="bank" id="bank">
+    			{% for target in target_prices %}
+    				<li name="{{ target.analytic_slug }}" class="passive">
+    					<span class="corp sliding">
+    						<a class="text" href="{{target.analytic.get_absolute_url}}">
+    							<span class="slid">{{ target.analytic }} </span>
+    							<span class="bliur">&nbsp;</span>
+    			    			<span class="goust">&nbsp;</span>
+    						</a>
+    					</span> 
+    					<span class="date">{{ target.date }}</span>
+    					<span class="number">
+                            {{ target.price|cut:'.0' }} <strong>Last target price</strong>
+                        </span>
+    					<span class="number">
+                            {{ target.target_price_number_analytic_ticker.number }}<strong>No of target prices</strong>
+                        </span>
+    					<span class="number">
+                            {{ target.volatility.number }}/{{ target.volatility.total }}<strong>Volatility</strong>
+                        </span>
+    				</li>
+    			{% endfor %}
+    		</ul>
+    		
+    		<div class="in_graph">
+                <button class="btn">In graph analysis</button>
+    			<div class="sear">
+    				<input type="text" name="sear" placeholder="Search" />
+    				<ul>
+    					{% for target in target_prices %}
+    					<li name="{{target.analytic_slug}}">{{target.analytic}}</li>
+    					{% endfor %}
+    				</ul>
+    			</div>
+    		</div>
+    	</div>
+    	<div id="chart" class="graph"></div>
+    	
+    	<br class="clear" />
+    	</div>
 
-	<div type='ticker' class="inner_target_prices hidden">
-        <div class="latest_target_prices title grid" id="latest-target-price-list">
-        <div class="horizontal_slider absolute">
-            <div class="now">{{date|date:"M. d, Y"}}</div>
-            <a class="toggle">Compare</a>
+    	<div type='ticker' class="inner_target_prices hidden">
+            <div class="latest_target_prices title grid" id="latest-target-price-list">
+            <div class="horizontal_slider absolute">
+                <div class="now">{{date|date:"M. d, Y"}}</div>
+                <a class="toggle">Compare</a>
+            </div>
+
+            <div class="pre_info">
+                <span class="ch" name="change"><a class="up"></a><a class="down"></a></span>
+                <span class="ac" name="accuracy">Accuracy<a class="up"></a><a class="down"></a></span>
+                <span class="pr" name="profitability">Profitability<a class="up"></a><a class="down"></a></span>
+                <span class="re" name="reach_time">Reach time<a class="up"></a><a class="down"></a></span>
+            </div>
+            <ul class="target_price_list" id="target-price-list">
+            <br class="clear"/>
+            </ul>
         </div>
-
-        <div class="pre_info">
-            <span class="ch" name="change"><a class="up"></a><a class="down"></a></span>
-            <span class="ac" name="accuracy">Accuracy<a class="up"></a><a class="down"></a></span>
-            <span class="pr" name="profitability">Profitability<a class="up"></a><a class="down"></a></span>
-            <span class="re" name="reach_time">Reach time<a class="up"></a><a class="down"></a></span>
-        </div>
-        <ul class="target_price_list" id="target-price-list">
-        <br class="clear"/>
-        </ul>
     </div>
-    </div>
-
-    <script type="text/javascript">
-        tp.update_ticker_stock("{{ticker.name}}")
-    </script>
-
-    <script id="target_price_template" type="text/x-jquery-template">
-        {% include "morbid/card_template.html" %}
-    </script>
 
 	{% endif %}
 {% endblock %}
 
 {% block afterbody %}
+<script type="text/javascript">
+    tp.update_ticker_stock("{{ticker.name}}")
+</script>
+
+<script id="target_price_template" type="text/x-jquery-template">
+    {% include "morbid/card_template.html" %}
+</script>
+<script type="text/javascript">
+    $(document).ready(loader.document_ready(false));
+    $(window).scroll(loader.scroll_happend);
+</script>
 {% endblock %}

@@ -651,6 +651,7 @@ var render = (function() {
                 data.direction = 'down';
             }
             data.slug = $(this).parent('span').attr('name');
+
             /**
              * Remove the previous data
              */
@@ -659,7 +660,18 @@ var render = (function() {
             /**
              * Pass the information to loader
              */
-            loader.sorted(data.slug, data.direction, 0);
+            config = {
+                'display': 'grid',
+                'analytic': null,
+                'ticker': $('.ta').attr('data-ticker'),
+                'sort': {
+                    'slug': data.slug,
+                    'direction': data.direction
+                },
+                'page': 0
+            };
+            console.log('Sort target prices');
+            loader.target_prices(config);
         },
         /**
          * Remove content, add to another list
@@ -670,19 +682,23 @@ var render = (function() {
             var content = null;
 
             list_type = (list_type == 'list') ? 'grid' : 'list'; // ?????
+
             $('.latest_target_prices svg').remove();
             if ($('#latest-target-price-list').hasClass('list')) {
                 $('#latest-target-price-list').removeClass('list');
                 $('#latest-target-price-list').addClass('grid');
                 /* Reload target prices */
                 $('#target-price-list').html('');
-                loader.target_prices(0);
+                loader.reset_sort();
+                loader.reset_page_number();
+                loader.target_prices();
             } else {
                 $('#latest-target-price-list').removeClass('grid');
                 $('#latest-target-price-list').addClass('list');
                 /* Reload target prices */
                 $('#target-price-list').html('');
-                loader.target_prices(0);
+                loader.reset_page_number();
+                loader.target_prices();
             }
         }
     };

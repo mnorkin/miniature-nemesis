@@ -10,6 +10,8 @@ from morbid.queries import front_page_query
 from morbid.queries import target_prices_for_ticker_query
 from morbid.queries import target_prices_for_analytic_query
 from morbid.queries import sort_by_features_query
+from morbid.queries import sort_by_features_ticker_query
+from morbid.queries import sort_by_features_analytic_query
 from morbid.queries import target_prices_query
 from morbid.queries import features_query
 
@@ -441,6 +443,90 @@ class TargetPriceManager(models.Manager):
             ticker_slug, entries_per_page, offset
         ])
         return self.construct_targets(cursor)
+
+    def sorted_ticker_target_prices(self, ticker_slug, sort_by, sort_direction, page=0, entries_per_page=20):
+        from django.db import connection
+        results_list = []
+
+        offset = 0
+        if page != 0:
+            offset = (int(page)*entries_per_page)+1
+
+        if sort_direction == 'up':
+            sort_direction = 'DESC'
+        else:
+            sort_direction = 'ASC'
+
+        sort_cursor = connection.cursor()
+        sort_cursor.execute(sort_by_features_ticker_query % {
+            'ticker_slug': ticker_slug,
+            'sort_by': sort_by,
+            'sort_direction': sort_direction,
+            'limit': entries_per_page,
+            'offset': offset
+        })
+        cursor = connection.cursor()
+
+        for sort_row in self.dictfetchall(sort_cursor):
+            cursor.execute(target_prices_query, [sort_row['target_id']])
+            row = self.dictfetchall(cursor)[0]
+
+            results_list.append({
+                'date': str(row['date']),
+                'ticker_name': row['ticker_name'],
+                'ticker_long_name': row['ticker_long_name'],
+                'analytic': row['analytic_name'],
+                'analytic_slug': row['analytic_slug'],
+                'price': row['price'],
+                'hash': self.construct_hash(row),
+                'features': self.construct_features(row),
+                'change': self.construct_change(row),
+                'url': '/ticker/' + row['ticker_slug'] + '/',
+            })
+
+        return results_list
+
+    def sorted_analytic_target_prices(self, analytic_slug, sort_by, sort_direction, page=0, entries_per_page=20):
+        from django.db import connection
+        results_list = []
+
+        offset = 0
+        if page != 0:
+            offset = (int(page)*entries_per_page)+1
+
+        if sort_direction == 'up':
+            sort_direction = 'DESC'
+        else:
+            sort_direction = 'ASC'
+
+        sort_cursor = connection.cursor()
+        sort_cursor.execute(sort_by_features_analytic_query % {
+            'analytic_slug': analytic_slug,
+            'sort_by': sort_by,
+            'sort_direction': sort_direction,
+            'limit': entries_per_page,
+            'offset': offset
+        })
+        cursor = connection.cursor()
+
+        for sort_row in self.dictfetchall(sort_cursor):
+            cursor.execute(target_prices_query, [sort_row['target_id']])
+            row = self.dictfetchall(cursor)[0]
+
+            results_list.append({
+                'date': str(row['date']),
+                'ticker_name': row['ticker_name'],
+                'ticker_long_name': row['ticker_long_name'],
+                'analytic': row['analytic_name'],
+                'analytic_slug': row['analytic_slug'],
+                'price': row['price'],
+                'hash': self.construct_hash(row),
+                'features': self.construct_features(row),
+                'change': self.construct_change(row),
+                'url': '/ticker/' + row['ticker_slug'] + '/',
+            })
+
+        return results_list
 
     def sorted(self, feature_slug='accuracy', sort_direction='down', page=0, entries_per_page=20):
         """

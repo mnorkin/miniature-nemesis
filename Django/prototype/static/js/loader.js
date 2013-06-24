@@ -23,54 +23,29 @@ var loader = (function() {
 
     return {
 
-        document_ready: function() {
+        document_ready: function(_autoload) {
+            if (_autoload === undefined) {
+                _autoload = true;
+            }
             if ($('.horizontal_slider').length !== 0) {
                 horizontal_slider_top_offset = $('.horizontal_slider').offset().top;
             }
-            loader.target_prices();
+            if (_autoload) {
+                loader.target_prices();
+            }
         },
 
-        /**
-         * Loading sorted 
-         * 
-         * @param  {[type]} slug      [description]
-         * @param  {[type]} direction [description]
-         * @return {[type]}           [description]
-         */
-        sorted: function(_config) {
-            /**
-             * Check input
-             */
-            if (_sort_slug === undefined) {
-                if (sort_slug === null) {
-                    sort_slug = 'accuracy';
-                }
-            } else {
-                sort_slug = _sort_slug;
-            }
-            if (_sort_direction === undefined) {
-                if (sort_direction === null) {
-                    sort_direction = 'down';
-                }
-            } else {
-                sort_direction = _sort_direction;
-            }
-            if (_page !== undefined) {
-                config.page = _page;
-            }
-
-            config.type = 'list';
-
-            $.getJSON('/api/target_prices/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/', function(data) {
-                if (data.length < 1) {
-                    loading = true;
-                } else {
-                    render.target_prices(data);
-                    loading = false;
-                }
-            });
-            config.page = config.page + 1;
+        reset_page_number: function() {
+            config.page = 0;
         },
+
+        reset_sort: function() {
+            config.sort = {
+                'slug': null,
+                'direction': null
+            };
+        },
+
         /**
          * Load listing of target prices
          * 
@@ -82,8 +57,14 @@ var loader = (function() {
                 config = _config;
             }
 
+            console.log(config);
+
             url = null;
-            if (config.analytic !== null) {
+            if (config.ticker !== null && config.sort.slug !== null && config.sort.direction !== null) {
+                url = '/api/target_prices/tickers/' + config.ticker + '/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
+            } else if (config.anlaytic !== null && config.sort.slug !== null && config.sort.direction !== null) {
+                url = '/api/target_prices/analytics/' + config.anlaytic + '/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
+            } else if (config.analytic !== null) {
                 /**
                  * Analytic target prices
                  * 
@@ -140,12 +121,8 @@ var loader = (function() {
             if ( $(window).scrollTop() + $(window).height() >= this.last_offset && loading === false ) {
                 console.log(config);
                 loading = true;
-                /* Check the view */
-                if (config.type == 'grid') {
-                    loader.target_prices();
-                } else {
-                    loader.sorted();
-                }
+                /* View is managed by render */
+                loader.target_prices();
             }
         }
     };

@@ -57,7 +57,15 @@ urlpatterns = patterns(
         target_price_handler
     ),
     url(
+        r'^target_prices/tickers/(?P<ticker_slug>[\w-]+)/(?P<sort_by>[\w-]+)/(?P<sort_direction>[\w-]+)/(?P<page>\d+)/$',
+        target_price_handler
+    ),
+    url(
         r'^target_prices/analytics/(?P<analytic_slug>[\w-]+)/(?P<page>\d+)/$',
+        target_price_handler
+    ),
+    url(
+        r'^target_prices/analytics/(?P<analytic_slug>[\w-]+)/(?P<sort_by>[\w-]+)/(?P<sort_direction>[\w-]+)/(?P<page>\d+)/$',
         target_price_handler
     ),
     url(
