@@ -362,6 +362,7 @@ class StockPriceHandler(BaseHandler):
     def update(self, request):
         if request.content_type:
             data = request.data
+            # Ticker part
             ticker = Ticker
             try:
                 ticker = Ticker.objects.get(name=data['ticker'])
@@ -370,8 +371,13 @@ class StockPriceHandler(BaseHandler):
 
             ticker.last_stock_price = data['last_stock_price']
             ticker.last_stock_change = data['last_stock_change']
-
             ticker.save()
+
+            # TP part
+            target_prices = TargetPrice.objects.filter(ticker=ticker)
+            for target in target_prices:
+                target.change = round(float(target.price - data['last_stock_price'])/target.price*100*10)/10
+                target.save()
 
             return rc.ALL_OK
         else:

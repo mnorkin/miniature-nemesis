@@ -269,7 +269,7 @@ li{ list-style: none; }
     text-align: center;
 }
 .inner_target_prices .now{
-    visibility: hidden;
+    /*visibility: hidden;*/
 }
 
 .title .now::after{
@@ -306,10 +306,7 @@ li{ list-style: none; }
 .title .toggle, .title .now{
     top:32px;
 }
-
-
-
-.title.grid .chart .bar{
+.title.grid .chart .bar {
     position: relative;
     top:18px;
     left:-12px;

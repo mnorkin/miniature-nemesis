@@ -660,10 +660,19 @@ var render = (function() {
             /**
              * Pass the information to loader
              */
+            var analytic = $('.ta').attr('data-analytic');
+            if (analytic === undefined) {
+                analytic = null;
+            }
+            var ticker = $('.ta').attr('data-ticker');
+            if (ticker === undefined) {
+                ticker = null;
+            }
+
             config = {
                 'display': 'grid',
-                'analytic': null,
-                'ticker': $('.ta').attr('data-ticker'),
+                'analytic': analytic,
+                'ticker': ticker,
                 'sort': {
                     'slug': data.slug,
                     'direction': data.direction

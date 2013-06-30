@@ -10,6 +10,7 @@ from morbid.queries import front_page_query
 from morbid.queries import target_prices_for_ticker_query
 from morbid.queries import target_prices_for_analytic_query
 from morbid.queries import sort_by_features_query
+from morbid.queries import sort_by_change
 from morbid.queries import sort_by_features_ticker_query
 from morbid.queries import sort_by_features_analytic_query
 from morbid.queries import target_prices_query
@@ -322,10 +323,12 @@ class TargetPriceManager(models.Manager):
         """
         value = 0
         direction = 'up'
-        try:
-            value = round(float(row['price'] - row['last_stock_price'])/row['price']*100*10)/10
-        except ZeroDivisionError:
-            pass
+        # try:
+        #     # value = round(float(row['price'] - row['last_stock_price'])/row['price']*100*10)/10
+        # except ZeroDivisionError:
+        #     pass
+
+        value = row['change']
 
         if value < 0:
             direction = 'down'
@@ -528,7 +531,7 @@ class TargetPriceManager(models.Manager):
 
         return results_list
 
-    def sorted(self, feature_slug='accuracy', sort_direction='down', page=0, entries_per_page=20):
+    def sorted(self, sort_by='accuracy', sort_direction='down', page=0, entries_per_page=20):
         """
         Sorted target prices
         """
@@ -551,12 +554,19 @@ class TargetPriceManager(models.Manager):
             sort_direction = 'ASC'
 
         sort_cursor = connection.cursor()
-        sort_cursor.execute(sort_by_features_query % {
-            'feature_slug': feature_slug,
-            'sort_direction': sort_direction,
-            'limit': entries_per_page,
-            'offset': offset
-        })
+        if (sort_by == 'change'):
+            sort_cursor.execute(sort_by_change % {
+                'sort_direction': sort_direction,
+                'limit': entries_per_page,
+                'offset': offset
+            })
+        else:
+            sort_cursor.execute(sort_by_features_query % {
+                'sort_by': sort_by,
+                'sort_direction': sort_direction,
+                'limit': entries_per_page,
+                'offset': offset
+            })
         cursor = connection.cursor()
 
         for sort_row in self.dictfetchall(sort_cursor):

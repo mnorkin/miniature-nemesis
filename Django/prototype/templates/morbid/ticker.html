@@ -55,8 +55,10 @@
     					<a href="/feature_by_ticker/{{ ticker.slug }}/{{ feature.id }}/" class="{{ feature.slug }}">{{ feature.name }}</a>
     					<span></span>
     					<div class="info_box_content">
-    						{{feature.description|safe}}
-    						{% if feature.slug != 'profitability' %}<img src="/static/images/mini_graphs/{{feature.slug}}.png">{% endif %}
+    						{{ feature.description|safe }}
+    						{% if feature.slug != 'profitability' %}
+                                <img src="/static/images/mini_graphs/{{feature.slug}}.png">
+                            {% endif %}
     					</div>
     				</div>
     			{% endfor %}
@@ -67,7 +69,7 @@
     	<div class="analyser">
     		<ul class="bank" id="bank">
     			{% for target in target_prices %}
-    				<li name="{{ target.analytic_slug }}" class="passive">
+    				<li name="{{ target.analytic.slug }}" class="passive">
     					<span class="corp sliding">
     						<a class="text" href="{{target.analytic.get_absolute_url}}">
     							<span class="slid">{{ target.analytic }} </span>
@@ -95,7 +97,7 @@
     				<input type="text" name="sear" placeholder="Search" />
     				<ul>
     					{% for target in target_prices %}
-    					<li name="{{target.analytic_slug}}">{{target.analytic}}</li>
+    					<li name="{{target.analytic.slug}}">{{target.analytic}}</li>
     					{% endfor %}
     				</ul>
     			</div>

@@ -61,15 +61,24 @@ var loader = (function() {
 
             url = null;
             if (config.ticker !== null && config.sort.slug !== null && config.sort.direction !== null) {
+                /**
+                 * Ticker sort target prices
+                 */
+                console.log('Ticker sort');
                 url = '/api/target_prices/tickers/' + config.ticker + '/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
-            } else if (config.anlaytic !== null && config.sort.slug !== null && config.sort.direction !== null) {
-                url = '/api/target_prices/analytics/' + config.anlaytic + '/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
+            } else if (config.analytic !== null && config.sort.slug !== null && config.sort.direction !== null) {
+                /**
+                 * Analytic sort target prices
+                 */
+                console.log('Analytic sort');
+                url = '/api/target_prices/analytics/' + config.analytic + '/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
             } else if (config.analytic !== null) {
                 /**
                  * Analytic target prices
                  * 
                  * @type {String}
                  */
+                console.log('Analytic target prices');
                 url = '/api/target_prices/analytics/' + config.analytic + '/' + config.page + '/';
             } else if (config.ticker !== null) {
                 /**
@@ -77,6 +86,7 @@ var loader = (function() {
                  * 
                  * @type {String}
                  */
+                console.log('Ticker target prices');
                 url = '/api/target_prices/tickers/' + config.ticker + '/' + config.page + '/';
             } else if (config.sort.slug !== null && config.sort.direction !== null) {
                 /**
@@ -84,6 +94,7 @@ var loader = (function() {
                  * 
                  * @type {String}
                  */
+                console.log('Ticker target sort');
                 url = '/api/target_prices/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
             } else {
                 /**
@@ -91,6 +102,7 @@ var loader = (function() {
                  * 
                  * @type {String}
                  */
+                console.log('Ticker target');
                 url = '/api/target_prices/' + config.page + '/';
             }
 

@@ -76,7 +76,11 @@ def ticker(request, slug):
     #     )
     #     target_price_list.append(target_price)
 
-    target_price_list = TargetPrice.objects.ticker_target_prices(ticker.slug)
+    # target_price_list = TargetPrice.objects.ticker_target_prices(ticker.slug)
+    target_price_list = TargetPrice.objects.filter(
+        ticker__slug=ticker.slug
+    ).order_by('analytic', 'date').reverse().distinct('analytic')
+
     # Load feature info
     list_of_features = Feature.objects.all()
 
@@ -183,25 +187,29 @@ def analytic(request, slug):
         raise Http404
 
     # Load target price info
-    latest_target_prices = TargetPrice.objects.filter(
-        analytic_id=analytic.id
+    # latest_target_prices = TargetPrice.objects.filter(
+    #     analytic_id=analytic.id
+    # ).order_by('ticker', 'date').reverse().distinct('ticker')
+
+    # target_price_list = []
+
+    # feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
+    #     analytic_id=analytic.id,
+    #     ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct
+    # )
+
+    # for target_price in latest_target_prices:
+
+    #     feature_analytic_tickers = feature_analytic_tickers.filter(
+    #         ticker_id=target_price.ticker_id
+    #     )
+
+    #     target_price.fap = feature_analytic_tickers
+    #     target_price_list.append(target_price)
+
+    target_price_list = TargetPrice.objects.filter(
+        analytic__slug=analytic.slug
     ).order_by('ticker', 'date').reverse().distinct('ticker')
-
-    target_price_list = []
-
-    feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
-        analytic_id=analytic.id,
-        ticker_id__in=latest_target_prices.values_list('ticker_id', flat=True).distinct
-    )
-
-    for target_price in latest_target_prices:
-
-        feature_analytic_tickers = feature_analytic_tickers.filter(
-            ticker_id=target_price.ticker_id
-        )
-
-        target_price.fap = feature_analytic_tickers
-        target_price_list.append(target_price)
 
     # Load feature info
     list_of_features = Feature.objects.all()
@@ -288,7 +296,6 @@ def target_prices(self, analytic_slug=None, ticker_slug=None, page=0):
     return HttpResponse(t.render(c))
 
 
-
 def feature_by_ticker(self, slug, feature_id):
     """
     The feature return management on the Ticker page
@@ -319,7 +326,6 @@ def feature_by_ticker(self, slug, feature_id):
     return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))
 
 
-
 def feature_by_analytic(self, slug, feature_id):
     """
     The feature return management on the analytic page
@@ -343,7 +349,6 @@ def feature_by_analytic(self, slug, feature_id):
     ).values('value', 'ticker__name', 'ticker__slug')
 
     return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))
-
 
 
 def search(self, search_me):

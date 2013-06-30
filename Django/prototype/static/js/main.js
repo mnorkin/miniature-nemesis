@@ -936,6 +936,15 @@ var tp = (function() {
             return false;
         }
 
+        var analytic = $('.ta').attr('data-analytic');
+        if (analytic === undefined) {
+            analytic = null;
+        }
+        var ticker = $('.ta').attr('data-ticker');
+        if (ticker === undefined) {
+            ticker = null;
+        }
+
         var url = $(this).attr('href');
         var that = this;
         $('.inner_buttons a').removeClass('active');
@@ -950,8 +959,8 @@ var tp = (function() {
                 $('.inner_target_prices').removeClass('hidden');
                 config = {
                     'display': 'grid',
-                    'analytic': null,
-                    'ticker': $('.ta').attr('data-ticker'),
+                    'analytic': analytic,
+                    'ticker': ticker,
                     'sort': {
                         'slug': null,
                         'direction': null
