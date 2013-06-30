@@ -319,7 +319,7 @@ li{ list-style: none; }
         background: url('../images/bar_1q.png') 0 20px no-repeat;
         color:#b78f65;
     }
-    .title.grid .chart .bar > li span{
+    .title.grid .chart .bar > li span {
         height: 17px;
         margin-top:3px;
         display: inline-block;
@@ -350,7 +350,7 @@ li{ list-style: none; }
     background: red;
 }
 
-.title .bar_tooltip{
+.title .bar_tooltip {
     position: absolute;
     border:1px solid #c2ae9a;
     color:#c2ae9a;
@@ -363,7 +363,7 @@ li{ list-style: none; }
     font-size: 12px;
     white-space: nowrap;
 }
-.title .chart .tooltip_point{
+.title .chart .tooltip_point {
     border-top: 3px solid transparent;
     border-right: 5px solid #fff;
     border-bottom: 3px solid transparent;
@@ -373,7 +373,7 @@ li{ list-style: none; }
     z-index: 11;
 }
 
-.title.grid .chart .circle{
+.title.grid .chart .circle {
     position: absolute;
     width:81px;
     height: 81px;
@@ -382,7 +382,7 @@ li{ list-style: none; }
     right: 12px;
     text-align: center;
 }
-.title.grid .chart .circle{
+.title.grid .chart .circle {
     position: absolute;
     width: 90px;
     height: 90px;
@@ -1047,10 +1047,14 @@ li{ list-style: none; }
 #chart.profitability{
     height: 550px;
     left: -13px;
+    overflow-x:scroll;
+    overflow-y:hidden;
 }
 #chart.reach_time{
     left:-28px;
     height: 550px;
+    overflow-y:scroll;
+    overflow-x:hidden;
 }
 #chart.accuracy{
     height: 425px;

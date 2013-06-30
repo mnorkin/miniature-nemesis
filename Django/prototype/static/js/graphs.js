@@ -26,6 +26,13 @@ var graphs = (function () {
     d3.selectAll("#" + _element_id + " svg").remove();
 
     return {
+
+        /**
+         * Seting up the URL
+         * 
+         * @param  {[type]} url
+         * @return {[type]}
+         */
         set_url: function (url) {
             /**
              * Setting url
@@ -33,10 +40,22 @@ var graphs = (function () {
              */
             _url = url;
         },
+
+        /**
+         * Return the best analytic
+         * 
+         * @return {[type]}
+         */
         get_best_analytic: function () {
             return best_analytic;
         },
 
+        /**
+         * Top bar
+         * 
+         * @param  {[type]} slug
+         * @return {[type]}
+         */
         topbar_show: function (slug) {
             if (active_topbar == slug) {
                 return;
@@ -47,10 +66,22 @@ var graphs = (function () {
             d3.select(".bank li[name='" + slug + "']").attr('class', 'active').style('background-color', '#FAFAFA').transition().duration(300).style('background-color', '#fff');
         },
 
+        /**
+         * Hiding the top bar
+         * @return {[type]}
+         */
         topbar_hide: function () {
             d3.selectAll(".bank li[class='active']").attr('class', 'passive');
         },
 
+        /**
+         * Tooltip
+         * 
+         * @param  {[type]} top
+         * @param  {[type]} left
+         * @param  {[type]} text
+         * @return {[type]}
+         */
         tooltip_show: function (top, left, text) {
             d3.selectAll("#chart div").remove();
             d3.select("#chart")
@@ -65,6 +96,10 @@ var graphs = (function () {
                 .style('display', "block").style("opacity", 0).transition().duration(200).style("opacity", 1);
         },
 
+        /**
+         * Mouse out event
+         * @return {[type]}
+         */
         on_mouseout: function () {
             if (d3.select(this).attr('selectd') == 0) {
                 d3.select(this).attr("fill", d3.select(this).attr('origin_fill'));
@@ -72,31 +107,42 @@ var graphs = (function () {
             d3.select(this).style('opacity', 1);
         },
 
+        /**
+         * Click event
+         * 
+         * @return {[type]}
+         */
         on_click: function(){
             var name = d3.select(this).attr('name');
             $('.in_graph .sear li[name='+name+']').trigger('click');
         },
 
-        populate: function (json) {
+        /**
+         * Populates something
+         * 
+         * @param  {[type]} data
+         * @return {[type]}
+         */
+        populate: function (data) {
             var tmp_obj, f_data = [];
 
-            for (i = 0; i < json.length; i++) {
+            for (i = 0; i < data.length; i++) {
                 tmp_obj = {};
                 // TODO: why values come negative?
                 // set values max 100, min 0
-                tmp_obj.value = Math.max(0, json[i].value);
+                tmp_obj.value = Math.max(0, data[i].value);
                 tmp_obj.value = Math.min(100, tmp_obj.value);
 
                 // analytics (banks) in graph
-                if (json[i].ticker__slug === undefined) {
-                    tmp_obj.name = json[i].analytic__name;
-                    tmp_obj.slug = json[i].analytic__slug;
+                if (data[i].ticker__slug === undefined) {
+                    tmp_obj.name = data[i].analytic__name;
+                    tmp_obj.slug = data[i].analytic__slug;
                     tmp_obj.type = 'analytic';
 
                     // ticker (company) in graph
                 } else {
-                    tmp_obj.name = json[i].ticker__name;
-                    tmp_obj.slug = json[i].ticker__slug;
+                    tmp_obj.name = data[i].ticker__name;
+                    tmp_obj.slug = data[i].ticker__slug;
                     tmp_obj.type = 'ticker';
                 }
 
@@ -110,45 +156,18 @@ var graphs = (function () {
             return f_data;
         },
 
+        /**
+         * Return the data by ??
+         * 
+         * @param  {[type]} d
+         * @return {[type]}
+         */
         get__data: function (d) {
             var new_d = [];
             for (i = 0; i < d.length; i++) {
                 new_d.push(d[i].value);
             }
             return new_d;
-        },
-
-        /* Reorder full_data array, move active element to begin of array */
-        reorder_UNUSED: function(order_elem_name){
-            var elem, to_end = true;
-            switch(graphs.current_slug){
-                case 'profitability':
-                case 'impact_to_market':
-                case 'accuracy':
-                to_end = false;
-                break;
-            }
-
-            for (var i = 0 ; i < full_data.length; i++) {
-                if(full_data[i].slug == order_elem_name){
-                    if(to_end === true){
-                        full_data.push(full_data[i]);
-                        full_data.splice(i, 1);
-                    }else{
-                        full_data.unshift(full_data[i]);
-                        full_data.splice(i+1, 1);
-                    }
-                    break;
-                }
-            }
-            return;
-        },
-        draw_reordered_UNUSED: function(){
-
-            d3.selectAll("#" + _element_id + " svg").remove();
-            _data = graphs.get__data(full_data);
-            var graph_fx = eval('graphs.draw_'+graphs.current_slug);
-            graph_fx(); // run
         },
 
         aggressiveness: function (url) {
@@ -173,14 +192,17 @@ var graphs = (function () {
             return graphs;
         },
 
+        /**
+         * Profitability request
+         * @param  {[type]} url
+         * @return {[type]}
+         */
         profitability: function (url) {
-            /**
-             * Profitability request
-             */
             d3.json(host + url, function (error, json) {
                 if (!error) {
 
                     full_data = graphs.populate(json);
+                    full_data = full_data.slice(1, 30);
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
@@ -225,6 +247,7 @@ var graphs = (function () {
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
+                    // full_data = full_data.slice(1,40);
                     _data = graphs.get__data(full_data);
                     graphs.draw_reach_time();
                     tp.in_graph_select_active_elements();
@@ -493,14 +516,28 @@ var graphs = (function () {
             /*
              * Draw profitability graph
              */
+            $(".profitability").niceScroll({
+                'cursorborder': '0px',
+                'cursorcolor': '#cdcdcd',
+                'cursorwidth': '6px',
+                'horizrailenabled': true
+            });
 
             var linear_data = [0, 20, 40, 60, 80, 100];
 
-            var w = $("#" + _element_id).width() - 20,
-                h = $("#" + _element_id).height() - 20,
-                rhw = h / 106,
-                translate_w = w / 16,
-                translate = "translate(" + translate_w / 3 * 2 + "," + h + ")";
+            var expand_width = 0;
+
+            if (_data.length > 35) {
+                expand_width = (_data.length - 35) * 15;
+                
+            }
+
+            var w = $("#" + _element_id).width() - 20 + expand_width;
+            var h = $("#" + _element_id).height() - 20;
+            var rhw = h / 106;
+            // var translate_w = w / 16;
+            var translate_w = 20;
+            var translate = "translate(" + translate_w / 3 * 2 + "," + h + ")";
 
             var linear = d3.select("#" + _element_id).append("svg:svg")
                 .attr("width", w)
@@ -866,21 +903,37 @@ var graphs = (function () {
             return graphs;
         },
 
-
-
-
+        /**
+         * Drawing the reach time
+         * 
+         * @return {[type]}
+         */
         draw_reach_time: function () {
+
             /**
-             ** Method to draw reach time
-             ***/
+             * Apply nice scroll to the context
+             */
+            $(".reach_time").niceScroll({
+                'cursorborder': '0px',
+                'cursorcolor': '#cdcdcd',
+                'cursorwidth': '6px',
+                'horizrailenabled': false
+            });
             var linear_data = [0, 20, 40, 60, 80, 100];
 
+            var expand_height = 0;
+            if (_data.length > 20) {
+                expand_height = (_data.length - 20) * 15;
+            }
+
             var w = $("#" + _element_id).width(),
-                h = $("#" + _element_id).height(),
+                h = $("#" + _element_id).height() + expand_height,
                 rhw = w / 109,
                 translate_w = w / 16,
-                graph_height = h - 15,
-                translate = "translate(" + translate_w / 3 * 2 + "," + h + ")";
+                graph_height = h - 15
+
+            var translate = "translate(" + translate_w / 3 * 2 + "," + h + ")";
+            // var translate = "";
 
             var linear = d3.select("#" + _element_id).append("svg:svg")
                 .attr("width", w)
@@ -890,12 +943,12 @@ var graphs = (function () {
                 .append("svg:rect")
                 .attr('fill', "#f4ede7")
                 .attr('height', function () {
-                return graph_height - 25;
-            })
+                    return graph_height - 25;
+                })
                 .attr('width', 1)
                 .attr("x", function (d, i) {
-                return d * rhw;
-            })
+                    return d * rhw;
+                })
                 .attr("y", -graph_height)
                 .attr("transform", translate);
 
@@ -908,55 +961,55 @@ var graphs = (function () {
                 .style("fill", "#dec7b5")
                 .attr("dy", -10)
                 .attr("dx", function (d, i) {
-                return d * rhw - (-0.7 + new String(d).length*2.9); // can't center with text-anchor, because of firefox and opera bug 
-            })
+                    return d * rhw - (-0.7 + new String(d).length*2.9); // can't center with text-anchor, because of firefox and opera bug 
+                })
                 .text(function (d) {
-                return d;
-            })
+                    return d;
+                })
                 .attr("transform", translate);
 
             linear.selectAll("#" + _element_id).data(_data).enter()
                 .append("svg:rect")
                 .attr("fill", "#e7d9cd")
                 .attr('width', function (d, i) {
-                return d * rhw;
-            })
+                    return d * rhw;
+                })
                 .attr('height', 1)
                 .attr('y', function (d, i) {
-                return -graph_height / (_data.length + 1) * (i + 1);
-            })
+                    return -graph_height / (_data.length + 1) * (i + 1) - 10;
+                })
                 .attr('x', 0)
                 .attr('txt', function (d, i) {
-                return d + ' %';
-            })
+                    return d + ' %';
+                })
                 .attr("transform", translate);
 
             linear.selectAll('#' + _element_id).data(_data).enter()
                 .append('svg:circle')
                 .attr('cx', function (d, i) {
-                return d * rhw;
-            })
+                    return d * rhw;
+                })
                 .attr('cy', function (d, i) {
-                return -graph_height / (_data.length + 1) * (i + 1);
-            })
+                    return -graph_height / (_data.length + 1) * (i + 1) - 10;
+                })
                 .attr('r', 6)
                 .attr('fill', '#91bcc5')
                 .attr('origin_fill', '#91bcc5')
                 .attr('selectd', 0)
                 .attr('txt', function (d, i) {
-                return _data[i] + ' %';
-            })
+                    return _data[i] + ' %';
+                })
                 .attr('name', function (d, i) {
-                return full_data[i].slug;
-            })
+                    return full_data[i].slug;
+                })
                 .on('mouseover', function (d, i) {
-                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
-                var top = h + parseFloat(d3.select(this).attr('cy')) - 37;
-                var left = translate_w / 3 * 2 + parseFloat(d3.select(this).attr('cx')) - 23;
-                var text = d3.select(this).attr('txt');
-                graphs.tooltip_show(top, left, text);
-                graphs.topbar_show(full_data[i].slug);
-            })
+                    d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
+                    var top = h + parseFloat(d3.select(this).attr('cy')) - 37;
+                    var left = translate_w / 3 * 2 + parseFloat(d3.select(this).attr('cx')) - 23;
+                    var text = d3.select(this).attr('txt');
+                    graphs.tooltip_show(top, left, text);
+                    graphs.topbar_show(full_data[i].slug);
+                })
                 .on("mouseout", graphs.on_mouseout)
                 .on("click" , graphs.on_click)
                 .attr("transform", translate);
