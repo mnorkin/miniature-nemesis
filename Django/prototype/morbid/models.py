@@ -12,7 +12,9 @@ from morbid.queries import target_prices_for_analytic_query
 from morbid.queries import sort_by_features_query
 from morbid.queries import sort_by_change
 from morbid.queries import sort_by_features_ticker_query
+from morbid.queries import sort_by_change_ticker_query
 from morbid.queries import sort_by_features_analytic_query
+from morbid.queries import sort_by_change_analytic_query
 from morbid.queries import target_prices_query
 from morbid.queries import features_query
 
@@ -461,13 +463,21 @@ class TargetPriceManager(models.Manager):
             sort_direction = 'ASC'
 
         sort_cursor = connection.cursor()
-        sort_cursor.execute(sort_by_features_ticker_query % {
-            'ticker_slug': ticker_slug,
-            'sort_by': sort_by,
-            'sort_direction': sort_direction,
-            'limit': entries_per_page,
-            'offset': offset
-        })
+        if sort_by == 'change':
+            sort_cursor.execute(sort_by_change_ticker_query % {
+                'ticker_slug': ticker_slug,
+                'sort_direction': sort_direction,
+                'limit': entries_per_page,
+                'offset': offset
+            })
+        else:
+            sort_cursor.execute(sort_by_features_ticker_query % {
+                'ticker_slug': ticker_slug,
+                'sort_by': sort_by,
+                'sort_direction': sort_direction,
+                'limit': entries_per_page,
+                'offset': offset
+            })
         cursor = connection.cursor()
 
         for sort_row in self.dictfetchall(sort_cursor):
@@ -503,13 +513,21 @@ class TargetPriceManager(models.Manager):
             sort_direction = 'ASC'
 
         sort_cursor = connection.cursor()
-        sort_cursor.execute(sort_by_features_analytic_query % {
-            'analytic_slug': analytic_slug,
-            'sort_by': sort_by,
-            'sort_direction': sort_direction,
-            'limit': entries_per_page,
-            'offset': offset
-        })
+        if sort_by == 'change':
+            sort_cursor.execute(sort_by_change_analytic_query % {
+                'analytic_slug': analytic_slug,
+                'sort_direction': sort_direction,
+                'limit': entries_per_page,
+                'offset': offset
+            })
+        else:
+            sort_cursor.execute(sort_by_features_analytic_query % {
+                'analytic_slug': analytic_slug,
+                'sort_by': sort_by,
+                'sort_direction': sort_direction,
+                'limit': entries_per_page,
+                'offset': offset
+            })
         cursor = connection.cursor()
 
         for sort_row in self.dictfetchall(sort_cursor):
