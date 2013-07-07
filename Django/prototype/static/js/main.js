@@ -89,7 +89,7 @@ var tp = (function() {
             // In analyse page, on document ready, load first property or take from hash!
             var feature = hash_get('feature');
             if (feature == 'target_prices') {
-                // $('.inner_buttons a.ta').trigger('click');
+                $('.inner_buttons a.ta').trigger('click');
             } else if (feature.length) {
                 $('.analyse_menu div[name=' + feature + '] a').trigger('click');
             } else {
@@ -956,7 +956,10 @@ var tp = (function() {
                 'opacity': 0
             }, 50, function() {
                 $(this).addClass('hidden');
-                $('.inner_target_prices').removeClass('hidden');
+                $('.inner_target_prices').removeClass('hidden').css('opacity', 0);
+                $('.inner_target_prices').animate({
+                    'opacity': 1
+                }, 100);
                 config = {
                     'display': 'grid',
                     'analytic': analytic,
@@ -976,7 +979,7 @@ var tp = (function() {
             $('.inner_target_prices').animate({
                 'opacity': 0
             }, 50, function() {
-                $(this).addClass('hidden').html('');
+                $(this).addClass('hidden');
 
                 $('.inner_content').removeClass('hidden').css('opacity', 0);
                 $('.inner_content').animate({

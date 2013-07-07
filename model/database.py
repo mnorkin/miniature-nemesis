@@ -404,6 +404,7 @@ class database:
                     SELECT * FROM entries \
                     WHERE ticker = '%s' \
                     AND price0 != 0 \
+                    AND pub_date + INTERVAL '1 year' < NOW() \
                     ) p \
                 GROUP BY pub_date, analytic, price0 \
                 ORDER BY analytic, pub_date desc, price0;" % (

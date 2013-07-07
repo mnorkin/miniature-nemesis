@@ -101,6 +101,13 @@ var render = (function() {
             }
         },
 
+        clear_element: function() {
+            if (reload_now_value === true) {
+                console.log('Clearing the element');
+                $('#target-price-list').html('');
+            }
+        },
+
         /**
          * Enable reload of now value
          * 
@@ -130,6 +137,7 @@ var render = (function() {
             var j = 0;
             var element = null;
             var graph_data = null;
+            render.clear_element();
             target_price_template = $("#target_price_template").html();
             for (i=0; i < data.length; i++) {
                 if (previous_date === null) {

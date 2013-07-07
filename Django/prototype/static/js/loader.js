@@ -57,8 +57,6 @@ var loader = (function() {
                 config = _config;
             }
 
-            console.log(config);
-
             url = null;
             if (config.ticker !== null && config.sort.slug !== null && config.sort.direction !== null) {
                 /**
@@ -111,8 +109,10 @@ var loader = (function() {
                  * No more data from the server -- kill the loader
                  */
                 if (data.length < 1) {
+                    console.log('Data length is FAIL');
                     loading = true;
                 } else {
+                    console.log('Data length is OK');
                     render.target_prices(data);
                     loading = false;
                 }
