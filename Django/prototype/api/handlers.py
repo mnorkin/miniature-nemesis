@@ -376,7 +376,9 @@ class StockPriceHandler(BaseHandler):
             # TP part
             target_prices = TargetPrice.objects.filter(ticker=ticker)
             for target in target_prices:
-                target.change = round(float(target.price - data['last_stock_price'])/target.price*100*10)/10
+                target.change = round(
+                    float(
+                        target.price - data['last_stock_price'])/target.price*100*10)/10
                 target.save()
 
             return rc.ALL_OK
@@ -483,20 +485,43 @@ class TargetPriceHandler(BaseHandler):
         page=0, sort_by=None, sort_direction=None
     ):
         if ticker_slug and sort_by and sort_direction:
-            return TargetPrice.objects.sorted_ticker_target_prices(ticker_slug, sort_by, sort_direction, page)
+            """
+            Ticker, sort, direction
+            """
+            return TargetPrice.objects.sorted_ticker_target_prices(
+                ticker_slug, sort_by, sort_direction, page)
         elif analytic_slug and sort_by and sort_direction:
-            return TargetPrice.objects.sorted_analytic_target_prices(analytic_slug, sort_by, sort_direction, page)
+            """
+            Analytic, sort, direction
+            """
+            return TargetPrice.objects.sorted_analytic_target_prices(
+                analytic_slug, sort_by, sort_direction, page)
         elif ticker_slug and analytic_slug:
+            """
+            Ticker, Analytic
+            """
             ticker = Ticker.objects.get(slug=ticker_slug)
             analytic = Analytic.objects.get(slug=analytic_slug)
             return target_data(ticker.name, analytic.name)
         elif ticker_slug and not analytic_slug:
+            """
+            Only ticker
+            """
             return TargetPrice.objects.ticker_target_prices(ticker_slug, page)
         elif not ticker_slug and analytic_slug:
+            """
+            Only Analytic
+            """
             return TargetPrice.objects.analytic_target_prices(analytic_slug, page)
         elif sort_by and sort_direction:
+            """
+            Only sort
+            """
             return TargetPrice.objects.sorted(sort_by, sort_direction, page)
         else:
+            """
+            Default
+            """
             return TargetPrice.objects.recent_target_prices(page)
 
     def create(self, request):

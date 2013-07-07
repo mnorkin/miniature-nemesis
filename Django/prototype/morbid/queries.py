@@ -55,13 +55,6 @@ sort_by_change = "\
     RIGHT JOIN morbid_analytic ON ( \
         morbid_targetprice.analytic_id = morbid_analytic.id \
     ) \
-    RIGHT JOIN morbid_featureanalyticticker ON ( \
-        morbid_targetprice.analytic_id = morbid_featureanalyticticker.analytic_id AND \
-        morbid_targetprice.ticker_id = morbid_featureanalyticticker.ticker_id \
-    ) \
-    RIGHT JOIN morbid_feature ON ( \
-        morbid_featureanalyticticker.feature_id = morbid_feature.id\
-    )\
     RIGHT JOIN morbid_ticker ON ( \
         morbid_targetprice.ticker_id = morbid_ticker.id \
     )\
@@ -78,7 +71,9 @@ sort_by_change = "\
             DESC LIMIT 1 OFFSET 5 \
             ) AND\
         morbid_ticker.display = true \
-    ORDER BY morbid_targetprice.change %(sort_direction)s \
+    ORDER BY \
+        morbid_targetprice.change %(sort_direction)s, \
+        morbid_targetprice.date DESC\
     LIMIT %(limit)s OFFSET %(offset)s \
 "
 
