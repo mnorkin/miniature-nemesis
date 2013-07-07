@@ -347,7 +347,10 @@ class TargetPriceManager(models.Manager):
         """
         from django.db import connection
         features_cursor = connection.cursor()
-        features_cursor.execute(features_query, [row['ticker_id'], row['analytic_id']])
+        features_cursor.execute(features_query % { 
+            'ticker_id': row['ticker_id'], 
+            'analytic_id': row['analytic_id']
+        })
         features = []
         for feature in self.dictfetchall(features_cursor):
             features.append({
@@ -392,7 +395,7 @@ class TargetPriceManager(models.Manager):
         Define offset
         """
         offset = 0
-        if page != 0:
+        if int(page) != 0:
             offset = (int(page)*entries_per_page)+1
 
         """
@@ -402,7 +405,10 @@ class TargetPriceManager(models.Manager):
         """
         Describe queries
         """
-        cursor.execute(front_page_query, [entries_per_page, offset])
+        cursor.execute(front_page_query % {
+            'limit': entries_per_page,
+            'offset': offset
+        })
         return self.construct_targets(cursor)
 
     def analytic_target_prices(self, analytic_slug=None, page=0, entries_per_page=20):
@@ -415,16 +421,18 @@ class TargetPriceManager(models.Manager):
         Define offset
         """
         offset = 0
-        if page != 0:
+        if int(page) != 0:
             offset = (int(page)*entries_per_page)+1
 
         """
         Connection cursors
         """
         cursor = connection.cursor()
-        cursor.execute(target_prices_for_analytic_query, [
-            analytic_slug, entries_per_page, offset
-        ])
+        cursor.execute(target_prices_for_analytic_query % {
+            'analytic_slug': analytic_slug, 
+            'limit': entries_per_page, 
+            'offset': offset
+        })
         return self.construct_targets(cursor)
 
     def ticker_target_prices(self, ticker_slug=None, page=0, entries_per_page=20):
@@ -437,25 +445,27 @@ class TargetPriceManager(models.Manager):
         Define offset
         """
         offset = 0
-        if page != 0:
+        if int(page) != 0:
             offset = (int(page)*entries_per_page)+1
 
         """
         Connection cursors
         """
         cursor = connection.cursor()
-        cursor.execute(target_prices_for_ticker_query, [
-            ticker_slug, entries_per_page, offset
-        ])
+        cursor.execute(target_prices_for_ticker_query % {
+            'ticker_slug': ticker_slug,
+            'limit': entries_per_page, 
+            'offset': offset
+        })
         return self.construct_targets(cursor)
 
-    def sorted_ticker_target_prices(self, ticker_slug, sort_by, sort_direction, page=0, entries_per_page=20):
+    def sorted_ticker_target_prices(self, ticker_slug, sort_by, sort_direction, page=0, limit=20):
         from django.db import connection
         results_list = []
 
         offset = 0
-        if page != 0:
-            offset = (int(page)*entries_per_page)+1
+        if int(page) != 0:
+            offset = (int(page)*limit) + 1
 
         if sort_direction == 'up':
             sort_direction = 'DESC'
@@ -464,24 +474,32 @@ class TargetPriceManager(models.Manager):
 
         sort_cursor = connection.cursor()
         if sort_by == 'change':
-            sort_cursor.execute(sort_by_change_ticker_query % {
-                'ticker_slug': ticker_slug,
-                'sort_direction': sort_direction,
-                'limit': entries_per_page,
-                'offset': offset
-            })
+            sort_cursor.execute(
+                sort_by_change_ticker_query % {
+                    'ticker_slug': ticker_slug,
+                    'sort_direction': sort_direction,
+                    'limit': limit,
+                    'offset': offset
+                }
+            )
         else:
-            sort_cursor.execute(sort_by_features_ticker_query % {
-                'ticker_slug': ticker_slug,
-                'sort_by': sort_by,
-                'sort_direction': sort_direction,
-                'limit': entries_per_page,
-                'offset': offset
-            })
+            sort_cursor.execute(
+                sort_by_features_ticker_query % {
+                    'ticker_slug': ticker_slug,
+                    'sort_by': sort_by,
+                    'sort_direction': sort_direction,
+                    'limit': limit,
+                    'offset': offset
+                }
+            )
         cursor = connection.cursor()
 
         for sort_row in self.dictfetchall(sort_cursor):
-            cursor.execute(target_prices_query, [sort_row['target_id']])
+            cursor.execute(
+                target_prices_query % {
+                    'target_id': sort_row['target_id']
+                }
+            )
             row = self.dictfetchall(cursor)[0]
 
             results_list.append({
@@ -499,13 +517,13 @@ class TargetPriceManager(models.Manager):
 
         return results_list
 
-    def sorted_analytic_target_prices(self, analytic_slug, sort_by, sort_direction, page=0, entries_per_page=20):
+    def sorted_analytic_target_prices(self, analytic_slug, sort_by, sort_direction, page=0, limit=20):
         from django.db import connection
         results_list = []
 
         offset = 0
-        if page != 0:
-            offset = (int(page)*entries_per_page)+1
+        if int(page) != 0:
+            offset = (int(page)*limit)+1
 
         if sort_direction == 'up':
             sort_direction = 'DESC'
@@ -513,25 +531,34 @@ class TargetPriceManager(models.Manager):
             sort_direction = 'ASC'
 
         sort_cursor = connection.cursor()
+
         if sort_by == 'change':
-            sort_cursor.execute(sort_by_change_analytic_query % {
-                'analytic_slug': analytic_slug,
-                'sort_direction': sort_direction,
-                'limit': entries_per_page,
-                'offset': offset
-            })
+            sort_cursor.execute(
+                sort_by_change_analytic_query % {
+                    'analytic_slug': analytic_slug,
+                    'sort_direction': sort_direction,
+                    'limit': limit,
+                    'offset': offset
+                }
+            )
         else:
-            sort_cursor.execute(sort_by_features_analytic_query % {
-                'analytic_slug': analytic_slug,
-                'sort_by': sort_by,
-                'sort_direction': sort_direction,
-                'limit': entries_per_page,
-                'offset': offset
-            })
+            sort_cursor.execute(
+                sort_by_features_analytic_query % {
+                    'analytic_slug': analytic_slug,
+                    'sort_by': sort_by,
+                    'sort_direction': sort_direction,
+                    'limit': limit,
+                    'offset': offset
+                }
+            )
         cursor = connection.cursor()
 
         for sort_row in self.dictfetchall(sort_cursor):
-            cursor.execute(target_prices_query, [sort_row['target_id']])
+            cursor.execute(
+                target_prices_query % {
+                    'target_id': sort_row['target_id']
+                }
+            )
             row = self.dictfetchall(cursor)[0]
 
             results_list.append({
@@ -540,6 +567,7 @@ class TargetPriceManager(models.Manager):
                 'ticker_long_name': row['ticker_long_name'],
                 'analytic': row['analytic_name'],
                 'analytic_slug': row['analytic_slug'],
+                'analytic_name': row['analytic_name'],
                 'price': row['price'],
                 'hash': self.construct_hash(row),
                 'features': self.construct_features(row),
@@ -558,7 +586,7 @@ class TargetPriceManager(models.Manager):
         Define offset
         """
         offset = 0
-        if page != 0:
+        if int(page) != 0:
             offset = (int(page)*entries_per_page)+1
 
         """
@@ -573,25 +601,31 @@ class TargetPriceManager(models.Manager):
 
         sort_cursor = connection.cursor()
         if (sort_by == 'change'):
-            sort_cursor.execute(sort_by_change % {
-                'sort_direction': sort_direction,
-                'limit': entries_per_page,
-                'offset': offset
-            })
+            sort_cursor.execute(
+                sort_by_change % {
+                    'sort_direction': sort_direction,
+                    'limit': entries_per_page,
+                    'offset': offset
+                }
+            )
         else:
-            sort_cursor.execute(sort_by_features_query % {
-                'sort_by': sort_by,
-                'sort_direction': sort_direction,
-                'limit': entries_per_page,
-                'offset': offset
-            })
+            sort_cursor.execute(
+                sort_by_features_query % {
+                    'sort_by': sort_by,
+                    'sort_direction': sort_direction,
+                    'limit': entries_per_page,
+                    'offset': offset
+                }
+            )
         cursor = connection.cursor()
 
         for sort_row in self.dictfetchall(sort_cursor):
             """
             Appending results
             """
-            cursor.execute(target_prices_query, [sort_row['target_id']])
+            cursor.execute(target_prices_query % {
+                'target_id': sort_row['target_id']
+            })
             row = self.dictfetchall(cursor)[0]
 
             results_list.append({

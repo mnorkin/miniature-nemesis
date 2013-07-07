@@ -480,9 +480,13 @@ class TargetPriceHandler(BaseHandler):
     model = TargetPrice
 
     def read(
-        self, request,
-        ticker_slug=None, analytic_slug=None,
-        page=0, sort_by=None, sort_direction=None
+        self, 
+        request,
+        ticker_slug=None, 
+        analytic_slug=None,
+        page=0, 
+        sort_by=None, 
+        sort_direction=None
     ):
 
         if ticker_slug and sort_by and sort_direction:
