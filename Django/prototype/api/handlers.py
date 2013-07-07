@@ -376,10 +376,14 @@ class StockPriceHandler(BaseHandler):
             # TP part
             target_prices = TargetPrice.objects.filter(ticker=ticker)
             for target in target_prices:
-                target.change = round(
-                    float(
-                        target.price - data['last_stock_price'])/target.price*100*10)/10
-                target.save()
+                if data['last_stock_price'] != 0:
+                    target.change = round(
+                        float(
+                            target.price - data['last_stock_price'])/target.price*100*10)/10
+                    target.save()
+                else:
+                    target.change = 0.00
+                    target.save()
 
             return rc.ALL_OK
         else:
