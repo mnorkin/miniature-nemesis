@@ -399,19 +399,35 @@ class database:
         on the specitic ticker
         """
         if ticker:
-            query = "SELECT DISTINCT ON (analytic) analytic, pub_date, price0 \
-                FROM ( \
-                    SELECT * FROM entries \
-                    WHERE ticker = '%s' \
-                    AND price0 != 0 \
-                    AND pub_date + INTERVAL '1 year' < NOW() \
-                    ) p \
-                GROUP BY pub_date, analytic, price0 \
-                ORDER BY analytic, pub_date desc, price0;" % (
-                    re.escape(ticker))
-            self.cursor.execute(query)
+            # query = "SELECT DISTINCT ON (analytic) analytic, pub_date, price0 \
+            #     FROM ( \
+            #         SELECT * FROM entries \
+            #         WHERE ticker = '%s' \
+            #         AND price0 != 0 \
+            #         AND pub_date + INTERVAL '1 year' > NOW() \
+            #         ) p \
+            #     GROUP BY pub_date, analytic, price0 \
+            #     ORDER BY analytic, pub_date desc, price0;" % (
+            #         re.escape(ticker))
+            # self.cursor.execute(query)
+            # 
+            query = "SELECT \
+                pub_date, analytic, price0\
+            FROM \
+                entries \
+            WHERE \
+                ticker = '%s' AND \
+                pub_date + INTERVAL '1 year' > NOW() \
+            GROUP BY \
+                pub_date, analytic, price0 \
+            ORDER BY \
+                pub_date DESC, analytic, price0;"
+
+            self.cursor.execute(query % re.escape(ticker))
 
             data = []
+
+            # print self.cursor.fetchall()
 
             for row in self.cursor.fetchall():
                 data.append(row[2])
