@@ -462,8 +462,6 @@ class TickerHandler(BaseHandler):
                 ticker.consensus_avg = data['consensus_avg']
             if 'consensus_max' in data:
                 ticker.consensus_max = data['consensus_max']
-            if 'display' in data:
-                ticker.display = data['display']
 
             ticker.save()
 
