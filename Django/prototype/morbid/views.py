@@ -369,11 +369,11 @@ def search(self, search_me):
     )[:5]
 
     raw_tickers_names = Ticker.objects.filter(
-        Q(name=search_me) | Q(name__icontains=search_me)
+        ( Q(name=search_me) | Q(name__icontains=search_me) ) & Q(display=True)
     ).extra(select={'length': 'Length(name)'}).order_by('length')[:5]
 
     raw_tickers_long_names = Ticker.objects.filter(
-        Q(long_name=search_me) | Q(long_name__icontains=search_me)
+        ( Q(long_name=search_me) | Q(long_name__icontains=search_me) ) & Q(display=True)
     ).extra(select={'length': 'Length(name)'}).order_by('length')[:5]
 
     for analytic in raw_analytics:

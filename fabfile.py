@@ -451,7 +451,8 @@ def django_production_configuration(opts):
         sudo('createdb fp%(version)s-morbid' % opts, user='postgres')
 
     virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
-    virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --noinput' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py migrate' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --link --noinput' % opts)
 
 
 def django_production_backup():

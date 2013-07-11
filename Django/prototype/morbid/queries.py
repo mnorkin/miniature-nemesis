@@ -439,3 +439,14 @@ features_query = "\
         morbid_featureanalyticticker.analytic_id = %(analytic_id)s \
     ORDER BY morbid_feature.name \
 "
+
+# ticker_search_query = "\
+#     SELECT DISTINCT \
+#         morbid_ticker.name, \
+#         morbid_ticker.slug \
+#     FROM \
+#         morbid_ticker \
+#     WHERE \
+#         morbid_ticker.name LIKE %(search_for)s% OR \
+#         morbid_ticker.long_name LIKE %(search_for)s% \
+#     ORDER BY \"
