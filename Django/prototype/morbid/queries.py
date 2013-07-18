@@ -99,7 +99,8 @@ target_prices_for_ticker_query = "\
             morbid_targetprice.ticker_id = morbid_ticker.id \
         ) \
         WHERE \
-            morbid_ticker.slug = '%(ticker_slug)s' \
+            morbid_ticker.slug = '%(ticker_slug)s' AND \
+            morbid_ticker.display = true \
         GROUP BY \
             morbid_targetprice.analytic_id, \
             morbid_targetprice.id \
@@ -142,7 +143,8 @@ target_prices_for_analytic_query = "\
         morbid_targetprice.ticker_id = morbid_ticker.id \
     ) \
     WHERE \
-        morbid_analytic.slug = '%(analytic_slug)s' \
+        morbid_analytic.slug = '%(analytic_slug)s' AND \
+        morbid_ticker.display = true \
     ORDER BY morbid_targetprice.date DESC \
     LIMIT %(limit)s OFFSET %(offset)s \
 "
@@ -195,7 +197,8 @@ sort_by_features_analytic_query = "\
         morbid_targetprice.ticker_id = morbid_ticker.id \
     ) \
     WHERE \
-        morbid_feature.slug = '%(sort_by)s' \
+        morbid_feature.slug = '%(sort_by)s' AND \
+        morbid_ticker.display = True\
     ORDER BY \
         morbid_featureanalyticticker.value %(sort_direction)s, \
         morbid_targetprice.date, \
@@ -251,6 +254,8 @@ sort_by_change_analytic_query = "\
     JOIN morbid_ticker ON ( \
         morbid_targetprice.ticker_id = morbid_ticker.id \
     ) \
+    WHERE \
+        morbid_ticker.display = True \
     ORDER BY \
         morbid_targetprice.change %(sort_direction)s, \
         morbid_ticker.id \
@@ -281,7 +286,8 @@ sort_by_features_ticker_query = "\
             morbid_targetprice.ticker_id = morbid_ticker.id \
         ) \
         WHERE \
-            morbid_ticker.slug = '%(ticker_slug)s' \
+            morbid_ticker.slug = '%(ticker_slug)s' AND \
+            morbid_ticker.display = true \
         GROUP BY \
             morbid_targetprice.analytic_id, \
             morbid_targetprice.id \
@@ -338,7 +344,8 @@ sort_by_change_ticker_query = "\
             morbid_targetprice.ticker_id = morbid_ticker.id \
         ) \
         WHERE \
-            morbid_ticker.slug = '%(ticker_slug)s' \
+            morbid_ticker.slug = '%(ticker_slug)s' AND \
+            morbid_ticker.display = true \
         GROUP BY \
             morbid_targetprice.analytic_id, \
             morbid_targetprice.id \
@@ -421,7 +428,8 @@ target_prices_query = "\
         morbid_targetprice.ticker_id = morbid_ticker.id \
     )\
     WHERE \
-        morbid_targetprice.id = %(target_id)s \
+         morbid_targetprice.id = %(target_id)s AND \
+         morbid_ticker.display = true \
 "
 
 features_query = "\

@@ -131,10 +131,6 @@
 {% endblock %}
 
 {% block afterbody %}
-<script type="text/javascript">
-    tp.update_ticker_stock("{{ticker.name}}")
-</script>
-
 <script id="target_price_template" type="text/x-jquery-template">
     {% include "morbid/card_template.html" %}
 </script>
