@@ -50,7 +50,10 @@ urlpatterns = patterns(
     url(r'^api/', include('api.urls')),
 
     # Screen page
-    url(r'^screen/$', 'morbid.views.screen')
+    url(r'^screen/$', 'morbid.views.screen'),
+
+    # Graph
+    url(r'^graph_01/$', 'morbid.views.graph_01'),
 )
 
 # Statics (need for gunicorn)

@@ -253,6 +253,9 @@ var render = (function() {
              * @type {[type]}
              */
             value = Math.abs(value);
+            // value = value;
+
+            // console.log(value);
 
             value = render.filter_minimum_data(value, feature);
             value = render.filter_maximum_data(value, feature);

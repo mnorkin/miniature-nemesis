@@ -18,8 +18,10 @@ from morbid.utils import beta_data
 import re
 import json
 import urllib as u
+from django.views.decorators.cache import cache_page
 
 
+@cache_page(15*60)
 def index(request, page=0):
     """
     Index page
@@ -37,7 +39,7 @@ def index(request, page=0):
 
     return HttpResponse(t.render(c))
 
-
+@cache_page(15*60)
 def ticker(request, slug):
     """
     Ticker page
@@ -95,6 +97,7 @@ def ticker(request, slug):
     return HttpResponse(t.render(c))
 
 
+@cache_page(15*60)
 def tickers(request):
     """
     Returning all the tickers, in the system
@@ -113,6 +116,7 @@ def tickers(request):
     return HttpResponse(json.dumps(tickers, indent=4))
 
 
+@cache_page(15*60)
 def target_prices_sort(request, sort_by='accuracy', sort_direction='down', page=0):
     """
     Returning sorted tickers
@@ -122,6 +126,7 @@ def target_prices_sort(request, sort_by='accuracy', sort_direction='down', page=
     return HttpResponse(json.dumps(target_prices, indent=4))
 
 
+@cache_page(15*60)
 def ticker_data(request, ticker):
     PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
     url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b3c6p&e=.csv' % (ticker.upper())
@@ -170,6 +175,7 @@ def ticker_data(request, ticker):
     return HttpResponse(json.dumps(item))
 
 
+@cache_page(15*60)
 def analytic(request, slug):
     """
     Analytic page
@@ -225,6 +231,7 @@ def analytic(request, slug):
     return HttpResponse(t.render(c))
 
 
+@cache_page(15*60)
 def target_prices(self, analytic_slug=None, ticker_slug=None, page=0):
 
     target_price_list = []
@@ -296,6 +303,7 @@ def target_prices(self, analytic_slug=None, ticker_slug=None, page=0):
     return HttpResponse(t.render(c))
 
 
+@cache_page(15*60)
 def feature_by_ticker(self, slug, feature_id):
     """
     The feature return management on the Ticker page
@@ -325,7 +333,7 @@ def feature_by_ticker(self, slug, feature_id):
 
     return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))
 
-
+@cache_page(15*60)
 def feature_by_analytic(self, slug, feature_id):
     """
     The feature return management on the analytic page
@@ -350,7 +358,7 @@ def feature_by_analytic(self, slug, feature_id):
 
     return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))
 
-
+@cache_page(15*60)
 def search(self, search_me):
     """
     The search of the page
@@ -438,7 +446,7 @@ def graph_03(request):
 
     return HttpResponse(t.render(c))
 
-
+@cache_page(15*60)
 def screen(request):
     """
     This is the screen page, which displays the screen shots of the system

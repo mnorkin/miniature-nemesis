@@ -3,11 +3,17 @@
   <title>Graph 01</title>
   <script type="text/javascript" src ="http://code.jquery.com/jquery-1.9.1.min.js"></script>
   <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+  <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+  <script type="text/javascript" src="/static/js/jquery.nicescroll.min.js"></script>
+  <script type="text/javascript" src="/static/js/main.js"></script>
   <script type="text/javascript" src="/static/js/graphs.js"></script>
+  <script type="text/javascript" src="/static/js/loader.js"></script>
+  <script type="text/javascript" src="/static/js/jquery.mousewheel.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/css/style.css">
   <script type="text/javascript">
   
   $(document).ready(function(){
-    graphs.reach_time("/feature_by_ticker/expe/1/");
+    graphs.profitability("/feature_by_analytic/bmo-capital-markets/3/");
   })
 
   </script>
@@ -30,14 +36,41 @@
   }
 
   #chart {
-    width: 1200px;
-    height: 500px;
+    /*width: 500px;*/
+    /*height: 500px;*/
+    /*border: 1px solid #000;*/
+    margin-left: -1px;
+  }
+
+  .profitability {
+    width: 800px;
     border: 1px solid #000;
+    margin-left: 300px;
   }
 
   </style>
 </head>
   <body>
-    <div id="chart"></div>
+    <div class="profitability">
+      <div id="chart"></div>
+    </div>
   </body>
+  <script type="text/javascript">
+  /*
+  Some constants
+  */
+  
+
+  /*
+  Hystoric values
+  */
+  var prev_scroll_left = 0;
+  var prev_scroll_top = 0;
+
+  /**
+   * Bind some scroll event to this picture
+   * 
+   * @return {[type]} [description]
+   */
+  </script>
 </html>

@@ -70,7 +70,7 @@ class stock_crawler():
     def yahoo_quote(self, ticker_group=None):
         results = []
         PATTERN = re.compile(r'''((?:[^,"']|"[^"]*"|'[^']*')+)''')
-        url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=b2c6sn&e=.csv' % (ticker_group)
+        url = 'http://download.finance.yahoo.com/d/quotes.csv?s=%s&f=l1c6sn&e=.csv' % (ticker_group)
         f = u.urlopen(url, proxies={})
         rows = f.readlines()
         for row in rows:
@@ -132,8 +132,8 @@ class stock_crawler():
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("cra.baklazanas.lt")
-        conn = httplib.HTTPConnection("localhost:8000")
-        # conn = httplib.HTTPConnection("dev4.baklazanas.lt")
+        #conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection("dev4.baklazanas.lt")
         logging.debug(url)
         logging.debug(headers)
         logging.debug(params)

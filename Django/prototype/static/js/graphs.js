@@ -125,12 +125,11 @@ var graphs = (function () {
          */
         populate: function (data) {
             var tmp_obj, f_data = [];
-
             for (i = 0; i < data.length; i++) {
                 tmp_obj = {};
                 // TODO: why values come negative?
                 // set values max 100, min 0
-                tmp_obj.value = Math.max(0, data[i].value);
+                tmp_obj.value = Math.max(-100, data[i].value);
                 tmp_obj.value = Math.min(100, tmp_obj.value);
 
                 // analytics (banks) in graph
@@ -152,6 +151,7 @@ var graphs = (function () {
                     best_analytic = tmp_obj;
                 }
             }
+
 
             return f_data;
         },
@@ -202,7 +202,7 @@ var graphs = (function () {
                 if (!error) {
 
                     full_data = graphs.populate(json);
-                    full_data = full_data.slice(1, 30);
+                    // full_data = full_data.slice(1, 30);
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
@@ -520,58 +520,76 @@ var graphs = (function () {
                 'cursorborder': '0px',
                 'cursorcolor': '#cdcdcd',
                 'cursorwidth': '6px',
+                'scrollspeed': '10',
                 'horizrailenabled': true
             });
+            var chart_width = $('#chart').width();
+            var chart_height = $("#chart").height();
 
-            var linear_data = [0, 20, 40, 60, 80, 100];
+            $('.profitability').mousewheel(function(event, delta) {
+                this.scrollLeft -= (delta*chart_width*0.6);
+                event.preventDefault();
+            });
+
+            var linear_data = [-100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100];
 
             var expand_width = 0;
+            var min = 0;
+            var max = 0;
+
+            for (var i = _data.length - 1; i >= 0; i--) {
+                if (_data[i] < min) {
+                    min = _data[i];
+                }
+                if (_data[i] > max) {
+                    max = _data[i];
+                }
+            };
 
             if (_data.length > 35) {
                 expand_width = (_data.length - 35) * 15;
-                
             }
 
             var w = $("#" + _element_id).width() - 20 + expand_width;
             var h = $("#" + _element_id).height() - 20;
             var rhw = h / 106;
             // var translate_w = w / 16;
-            var translate_w = 20;
+            var translate_w = 20+10;
             var translate = "translate(" + translate_w / 3 * 2 + "," + h + ")";
 
             var linear = d3.select("#" + _element_id).append("svg:svg")
                 .attr("width", w)
-                .attr("height", h);
+                .attr("height", h+Math.abs(min)*5);
 
             linear.selectAll("#" + _element_id).data(linear_data).enter()
                 .append("svg:rect")
                 .attr('fill', "#e7e2de")
                 .attr('width', function () {
-                return w - translate_w;
-            })
+                    return w - translate_w;
+                })
                 .attr('height', 0.5)
                 .attr("x", 10)
                 .attr("y", function (d) {
-                return d === 0 ? -10 : -d * rhw - 10;
-            })
+                    return d === 0 ? -10 : -d * rhw - 10;
+                })
                 .attr("transform", translate);
 
             linear.selectAll("#" + _element_id).data(linear_data).enter()
                 .append("svg:text")
                 .style("text-anchor", "end")
-                .style("width", "10px")
-                .style("height", "10px")
+                .style("width", "30px")
+                .style("height", "14px")
                 .style("font-size", "10px")
                 .style("fill", "#dec7b5")
                 .attr("dy", function (d, i) {
-                return d === 0 ? -5 : -d * rhw - 5;
-            })
+                    return d === 0 ? -5 : -d * rhw - 5;
+                })
                 .attr("dx", function (d, i) {
-                return 5;
-            })
+                    return 5;
+                })
                 .text(function (d) {
-                return d;
-            })
+                    return d;
+                })
                 .attr("transform", translate);
 
             linear.selectAll("#" + _element_id).data(_data).enter()
@@ -579,46 +597,52 @@ var graphs = (function () {
                 .attr("fill", "#dfc8b6")
                 .attr('width', 0.7)
                 .attr('height', function (d, i) {
-                return d * rhw;
-            })
+                    if (d * rhw < 0) {
+                        return Math.abs(d*rhw);
+                    }
+                    return d * rhw;
+                })
                 .attr('y', function (d, i) {
-                return -d * rhw - 10;
-            })
+                    if (-d * rhw - 10 > 0) {
+                        return -10;
+                    }
+                    return -d * rhw - 10;
+                })
                 .attr('x', function (d, i) {
-                return (i + 1) * (w - translate_w) / (_data.length + 1);
-            })
+                    return (i + 1) * (w - translate_w) / (_data.length + 1);
+                })
                 .attr("transform", translate);
 
             linear.selectAll('#' + _element_id).data(_data).enter()
                 .append('svg:circle')
                 .attr('cx', function (d, i) {
-                return (i + 1) * (w - translate_w) / (_data.length + 1);
-            })
+                    return (i + 1) * (w - translate_w) / (_data.length + 1);
+                })
                 .attr('cy', function (d, i) {
-                return -d * rhw - 10;
-            })
+                    return -d * rhw - 10;
+                })
                 .attr('r', 6)
                 .attr('fill', '#ac8dc6')
                 .attr('origin_fill', '#ac8dc6')
                 .attr('selectd', 0)
                 .attr('txt', function (d, i) {
-                return _data[i] + ' %';
-            })
+                    return _data[i] + ' %';
+                })
                 .attr('name', function (d, i) {
-                return full_data[i].slug;
-            })
-
-            .on('mouseover', function (d, i) {
-                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
-                var top = h + parseFloat(d3.select(this).attr('cy')) - 37;
-                var left = translate_w / 3 * 2 + parseFloat(d3.select(this).attr('cx')) - 23;
-                var text = d3.select(this).attr('txt');
-                graphs.tooltip_show(top, left, text);
-                graphs.topbar_show(full_data[i].slug);
-            })
+                    return full_data[i].slug;
+                })
+                .on('mouseover', function (d, i) {
+                    d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
+                    var top = h + parseFloat(d3.select(this).attr('cy')) - 37;
+                    var left = translate_w / 3 * 2 + parseFloat(d3.select(this).attr('cx')) - 23;
+                    var text = d3.select(this).attr('txt');
+                    graphs.tooltip_show(top, left, text);
+                    graphs.topbar_show(full_data[i].slug);
+                })
                 .on("mouseout", graphs.on_mouseout)
                 .on("click" , graphs.on_click)
                 .attr("transform", translate);
+
             return graphs;
         },
 
