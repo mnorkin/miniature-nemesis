@@ -214,7 +214,7 @@ def analytic(request, slug):
     #     target_price_list.append(target_price)
 
     target_price_list = TargetPrice.objects.filter(
-        analytic__slug=analytic.slug
+        Q(analytic__slug=analytic.slug) & Q(ticker__display=True)
     ).order_by('ticker', 'date').reverse().distinct('ticker')
 
     # Load feature info
@@ -353,7 +353,8 @@ def feature_by_analytic(self, slug, feature_id):
 
     feature_analytic_tickers = FeatureAnalyticTicker.objects.filter(
         analytic_id=analytic.id,
-        feature_id=feature_id
+        feature_id=feature_id,
+        ticker__display=True
     ).values('value', 'ticker__name', 'ticker__slug')
 
     return HttpResponse(json.dumps(list(feature_analytic_tickers), indent=4))

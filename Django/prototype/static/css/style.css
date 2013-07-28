@@ -1033,22 +1033,24 @@ li{ list-style: none; }
 }
 
 #chart{
-    width: 750px;
+    width: 795px;
     height: 550px;
     margin-left: 230px;
     position: relative;
     top:0px;
     left:0px;
 }
-#chart svg{
+#chart svg {
     position: relative;
 }
 
 #chart.profitability{
     height: 550px;
+    /*height: 400px;*/
     left: -13px;
     overflow-x:scroll;
     overflow-y:hidden;
+    margin-top: 20px;
 }
 #chart.reach_time{
     left:-28px;
@@ -1068,7 +1070,7 @@ li{ list-style: none; }
     top:25px;
 }
 
-#chart .bar_tooltip {
+.bar_tooltip {
     position: absolute;
     border:1px solid #edecea;
     border-radius: 4px;
@@ -1088,7 +1090,7 @@ li{ list-style: none; }
     box-shadow: 0 0 25px -7px #dcd9d8;
 }
 
-#chart .bar_tooltip:after {
+.bar_tooltip:after {
     position: absolute;
     content: '';
     border-top: 6px solid #FFF;

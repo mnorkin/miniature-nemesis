@@ -85,6 +85,7 @@ var graphs = (function () {
         tooltip_show: function (top, left, text) {
             d3.selectAll("#chart div").remove();
             d3.select("#chart")
+            // d3.select(".inner_content")
                 .append('div')
                 .attr('class', 'bar_tooltip')
                 .text(text)
@@ -521,15 +522,10 @@ var graphs = (function () {
                 'cursorcolor': '#cdcdcd',
                 'cursorwidth': '6px',
                 'scrollspeed': '10',
-                'horizrailenabled': true
+                'horizrailenabled': true,
             });
             var chart_width = $('#chart').width();
             var chart_height = $("#chart").height();
-
-            $('.profitability').mousewheel(function(event, delta) {
-                this.scrollLeft -= (delta*chart_width*0.6);
-                event.preventDefault();
-            });
 
             var linear_data = [-100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100];
 
@@ -551,15 +547,16 @@ var graphs = (function () {
             }
 
             var w = $("#" + _element_id).width() - 20 + expand_width;
-            var h = $("#" + _element_id).height() - 20;
-            var rhw = h / 106;
+            var h = $("#" + _element_id).height() - 0;
+            var rhw = (h / (106*2) - 0.10 );
             // var translate_w = w / 16;
             var translate_w = 20+10;
-            var translate = "translate(" + translate_w / 3 * 2 + "," + h + ")";
+            var translate = "translate(" + translate_w / 3 * 2 + "," + (h+25) + ")";
 
             var linear = d3.select("#" + _element_id).append("svg:svg")
                 .attr("width", w)
-                .attr("height", h+Math.abs(min)*5);
+                // .attr("height", h+Math.abs(100)*5);
+                .attr("height", h);
 
             linear.selectAll("#" + _element_id).data(linear_data).enter()
                 .append("svg:rect")
@@ -570,7 +567,7 @@ var graphs = (function () {
                 .attr('height', 0.5)
                 .attr("x", 10)
                 .attr("y", function (d) {
-                    return d === 0 ? -10 : -d * rhw - 10;
+                    return d === 0 ? -10 - h/2 : (-d * rhw - 10 - h/2);
                 })
                 .attr("transform", translate);
 
@@ -582,7 +579,7 @@ var graphs = (function () {
                 .style("font-size", "10px")
                 .style("fill", "#dec7b5")
                 .attr("dy", function (d, i) {
-                    return d === 0 ? -5 : -d * rhw - 5;
+                    return d === 0 ? -5-h/2 : -d * rhw - 5-h/2;
                 })
                 .attr("dx", function (d, i) {
                     return 5;
@@ -604,9 +601,9 @@ var graphs = (function () {
                 })
                 .attr('y', function (d, i) {
                     if (-d * rhw - 10 > 0) {
-                        return -10;
+                        return -10 - h/2;
                     }
-                    return -d * rhw - 10;
+                    return -d * rhw - 10 - h/2;
                 })
                 .attr('x', function (d, i) {
                     return (i + 1) * (w - translate_w) / (_data.length + 1);
@@ -619,7 +616,7 @@ var graphs = (function () {
                     return (i + 1) * (w - translate_w) / (_data.length + 1);
                 })
                 .attr('cy', function (d, i) {
-                    return -d * rhw - 10;
+                    return -d * rhw - 10 - h/2;
                 })
                 .attr('r', 6)
                 .attr('fill', '#ac8dc6')
@@ -633,7 +630,7 @@ var graphs = (function () {
                 })
                 .on('mouseover', function (d, i) {
                     d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
-                    var top = h + parseFloat(d3.select(this).attr('cy')) - 37;
+                    var top = h + parseFloat(d3.select(this).attr('cy')) - 37 + 25;
                     var left = translate_w / 3 * 2 + parseFloat(d3.select(this).attr('cx')) - 23;
                     var text = d3.select(this).attr('txt');
                     graphs.tooltip_show(top, left, text);

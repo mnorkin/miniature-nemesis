@@ -14,8 +14,8 @@ def send(request, url, data):
     if any(request.upper() in s for s in list_of_requests):
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
-        conn = httplib.HTTPConnection('localhost:8000')
-        # conn = httplib.HTTPConnection('dev4.baklazanas.lt')
+        # conn = httplib.HTTPConnection('localhost:8000')
+        conn = httplib.HTTPConnection('dev4.baklazanas.lt')
         conn.request(request.upper(), url, params, headers)
         response = conn.getresponse()
         conn.close()
