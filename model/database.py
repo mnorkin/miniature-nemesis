@@ -417,6 +417,7 @@ class database:
                 entries \
             WHERE \
                 ticker = '%s' AND \
+                price0 != 0 AND\
                 pub_date + INTERVAL '1 year' > NOW() \
             GROUP BY \
                 pub_date, analytic, price0 \
