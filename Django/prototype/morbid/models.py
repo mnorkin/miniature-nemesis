@@ -156,6 +156,12 @@ class Ticker(models.Model):
 
     objects = TickerManager()
 
+    def last_stock_change_percent(self):
+        """
+        Returning the stock change from percent to real value
+        """
+        return (self.last_stock_price-self.last_stock_change)/self.last_stock_price
+
     def get_absolute_url(self, slug=None):
         """
         Generating absolute url
