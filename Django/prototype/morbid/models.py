@@ -160,7 +160,10 @@ class Ticker(models.Model):
         """
         Returning the stock change from percent to real value
         """
-        return (self.last_stock_price-self.last_stock_change)/self.last_stock_price
+        try:
+            return (self.last_stock_price-self.last_stock_change)/self.last_stock_price
+        except ZeroDivisionError:
+            return 0
 
     def get_absolute_url(self, slug=None):
         """
