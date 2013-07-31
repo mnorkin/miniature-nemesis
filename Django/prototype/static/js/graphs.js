@@ -158,6 +158,45 @@ var graphs = (function () {
         },
 
         /**
+         * Populates something
+         * 
+         * @param  {[type]} data
+         * @return {[type]}
+         */
+        populate_days: function (data) {
+            var tmp_obj, f_data = [];
+            for (i = 0; i < data.length; i++) {
+                tmp_obj = {};
+                // TODO: why values come negative?
+                // set values max 100, min 0
+                tmp_obj.value = Math.max(0, data[i].value);
+                tmp_obj.value = Math.min(255, tmp_obj.value);
+
+                // analytics (banks) in graph
+                if (data[i].ticker__slug === undefined) {
+                    tmp_obj.name = data[i].analytic__name;
+                    tmp_obj.slug = data[i].analytic__slug;
+                    tmp_obj.type = 'analytic';
+
+                    // ticker (company) in graph
+                } else {
+                    tmp_obj.name = data[i].ticker__name;
+                    tmp_obj.slug = data[i].ticker__slug;
+                    tmp_obj.type = 'ticker';
+                }
+
+                f_data.push(tmp_obj);
+
+                if (tmp_obj.value > best_analytic.value) {
+                    best_analytic = tmp_obj;
+                }
+            }
+
+
+            return f_data;
+        },
+
+        /**
          * Return the data by ??
          * 
          * @param  {[type]} d
@@ -244,7 +283,7 @@ var graphs = (function () {
              */
             d3.json(host + url, function (error, json) {
                 if (!error) {
-                    full_data = graphs.populate(json);
+                    full_data = graphs.populate_days(json);
                     full_data.sort(function (a, b) {
                         return b.value - a.value;
                     });
@@ -940,7 +979,8 @@ var graphs = (function () {
                 'cursorwidth': '6px',
                 'horizrailenabled': false
             });
-            var linear_data = [0, 20, 40, 60, 80, 100];
+            // var linear_data = [0, 20, 40, 60, 80, 100];
+            var linear_data = [0, 51, 102, 153, 204, 255];
 
             var expand_height = 0;
             if (_data.length > 20) {
@@ -949,7 +989,7 @@ var graphs = (function () {
 
             var w = $("#" + _element_id).width(),
                 h = $("#" + _element_id).height() + expand_height,
-                rhw = w / 109,
+                rhw = w / (109*2.5),
                 translate_w = w / 16,
                 graph_height = h - 15
 
@@ -1001,7 +1041,7 @@ var graphs = (function () {
                 })
                 .attr('x', 0)
                 .attr('txt', function (d, i) {
-                    return d + ' %';
+                    return d + ' days';
                 })
                 .attr("transform", translate);
 
@@ -1018,7 +1058,7 @@ var graphs = (function () {
                 .attr('origin_fill', '#91bcc5')
                 .attr('selectd', 0)
                 .attr('txt', function (d, i) {
-                    return _data[i] + ' %';
+                    return _data[i] + ' days';
                 })
                 .attr('name', function (d, i) {
                     return full_data[i].slug;

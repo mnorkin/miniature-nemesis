@@ -132,8 +132,8 @@ class stock_crawler():
         params = json.dumps(data)
         headers = {"Content-type": "application/json"}
         # conn = httplib.HTTPConnection("cra.baklazanas.lt")
-        conn = httplib.HTTPConnection("localhost:8000")
-        #conn = httplib.HTTPConnection("dev4.baklazanas.lt")
+        # conn = httplib.HTTPConnection("localhost:8000")
+        conn = httplib.HTTPConnection("dev4.baklazanas.lt")
         logging.debug(url)
         logging.debug(headers)
         logging.debug(params)

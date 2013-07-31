@@ -72,7 +72,7 @@
     				<li name="{{ target.analytic.slug }}" class="passive">
     					<span class="corp sliding">
     						<a class="text" href="{{target.analytic.get_absolute_url}}">
-    							<span class="slid">{{ target.analytic }} </span>
+    							<span class="slid">{{ target.analytic }}</span>
     							<span class="bliur">&nbsp;</span>
     			    			<span class="goust">&nbsp;</span>
     						</a>
@@ -82,10 +82,10 @@
                             {{ target.price|cut:'.0' }} <strong>Last target price</strong>
                         </span>
     					<span class="number">
-                            {{ target.target_price_number_analytic_ticker.number }}<strong>No of target prices</strong>
+                            {{ target.target_price_number_analytic_ticker.number|default:"1" }}<strong>No of target prices</strong>
                         </span>
     					<span class="number">
-                            {{ target.volatility.number }}/{{ target.volatility.total }}<strong>Volatility</strong>
+                            {{ target.volatility.number|default:"0" }}/{{ target.volatility.total|default:"0" }}<strong>Volatility</strong>
                         </span>
     				</li>
     			{% endfor %}

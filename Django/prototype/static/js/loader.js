@@ -62,13 +62,13 @@ var loader = (function() {
                 /**
                  * Ticker sort target prices
                  */
-                console.log('Ticker sort');
+                // console.log('Ticker sort');
                 url = '/api/target_prices/tickers/' + config.ticker + '/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
             } else if (config.analytic !== null && config.sort.slug !== null && config.sort.direction !== null) {
                 /**
                  * Analytic sort target prices
                  */
-                console.log('Analytic sort');
+                // console.log('Analytic sort');
                 url = '/api/target_prices/analytics/' + config.analytic + '/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
             } else if (config.analytic !== null) {
                 /**
@@ -76,7 +76,7 @@ var loader = (function() {
                  * 
                  * @type {String}
                  */
-                console.log('Analytic target prices');
+                // console.log('Analytic target prices');
                 url = '/api/target_prices/analytics/' + config.analytic + '/' + config.page + '/';
             } else if (config.ticker !== null) {
                 /**
@@ -84,7 +84,7 @@ var loader = (function() {
                  * 
                  * @type {String}
                  */
-                console.log('Ticker target prices');
+                // console.log('Ticker target prices');
                 url = '/api/target_prices/tickers/' + config.ticker + '/' + config.page + '/';
             } else if (config.sort.slug !== null && config.sort.direction !== null) {
                 /**
@@ -92,7 +92,7 @@ var loader = (function() {
                  * 
                  * @type {String}
                  */
-                console.log('Ticker target sort');
+                // console.log('Ticker target sort');
                 url = '/api/target_prices/' + config.sort.slug + '/' + config.sort.direction + '/' + config.page + '/';
             } else {
                 /**
@@ -100,7 +100,7 @@ var loader = (function() {
                  * 
                  * @type {String}
                  */
-                console.log('Ticker target');
+                // console.log('Ticker target');
                 url = '/api/target_prices/' + config.page + '/';
             }
 
@@ -109,16 +109,16 @@ var loader = (function() {
                  * No more data from the server -- kill the loader
                  */
                 if (data.length < 1) {
-                    console.log('Data length is FAIL');
+                    // console.log('Data length is FAIL');
                     loading = true;
                 } else {
-                    console.log('Data length is OK');
+                    // console.log('Data length is OK');
                     render.target_prices(data);
                     loading = false;
                 }
             });
             if (config.page === 0) {
-                console.log('Reload now value from loader');
+                // console.log('Reload now value from loader');
                 render.now_reload_enable();
             } else {
                 render.now_reload_disable();

@@ -837,15 +837,15 @@ var tp = (function() {
      */
     function set_active_analytic() {
         // show first target price
-        console.log('Set Active Analytic');
+        // console.log('Set Active Analytic');
         if ($('#bank li.active').length === 0) {
             var name = hash_get('company');
             if (name.length === 0) {
                 name = graphs.get_best_analytic().slug;
-                console.log('best analytic: ' + name);
+                // console.log('best analytic: ' + name);
                 hash_set_company(name);
             }
-            console.log('#bank li[name=' + name + ']');
+            // console.log('#bank li[name=' + name + ']');
             $('#bank li[name=' + name + ']').addClass('active').removeClass('passive');
             $('.in_graph li[name=' + name + ']').addClass('active');
         }
