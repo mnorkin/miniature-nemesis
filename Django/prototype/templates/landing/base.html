@@ -24,43 +24,48 @@
                         <div class="form-inputs">
                             <form action="{{ action }}" method="POST">{% csrf_token %}
                                 <script class="{{form.email.id_for_label}}" type="text/x-jquery-template">{{form.email.help_text}}</script>
-                                {{form.email}}<input type="submit" value="Send" />
+                                <div class="email-input">
+                                    {{form.email}}
+                                </div>
+                                <div class="submit-input">
+                                    <input type="submit" value="Send" />
+                                </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="container container-separator">
+        <div class="container container-separator container-information">
             <div class="entry entry-left entry-information">
                 <div class="entry-description">
                     <h2>Information.</h2>
                     <p class="short-description">Get the newest investment recommendations from hundreds of analysts everyday.</p>
                 </div>
                 <div class="entry-image">
-                    <img src="/static/images/landing/information.jpg" alt="Inforamtion" />
+                    <img src="/static/images/landing/information.png" alt="Inforamtion" />
                 </div>
             </div>
         </div>
-        <div class="container container-separator">
+        <div class="container container-separator container-analysis">
             <div class="entry entry-right entry-analysis">
                 <div class="entry-description">
                     <h2>Analysis.</h2>
                     <p class="short-description">Know which banks make the most accurate and profitable investment recommendations for any stock.</p>
                 </div>
                 <div class="entry-image">
-                    <img src="/static/images/landing/analysis.jpg" alt="Analysis" />
+                    <img src="/static/images/landing/analysis.png" alt="Analysis" />
                 </div>
             </div>
         </div>
-        <div class="container container-separator">
+        <div class="container container-separator container-description">
             <div class="entry entry-left entry-discover">
                 <div class="entry-description">
-                    <h2>Discover.</h2>
+                    <h2>Discovery.</h2>
                     <p class="short-description">Find the hottest new companies spotted by the best analysts.</p>
                 </div>
-                <div class="entry-image">
-                    <img src="/static/images/landing/discover.jpg" alt="Discover" />
+                <div class="entry-image entry-image-discover">
+                    <img src="/static/images/landing/discover.png" alt="Discover" />
                 </div>
             </div>
         </div>

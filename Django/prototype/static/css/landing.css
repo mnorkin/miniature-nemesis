@@ -39,28 +39,32 @@ input {
 }
 
 form input[type="email"], form input[type="text"] {
-    width: 75%;
+    width: 100%;
 }
 
 input[type="email"], input[type="text"] {
     border: 1px solid #e5dbd2;
     padding: 11px 0 11px 11px;
+    margin-left: -11px;
 }
 
 input[type="submit"], input[type="button"] {
-    position: relative;
+    /*position: relative;*/
     bottom: 1px;
     border: 0;
     padding: 0;
     background: #e95201;
     color: #ffffff;
     width: 81px;
-    height: 43px;
+    padding-bottom: 11px;
+    padding-top: 12px;
+    /*height: 43px;*/
     font-weight: bold;
 }
 
 input[type="submit"]:hover, input[type="button"] {
     background-color: #ea7231;
+    /*margin-left: 13px;*/
 }
 
 input[type="email"]:focus, input[type="text"]:focus {
@@ -73,11 +77,13 @@ h1 {
     margin: 0;
     font-weight: 200;
     font-size: 42px;
-    font-family: 'Open Sans'
+    font-family: 'Open Sans';
 }
 
 h2 {
     margin: 0 0 21px 0;
+    font-weight: normal;
+    font-family: 'Open Sans';
 }
 
 header {
@@ -116,12 +122,16 @@ header {
     border-bottom: 1px solid #f6f1eb;
     margin-bottom: 22px;
 }
+.container-information {
+    height: 357px;
+    clear: left;
+}
 
 /**
  * Header contents
  */
 .promo {
-    padding-top: 62px;
+    padding-top: 127px;
     margin: 0 20px auto;
     text-align: center;
 }
@@ -138,6 +148,7 @@ header {
 .description {
     max-width: 920px;
     margin: 10px auto 0;
+    font-size: 16px;
 }
 
 .share-items {
@@ -173,7 +184,13 @@ header {
     float: right;
     height: 294px;
     width: 300px;
+    margin-right: -85px;
 }
+
+.entry-image-discover {
+    margin-right: -136px;
+}
+
 .entry-image img {
     position: absolute;
     bottom: 0;
@@ -266,8 +283,16 @@ header {
  * Email Input
  */
 .email-input {
-    width: 75%;
-    margin-right: 13px;
+    float: left;
+    margin-left: 30px;
+}
+.email-input  {
+    width: 350px;
+    /*width: 75%;*/
+}
+
+.submit-input {
+    float: left;
 }
 
 /**

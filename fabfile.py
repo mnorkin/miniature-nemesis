@@ -16,12 +16,13 @@ env.deploy_user = 'agurkas'
 env.deploy_pass = 'Tutatru3'
 
 # Version part
-env.version = 4
+env.version = 8
 
 # Local directory part
 env.model_path = 'model'
 env.crawler_path = 'crawler'
 env.crawler_daily_path = 'crawler_daily'
+env.django_landing_path = 'Django/prototype'
 env.django_production_path = 'Django/prototype'
 env.django_sink_path = 'Django/crawler'
 
@@ -30,6 +31,7 @@ env.deploy_model_path = '/home/%s/model' % env.deploy_user
 env.deploy_crawler_path = '/home/%s/crawler' % env.deploy_user
 env.deploy_crawler_daily_path = '/home/%s/crawler_daily' % env.deploy_user
 env.deploy_django_production_path = '/var/www/dev%s_targetprice' % env.version
+env.deploy_django_landing_path = '/var/www/lan%s_targetprice' % env.version
 env.deploy_django_sink_path = '/var/www/cra_targetprice'
 
 # Release part
@@ -38,11 +40,11 @@ env.release_model = 'model_' + env.release
 env.release_crawler = 'crawler_' + env.release
 env.release_crawler_daily = 'crawler_daily_' + env.release
 env.release_django_production = 'django_production_' + env.release
+env.release_django_landing = 'django_landing_' + env.release
 env.release_django_sink = 'django_sink_' + env.release
 
 # Password configuration part
 env.postgresql_pass = 'fupHU8Ut'
-
 
 def virtualenv(command):
     """
@@ -507,6 +509,87 @@ def django_production_deploy():
     archive_git_and_put(opts)
     install_requirements(opts)
     django_production_configuration(opts)
+    restart_deamon(opts)
+
+
+def django_landing_configuration(opts):
+    """
+    Django production configuration
+    """
+    env.activate = 'source %(deploy_path)s/bin/activate' % opts
+    # Update settings
+    run('mv %(deploy_path)s/releases/current/prototype/settings.py \
+        %(deploy_path)s/releases/current/prototype/settings_dev.py' % opts)
+    run('mv %(deploy_path)s/releases/current/prototype/settings_prod.py \
+        %(deploy_path)s/releases/current/prototype/settings.py' % opts)
+    sudo('chmod +x %(deploy_path)s/releases/current/deamon.py' % opts)
+    # Create the database
+    if opts['createdb']:
+        with settings(warn_only=True):
+            # Backup if there was anything
+            sudo('pg_dump fp%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            # Clean
+            sudo('dropdb fp%(version)s-morbid' % opts, user='postgres')
+        # Create
+        sudo('createdb fp%(version)s-morbid' % opts, user='postgres')
+
+    virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py migrate' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py collectstatic --link --noinput' % opts)
+
+
+def django_landing_backup():
+    """
+    Backing up the production database
+    """
+    opts = dict(
+        what_to_send_path=env.django_landing_path,
+        release=env.release_django_landing,
+        deploy_path=env.deploy_django_landing_path,
+        version=env.version
+    )
+    # Activating the virtualenv
+    env.activate = 'source %(deploy_path)s/bin/activate' % opts
+    # SQL data backup
+    sudo('touch %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('chmod 777 %(deploy_path)s/%(release)s.sql' % opts)
+    sudo('pg_dump fp%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+    local('mkdir -p ../backups/production')
+    get('%(deploy_path)s/%(release)s.sql' % opts, '../backups/production/%(release)s.sql' % opts)
+    sudo('rm %(deploy_path)s/%(release)s.sql' % opts)
+    # JSON data backup
+    sudo('touch %(deploy_path)s/%(release)s.json' % opts)
+    sudo('chmod 777 %(deploy_path)s/%(release)s.json' % opts)
+    virtualenv('%(deploy_path)s/releases/current/manage.py dumpdata morbid --indent=4 > \
+        %(deploy_path)s/%(release)s.json' % opts)
+    get('%(deploy_path)s/%(release)s.json' % opts, '%(what_to_send_path)s/morbid/fixtures/initial_data.json' % opts)
+    sudo('rm %(deploy_path)s/%(release)s.json' % opts)
+
+
+def django_landing_update():
+    opts = dict(
+        what_to_send_path=env.django_landing_path,
+        release=env.release_django_landing,
+        deploy_path=env.deploy_django_landing_path,
+        version=env.version,
+        createdb=False
+    )
+    archive_git_and_put(opts)
+    django_landing_configuration(opts)
+    restart_deamon(opts)
+
+
+def django_landing_deploy():
+    opts = dict(
+        what_to_send_path=env.django_landing_path,
+        release=env.release_django_landing,
+        deploy_path=env.deploy_django_landing_path,
+        version=env.version,
+        createdb=True
+    )
+    archive_git_and_put(opts)
+    install_requirements(opts)
+    django_landing_configuration(opts)
     restart_deamon(opts)
 
 
