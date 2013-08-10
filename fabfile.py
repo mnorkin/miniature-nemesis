@@ -22,8 +22,8 @@ env.version = 8
 env.model_path = 'model'
 env.crawler_path = 'crawler'
 env.crawler_daily_path = 'crawler_daily'
-env.django_landing_path = 'Django/prototype'
-env.django_production_path = 'Django/landing'
+env.django_landing_path = 'Django/landing'
+env.django_production_path = 'Django/prototype'
 env.django_sink_path = 'Django/crawler'
 
 # Remote directory part
