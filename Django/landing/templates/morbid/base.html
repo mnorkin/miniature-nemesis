@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    
+    <script type="text/javascript" src="/static/js/d3.v3.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.nicescroll.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="/static/js/graphs.js"></script>
+    <script type="text/javascript" src="/static/js/mustache.js"></script>
+    <script type="text/javascript" src="/static/js/render.js"></script>
+    <script type="text/javascript" src="/static/js/loader.js"></script>
+    <script type="text/javascript" src="/static/js/main.js"></script>
+
+    <title>{% block title %}Target price{% endblock %}</title>
+</head>
+<body>
+    {% block topline %}
+    {% endblock %}
+    <div class="container">
+        <div id="header">
+        {% block sidebar %}
+            <div class="title">
+                <a href="/">
+                    <img src="/static/images/logo_1.png" alt="Target price logo" title="logo" height="27"  />
+                </a>
+                <div class="main_intro">
+                    We are still in private beta. Now we are analyzing companies which are in S&P500 index. You can find all companies
+                    <a class="sp500" href=''>
+                        <img src="/static/images/txt_here.png" alt="here" />
+                    </a>
+                </div>
+                <div class="search">
+                    {% block nosearch %}
+                    <form action="" method="get">
+                        <input type="text" name="q" autocomplete="off" value="" class="inp-s" id="search_inp" onkeyup="tp.process_search(this, event)" onclick="tp.process_search(this, event)" />
+                        <input type="submit" value="Search" class="sub-s" onclick="tp.process_search(this, event)" />
+                        <ul class="search_res"></ul>
+                    </form>
+                    {% endblock %}
+                </div>
+            </div>
+            <div id="popup">
+                <div class="overlay"></div>
+                <span class="align_enemy"></span>
+                <div class="content">
+                    <div class="top">
+                        <h3>S&P500 index</h3>
+                        <a class="close"></a>
+                    </div>
+                    <div class="list"></div>
+                </div>
+            </div>
+        {% endblock %}
+        </div>
+
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+{% block afterbody %}
+<script type="text/javascript">
+    $(document).ready(loader.document_ready);
+    $(window).scroll(loader.scroll_happend);
+</script>
+{% endblock %}
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Target price screens</title>
+</head>
+<style type="text/css">
+body {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+
+}
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+ul li {
+    background: url('/static/images/screens/background.jpg')  repeat-x;
+}
+div {
+    margin: 0 auto;
+    width: 100%;
+}
+img {
+    max-width: 100%;
+}
+
+</style>
+<body>
+    {% load staticfiles %}
+    <div>
+        <ul>
+            <li id="grid-view"><img src="{% static 'images/screens/1.jpg' %}" alt="Front page grid view" /></li>
+            <li id="list-view"><img src="{% static 'images/screens/2.jpg' %}" alt="Front page list view" /></li>
+            <li id="accuracy"><img src="{% static 'images/screens/3.jpg' %}" alt="Accuracy graph" /></li>
+            <li id="proximity"><img src="{% static 'images/screens/4.jpg' %}" alt="Proximity graph" /></li>
+            <li id="profitability"><img src="{% static 'images/screens/5.jpg' %}" alt="Profitability graph" /></li>
+            <li id="aggressivness"><img src="{% static 'images/screens/6.jpg' %}" alt="Aggressivness graph" /></li>
+            <li id="reach-time"><img src="{% static 'images/screens/7.jpg' %}" alt="Reach time graph" /></li>
+            <li id="impact-to-market"><img src="{% static 'images/screens/8.jpg' %}" alt="Impact to market graph" /></li>
+        </ul>
+    </div>
+    
+</body>
+</html>

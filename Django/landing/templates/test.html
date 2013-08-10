@@ -1,0 +1,86 @@
+{% extends "morbid/base.html" %}
+
+{% block content %}
+
+<h1>{{feature_analytic_ticker.analytic.name}} -- {{feature_analytic_ticker.ticker.name}}</h1>
+<h3>Beta: {{ beta }}</h3>
+
+<div class="hidden" id="current-ticker-slug">{{feature_analytic_ticker.ticker.slug}}</div>
+<div class="hidden" id="current-analytic-slug">{{feature_analytic_ticker.analytic.slug}}</div>
+
+<div id="stock-graph"></div>
+
+<script type="text/javascript" src="/static/js/stock-test.js"></script>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Target Date</th>
+            <th>Target Price</th>
+            <th>Stock price open</th>
+            <th>Stock price close</th>
+            <th>Stock price open</th>
+            <th>Stock price close</th>
+        </tr>
+    </thread>
+    <tbody>
+        {% for target_price in target_prices %}
+        <tr>
+            <td>{{ target_price.date }}</td>
+            <td>{{ target_price.price }}</td>
+            <td>{{ target_price.stock_price_open }}</td>
+            <td>{{ target_price.stock_price_close }}</td>
+            <td>{{ target_price.stock_price_next_open }}</td>
+            <td>{{ target_price.stock_price_next_close }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Value</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in feature_analytic_ticker_data %}
+        <tr>
+            <td>{{ data.name }}</td>
+            <td>{{ data.value }}</td>
+            <td class="form">
+                <form action="{{ current_url }}" method="POST">{% csrf_token %}
+                    {{ data.feature_analytic_ticker_check_form.as_p }}
+                    <input type="submit" value="Submit" />
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+{% block nosearch %}
+
+<form action="" method="get">
+    <input type="text" name="q" autocomplete="off" value="" class="inp-s" id="search_inp" onkeyup="tp.process_testing_page_search(this, event)" onclick="tp.process_testing_page_search(this, event)" />
+    <input type="submit" value="Search" class="sub-s" onclick="tp.process_testing_page_search(this, event)" />
+    <ul class="search_res"></ul>
+</form>
+
+{% endblock %}
+
+{% block topline  %}
+{% if message %}
+<div class="top-line">
+    <div class="inner">
+        <div class="message {{ message.type }}">
+            {{message.text}}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

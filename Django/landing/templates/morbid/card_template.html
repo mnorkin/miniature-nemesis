@@ -1,0 +1,24 @@
+<li name="[[ date ]]" class="entry chart" id="[[ hash ]]01">
+  <a class="ticket sliding" href="[[ url ]]#[[ analytic_slug ]]">
+    <span class="text">
+      <span class="slid">[[ ticker_long_name ]] ([[ ticker_name ]]) </span>
+      <span class="bliur">&nbsp;</span>
+      <span class="goust">&nbsp;</span>
+    </span>
+  </a>
+  <a class="analytic">[[ analytic ]]</a>
+  <span class="price">[[ price ]]</span>
+  <span class="date">[[ date ]]</span>
+
+    <span class="circle [[ change.direction ]]">
+    <strong>[[ change.abs_value ]]%</strong>
+  </span>
+  
+  <ul class="bar">
+    [[#features]]
+    <li class="feature [[ slug ]]" data-value="[[ value ]]"><span>[[ name ]]</span></li>
+    [[/features]]
+  </ul>
+
+  <div class="bar_tooltip"></div>
+</li>

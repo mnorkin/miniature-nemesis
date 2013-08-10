@@ -1,0 +1,37 @@
+<li name="{{ target.date|date:'M. d, Y'}}" class="entry chart" id="{{ target.hash }}01">
+  <a class="ticket sliding" href="{{ target.url }}#{{ target.analytic_slug }}">
+    <span class="text">
+      <span class="slid">{{ target.ticker_long_name }} ({{ target.ticker_name }}) </span>
+      <span class="bliur">&nbsp;</span>
+      <span class="goust">&nbsp;</span>
+    </span>
+  </a>
+  <a class="analytic">{{ target.analytic }}</a>
+  <span class="price">{{ target.price|cut:".0" }}</span>
+  <span class="date">{{ target.date|date:"M. d, Y" }}</span>
+
+  <span class="circle {% if target.change < 0 %}down{% elif target.change > 0 %}up{% endif %}">
+    <strong>{{ target.change|floatformat:1|cut:"-"|cut:".0" }}%</strong>
+  </span>
+
+  <script type="text/javascript">
+    var tmp_target_price = {
+      'hash': "{{ target.hash }}01",
+      'name': "{{ target.ticker }}",
+      'processed' : false
+    };
+    tmp_target_price['change'] = "{{ target.change }}";
+    {% for feature in target.features %}
+      tmp_target_price['{{feature.slug}}'] = "{{ feature.value }}";
+    {% endfor %}
+    tp.append_target_price_list(tmp_target_price);
+  </script>
+  
+  <ul class="bar">
+    {% for feature in target.features %}
+    <li class="feature {{ feature.slug }}"><span>{{ feature.name }}</span></li>
+    {% endfor %}
+  </ul>
+
+  <div class="bar_tooltip"></div>
+</li>
