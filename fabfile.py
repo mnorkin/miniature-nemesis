@@ -527,11 +527,11 @@ def django_landing_configuration(opts):
     if opts['createdb']:
         with settings(warn_only=True):
             # Backup if there was anything
-            sudo('pg_dump fp%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
+            sudo('pg_dump lan%(version)s-morbid > %(deploy_path)s/%(release)s.sql' % opts, user='postgres')
             # Clean
-            sudo('dropdb fp%(version)s-morbid' % opts, user='postgres')
+            sudo('dropdb lan%(version)s-morbid' % opts, user='postgres')
         # Create
-        sudo('createdb fp%(version)s-morbid' % opts, user='postgres')
+        sudo('createdb lan%(version)s-morbid' % opts, user='postgres')
 
     virtualenv('%(deploy_path)s/releases/current/manage.py syncdb --noinput' % opts)
     virtualenv('%(deploy_path)s/releases/current/manage.py migrate' % opts)
