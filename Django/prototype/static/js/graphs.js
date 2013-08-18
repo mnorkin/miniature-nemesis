@@ -571,6 +571,7 @@ var graphs = (function () {
             var expand_width = 0;
             var min = 0;
             var max = 0;
+            var window_width = $("#" + _element_id).width() - 20;
 
             for (var i = _data.length - 1; i >= 0; i--) {
                 if (_data[i] < min) {
@@ -610,23 +611,25 @@ var graphs = (function () {
                 })
                 .attr("transform", translate);
 
-            linear.selectAll("#" + _element_id).data(linear_data).enter()
-                .append("svg:text")
-                .style("text-anchor", "end")
-                .style("width", "30px")
-                .style("height", "14px")
-                .style("font-size", "10px")
-                .style("fill", "#dec7b5")
-                .attr("dy", function (d, i) {
-                    return d === 0 ? -5-h/2 : -d * rhw - 5-h/2;
-                })
-                .attr("dx", function (d, i) {
-                    return 5;
-                })
-                .text(function (d) {
-                    return d;
-                })
-                .attr("transform", translate);
+            for (j = 0; j < w/window_width; j++) {
+                linear.selectAll("#" + _element_id).data(linear_data).enter()
+                    .append("svg:text")
+                    .style("text-anchor", "end")
+                    .style("width", "30px")
+                    .style("height", "14px")
+                    .style("font-size", "10px")
+                    .style("fill", "#dec7b5")
+                    .attr("dy", function (d, i) {
+                        return -d * rhw - 15 - h/2;
+                    })
+                    .attr("dx", function (d, i) {
+                        return 25+(window_width*j);
+                    })
+                    .text(function (d) {
+                        return d;
+                    })
+                    .attr("transform", translate);
+            }
 
             linear.selectAll("#" + _element_id).data(_data).enter()
                 .append("svg:rect")
@@ -1022,6 +1025,9 @@ var graphs = (function () {
                 translate_w = w / 16,
                 graph_height = h - 15
 
+
+            var window_height = $("#" + _element_id).height();
+
             var translate = "translate(" + translate_w / 3 * 2 + "," + h + ")";
             // var translate = "";
 
@@ -1042,21 +1048,28 @@ var graphs = (function () {
                 .attr("y", -graph_height)
                 .attr("transform", translate);
 
-            linear.selectAll("#" + _element_id).data(linear_data).enter()
-                .append("svg:text")
-                .attr("text-anchor", "left")
-                .attr("width", "10px")
-                .attr("height", "10px")
-                .style("font-size", "10px")
-                .style("fill", "#dec7b5")
-                .attr("dy", -10)
-                .attr("dx", function (d, i) {
-                    return d * rhw - (-0.7 + new String(d).length*2.9); // can't center with text-anchor, because of firefox and opera bug 
-                })
-                .text(function (d) {
-                    return d;
-                })
-                .attr("transform", translate);
+            for (j = 0; j < w/window_height; j++) {
+                linear.selectAll("#" + _element_id).data(linear_data).enter()
+                    .append("svg:text")
+                    .attr("text-anchor", "left")
+                    .attr("width", "10px")
+                    .attr("height", "10px")
+                    .style("font-size", "10px")
+                    .style("fill", "#dec7b5")
+                    .attr("dy", 10)
+                    .attr("dx", function (d, i) {
+                        // can't center with text-anchor, because of firefox and opera bug 
+                        return d * rhw - (-0.7 + new String(d).length*2.9) + 10;
+                    })
+                    .text(function (d) {
+                        return d;
+                    })
+                    .attr("transform", function(d, i) {
+                        return translate + " rotate(90, " + (0) + ", "+(d)+")";
+                        // return translate + " rotate(90, " + ((d-71)*rhw) + ", 0)";
+                    });
+            }
+            
 
             linear.selectAll("#" + _element_id).data(_data).enter()
                 .append("svg:rect")
