@@ -689,7 +689,7 @@ var graphs = (function () {
 
             pi = Math.PI;
             phase = 0;
-            var sun_data = [0, 20, 40, 60, 80, 100];
+            var sun_data = [-2.5, 0, 20, 40, 60, 80, 100];
 
             var w = $("#" + _element_id).width() - 20,
                 h = $("#" + _element_id).height(),
@@ -761,18 +761,18 @@ var graphs = (function () {
 
             var angle_arc = d3.svg.arc()
                 .innerRadius(function (d, i) {
-                return d / 100 * rhw + r;
-                //return r;
-            })
+                    return d / 100 * rhw + r;
+                    //return r;
+                })
                 .outerRadius(function (d, i) {
-                return d / 100 * rhw + r;
-            })
+                    return d / 100 * rhw + r;
+                })
                 .startAngle(function (d, i) {
-                return -pi / 2;
-            })
+                    return -pi / 2;
+                })
                 .endAngle(function (d, i) {
-                return pi / 2;
-            });
+                    return pi / 2;
+                });
 
             var calculate_start_angle = function (i, angle_scale) {
                 start_angle = angle_scale(i);
@@ -819,24 +819,31 @@ var graphs = (function () {
             };
 
             var data_arc = d3.svg.arc()
-                .innerRadius(function (d, i) {
-                return r;
-            })
                 .startAngle(function (d, i) {
-                start_angle = calculate_start_angle(i, angle_scale);
-                return start_angle;
-            })
+                    start_angle = calculate_start_angle(i, angle_scale);
+                    return start_angle;
+                })
                 .endAngle(function (d, i) {
-                end_angle = calculate_end_angle(i, angle_scale);
-                return end_angle;
-            })
+                    end_angle = calculate_end_angle(i, angle_scale);
+                    return end_angle;
+                })
+                .innerRadius(function (d, i) {
+                    return r-1;
+                    // return r;
+                })
                 .outerRadius(function (d, i) {
-                radius = r;
-                if (Math.abs(calculate_start_angle(i, angle_scale) - calculate_end_angle(i, angle_scale)) !== 0) {
-                    radius = d / 100 * rhw + r;
-                }
-                return radius;
-            });
+                    radius = r;
+
+                    if (d < 1) {
+                        d = -2;
+                    }
+                    
+                    if (Math.abs(calculate_start_angle(i, angle_scale) - calculate_end_angle(i, angle_scale)) !== 0) {
+                        radius = d / 100 * rhw + r;
+                    }
+
+                    return radius;
+                });
 
             var sun = d3.select("#" + _element_id).append("svg:svg")
                 .attr("width", w)
@@ -859,15 +866,14 @@ var graphs = (function () {
                 path.append('path')
                     .data([{
                         cx: -w / 14
-                    }
-                ])
+                    }])
                     .attr('d', 'm 0.0389418,0.0432822 9.9610575,0 -0.06029,5.0188999 0,5.2846009 -5.2480518,4.6774 -0.01414,-0.038 L 0,10.005182 0.049611,0.0241822')
                     .attr('fill', '#df5401')
                     .call(dragCircle)
                     .attr('class', 'scroller')
                     .attr('cx', function (d) {
-                    return d.cx;
-                })
+                        return d.cx;
+                    })
                     .attr("transform", "translate(" + (-w / 14) + ", 0)")
                     .attr('style', 'cursor:pointer');
 
@@ -875,7 +881,13 @@ var graphs = (function () {
             sun.selectAll('#' + _element_id)
                 .data(sun_data).enter()
                 .append('svg:path')
-                .attr("d", function(d, i){ if(i==0){d = -0.5;} return angle_arc(d,i) } )
+                .attr("d", function(d, i){ 
+                    if (d===0) {
+                        d = -0.5;
+                    }
+
+                    return angle_arc(d, i)
+                })
                 .attr('stroke-width', 1)
                 .attr("stroke", "#f1ebe7")
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
@@ -891,26 +903,26 @@ var graphs = (function () {
                 .attr('origin_fill', '#8dc6b3')
                 .attr('selectd', 0)
                 .attr('name', function (d, i) {
-                return full_data[i].slug;
-            })
+                    return full_data[i].slug;
+                })
                 .on("mouseover", function (d, i) {
-                d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
-                var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator'))) + angle_scale(parseFloat(d3.select(this).attr('enumerator')) + 1)) / 2 - pi;
-                var radius = parseFloat(d3.select(this).attr('txt'));
-                var top = (h - h / 8) + Math.cos(angle) * (radius * rhw / 100 + r);
-                var left = w / 2 - Math.sin(angle) * (radius * rhw / 110 + r);
-                var text = d3.select(this).attr('txt');
-                graphs.tooltip_show(top, left, text);
-                graphs.topbar_show(full_data[i].slug);
-            })
+                    d3.select(this).attr("fill", "#e95201").style('opacity', 0.7);
+                    var angle = (angle_scale(parseFloat(d3.select(this).attr('enumerator'))) + angle_scale(parseFloat(d3.select(this).attr('enumerator')) + 1)) / 2 - pi;
+                    var radius = parseFloat(d3.select(this).attr('txt'));
+                    var top = (h - h / 8) + Math.cos(angle) * (radius * rhw / 100 + r);
+                    var left = w / 2 - Math.sin(angle) * (radius * rhw / 110 + r);
+                    var text = d3.select(this).attr('txt');
+                    graphs.tooltip_show(top, left, text);
+                    graphs.topbar_show(full_data[i].slug);
+                })
                 .on("mouseout", graphs.on_mouseout)
                 .on("click" , graphs.on_click)
                 .attr('txt', function (d) {
-                return d + "%";
-            })
+                    return d + "%";
+                })
                 .attr('enumerator', function (d, i) {
-                return i;
-            })
+                    return i;
+                })
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
 
             sun.selectAll('#' + _element_id)
@@ -921,13 +933,22 @@ var graphs = (function () {
                 .attr('fill', '#ded1c6')
                 .attr('y', 0)
                 .attr('x', function (d, i) {
-                    if (i===0) {
+                    if (d===0) {
                         d = -0.5;
                     }
-                    return d / 100 * rhw + r;
-            })
+                    if (d > -0.5) {
+                        return d / 100 * rhw + r;
+                    } else {
+                        return 0 / 100 * rhw + r;
+                    }
+                })
                 .attr("stroke", "#ded1c6")
-                .attr('stroke-width', 0.5)
+                .attr('stroke-width', function (d, i) {
+                    if (d > -0.5) {
+                        return 0.5;
+                    }
+                    return 0;
+                })
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
 
             sun.selectAll("#" + _element_id)
@@ -943,17 +964,25 @@ var graphs = (function () {
                     if (i===0) {
                         d = 1.7;
                     }
-                    return d / 100 * rhw + r - (-0.8 + String(d).length*3.3);
+                    if (d > -2) {
+                        return d / 100 * rhw + r - (-0.8 + String(d).length*3.3);    
+                    }
                 })
                 .text(function (d) {
-                return d;
-            })
+                    if (d > -1) {
+                        return d;    
+                    }
+                })
                 .attr("transform", "translate(" + w / 2 + "," + (h - h / 32 * 2) + ")");
 
             sun.selectAll('#' + _element_id)
                 .data([1, -1]).enter().append("svg:line")
-                .attr('x1', function(d,i){ return (1 / 100 * rhw + r - 4) * d; } )
-                .attr('x2', function(d,i){ return (rhw + r) * d; })
+                .attr('x1', function(d,i) {
+                    return (1 / 100 * rhw + r - 10) * d; 
+                })
+                .attr('x2', function(d,i) { 
+                    return (rhw + r) * d;
+                })
                 .attr('y1', 0)
                 .attr('y2', 0)
                 .attr('stroke', '#f1ebe7')
