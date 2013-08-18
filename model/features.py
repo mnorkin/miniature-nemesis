@@ -50,7 +50,7 @@ class Features:
             'display': 1,
             'unit_id': 1,
             'position': 1,
-            'description': ''
+            'description': '<strong>Accruracy</strong> measures what percent of analyst’s previous recommendations for this stock reached it’s target price.'
         },
         'proximity':
         {
@@ -59,7 +59,7 @@ class Features:
             'display': 1,
             'unit_id': 1,
             'position': 2,
-            'description': ''
+            'description': '<strong>Proximity</strong> measures how close stock price was to the target price during all recommendation period. We are counting average measure from all target prices released for this company by particular analyst.'
         },
         'profitability':
         {
@@ -68,7 +68,7 @@ class Features:
             'display': 1,
             'unit_id': 1,
             'position': 3,
-            'description': ''
+            'description': '<strong>Profitability</strong> measures average profit earned by all previous analyst’s recommendations for this company. Profit is calculated at the end of recommendation period.'
         },
         'aggressiveness':
         {
@@ -77,7 +77,7 @@ class Features:
             'display': 1,
             'unit_id': 1,
             'position': 4,
-            'description': ''
+            'description': '<strong>Aggressiveness</strong> measures what was the average difference between analyst’s previous target prices and stock prices at the moment when recommendations were released. '
         },
         'reach_time':
         {
@@ -86,7 +86,7 @@ class Features:
             'display': 1,
             'unit_id': 2,
             'position': 5,
-            'description': ''
+            'description': '<strong>Reach time</strong> shows how long it took for stock price to reach analyst’s target price. Result is calculated from all previous analyst’s recommendations for this stock, using average measure.'
         },
         'impact_to_market':
         {
@@ -95,7 +95,7 @@ class Features:
             'display': 1,
             'unit_id': 1,
             'position': 6,
-            'description': ''
+            'description': '<strong>Impact to market</strong> shows abnormal return of the stock during target price release day and the next day. Abnormal return is the difference between the actual return of a security and the expected return. Expected return is calculated using SP 500 return and security’s beta measure.'
         }
     }
 

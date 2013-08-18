@@ -155,6 +155,7 @@ INSTALLED_APPS = (
     'south',
     'raven.contrib.django.raven_compat',
     'debug_toolbar',
+    'piston'
     # 'pipeline'
 )
 

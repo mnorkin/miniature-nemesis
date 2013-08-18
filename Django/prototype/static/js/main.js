@@ -927,7 +927,8 @@ var tp = (function() {
     }
 
     /**
-     * [load_target_prices description]
+     * Function to switch between target prices and analysis
+     * 
      * @return {[type]} [description]
      */
     function load_target_prices() {

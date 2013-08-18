@@ -49,7 +49,7 @@ class TickerAdmin(admin.ModelAdmin):
 
 
 class FeatureAdmin(admin.ModelAdmin):
-    list_display = ('name', 'unit', 'display_in_frontpage', 'position')
+    list_display = ('name', 'unit', 'display_in_frontpage', 'display', 'position')
     ordering = ['position']
 
 

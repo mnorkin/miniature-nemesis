@@ -39,7 +39,7 @@ def index(request, page=0):
 
     return HttpResponse(t.render(c))
 
-@cache_page(15*60)
+# @cache_page(15*60)
 def ticker(request, slug):
     """
     Ticker page
@@ -84,7 +84,7 @@ def ticker(request, slug):
     ).order_by('analytic', 'date').reverse().distinct('analytic')
 
     # Load feature info
-    list_of_features = Feature.objects.all()
+    list_of_features = Feature.objects.filter(display=True)
 
     t = loader.get_template('morbid/ticker.html')
 

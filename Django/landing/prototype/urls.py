@@ -42,19 +42,19 @@ urlpatterns = patterns(
     url(r'^test_page_search/(?P<search_me>[\w-]+)/$', 'morbid.views.test_page_search'),
 
     # Uncomment the admin/doc line below to enable admin documentation:
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    #url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^cRJCoGxGZh/', include(admin.site.urls)),
 
     # API
     # url(r'^api/feature_analytic_ticker/(?P<analytic_slug>[^/]+)/(?P<ticker_slug>[^/]+)/(?P<feature_id>\d+)/(?P<value>[^/]+)/$', feature_analytic_ticker_resource)
-    url(r'^api/', include('api.urls')),
+    #url(r'^api/', include('api.urls')),
 
     # Screen page
-    url(r'^screen/$', 'morbid.views.screen'),
+    #url(r'^screen/$', 'morbid.views.screen'),
 
     # Graph
-    url(r'^graph_01/$', 'morbid.views.graph_01'),
+    #url(r'^graph_01/$', 'morbid.views.graph_01'),
 )
 
 # Statics (need for gunicorn)
