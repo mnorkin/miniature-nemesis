@@ -139,11 +139,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     'django.contrib.admindocs',
     'gunicorn',
-    'apikey',
-    'morbid',
     'accounts',
     'south',
-    'raven.contrib.django.raven_compat'
 )
 
 # APIKEY
