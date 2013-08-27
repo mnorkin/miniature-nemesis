@@ -14,6 +14,88 @@
             </div>
         </header>
         {% block content %}
+        <div class="container-large-darker">
+            <div class="container container-wider">
+                <div class="promo-darker">
+                    <h3>3 problems with stock target prices.</h3>
+                    <div class="carousel-container">
+                        <div class="carousel">
+                            <div class="carousel-item">
+                                <div class="carousel-description carousel-description-problem-1">
+                                    Big names do not always mean the most profitable and accurate target prices.
+                                    <br />
+                                    Less known research companies often perform even better than well-known banks.
+                                </div>
+                                <strong>Profitability of target prices for First Solar</strong>
+                                <ul class="problem-1">
+                                    <li>
+                                        <span>Macquarie</span>
+                                        <br />
+                                        <div class="big success">+76%</div>
+                                    </li>
+                                    <li>
+                                        <span>Canaccord Genuity</span>
+                                        <br />
+                                        <div class="big success">+69%</div>
+                                    </li>
+                                    <li>
+                                        <span>UBS securities</span>
+                                        <br />
+                                        <div class="big failure">-0.01%</div>
+                                    </li>
+                                    <li>
+                                        <span>S&P research</span>
+                                        <br />
+                                        <div class="big failure">-50%</div>
+                                    </li>
+                                </ul>
+
+                            </div>
+                            <div class="carousel-item">
+                                <div class="carousel-description carousel-description-problem-2">
+                                    Different banks often give very different price targets for the same stock.
+                                    <br />
+                                    Target prices for the same stock can vary enormously.
+                                </div>
+                                <strong>Target prices for Penny J.C.</strong>
+                                <ul class="problem-2">
+                                    <li>
+                                        <span>Morgan Stanley</span>
+                                        <br />
+                                        <div class="bigger carrot">9</div>
+                                    </li>
+                                    <li>
+                                        <span>Citi Group</span>
+                                        <br />
+                                        <div class="bigger carrot">20</div>
+                                    </li>
+                                    <li>
+                                        <span>Maxim Group</span>
+                                        <br />
+                                        <div class="bigger carrot">27</div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="carousel-description carousel-description-problem-3">
+                                    Many analysts just follow trends in stock prices and set a higher target price if stock prices rise,
+                                    <br />
+                                    or a lower price if stock prices fall. Very few can predict the direction the stock will go before it actually happens.
+                                </div>
+                                <strong>Nokia's target prices</strong>
+                                <div class="problem-3">
+                                    <img src="/static/images/nokia_stock.png" alt="Nokia's target prices" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <a class="carousel-prev" id="carousel_prev" href="#"><span>prev</span></a>
+                        <a class="carousel-next" id="carousel_next" href="#"><span>next</span></a>
+                        <div class="carousel-pagination" id="carousel_pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="container-large">
             <div class="container">
                 <div class="promo">
@@ -36,6 +118,7 @@
                 </div>
             </div>
         </div>
+
         <div class="container container-separator container-information">
             <div class="entry entry-left entry-information">
                 <div class="entry-description">
@@ -69,6 +152,20 @@
                 </div>
             </div>
         </div>
+        <div class="container">
+            <div class="description-small">Leave us your email address to be notified when we launch. </div>
+            <div class="form-inputs-small">
+                <form action="{{ action }}" method="POST">{% csrf_token %}
+                    <script class="{{form.email.id_for_label}}" type="text/x-jquery-template">{{form.email.help_text}}</script>
+                    <div class="email-input-small">
+                        {{form.email}}
+                    </div>
+                    <div class="submit-input-small">
+                        <input type="submit" value="Send" />
+                    </div>
+                </form>
+            </div>
+        </div>
         {% endblock %}
         <div class="container">
             <footer>Investor relations and media inquiries <a href="mailto:info@anavest.com">info@anavest.com</a></footer>
@@ -76,9 +173,12 @@
     </body>
     {% block afterbody %}
     {% endblock %}
-    <script src="/static/js/respond.min.js"></script>
-    <script src="/static/js/jquery-1.9.1.min.js"></script>
-    <script src="/static/js/landing.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.transit.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.ba-throttle-debounce.min.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.carouFredSel-6.2.1-packed.js"></script>
+    <script type="text/javascript" src="/static/js/respond.min.js"></script>
+    <script type="text/javascript" src="/static/js/landing.js"></script>
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

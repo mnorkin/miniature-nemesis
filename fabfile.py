@@ -16,7 +16,7 @@ env.deploy_user = 'agurkas'
 env.deploy_pass = 'Tutatru3'
 
 # Version part
-env.version = 8
+env.version = 4
 
 # Local directory part
 env.model_path = 'model'

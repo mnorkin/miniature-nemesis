@@ -1,26 +1,63 @@
 $(document).ready(function() {
 
-    $('#id_email').val($('.id_email').html());
-    $('#id_email').css({'color': '#bdbdbd'});
+    $('input[name="email"]').each(function() {
+        $(this).val($('.id_email').html())
+    });
 
+    $('input[name="email"]').css({'color': '#bdbdbd'});
     $('body').on('click', function(event) {
         // console.log(event.target);
-        if ($(event.target).attr('id') == 'id_email') {
-            // console.log($('#id_email').val());
-            if ($('#id_email').val() === $('.id_email').html()) {
-                $('#id_email').val('');
-                $('#id_email').css({'color': '#333'});
+        if ($(event.target).attr('name') == 'email') {
+            if ($(event.target).val() === $('.id_email').html()) {
+                $(event.target).val('');
+                $(event.target).css({'color': '#333'});
             }
+            // if ($('#id_email').val() === $('.id_email').html()) {
+            //     $('#id_email').val('');
+            //     $('#id_email').css({'color': '#333'});
+            // }
         } else {
-            if ($('#id_email').length > 0) {
-                if ($('#id_email').val().length < 1) {
-                    $('#id_email').css({'color': '#bdbdbd'});
-                    $('#id_email').val($('.id_email').html());
+            $('input[name="email"]').each(function() {
+                if ($(this).length > 0) {
+                    if ($(this).val().length < 1) {
+                        $(this).css({'color': '#bdbdbd'});
+                        $(this).val($('.id_email').html());
+                    }
                 }
-            }
+            });
             
+            // if ($('#id_email').length > 0) {
+            //     if ($('#id_email').val().length < 1) {
+            //         $('#id_email').css({'color': '#bdbdbd'});
+            //         $('#id_email').val($('.id_email').html());
+            //     }
+            // }
         }
     });
+    /**
+     * Carousel
+     */
+    if ($('.carousel').length > 0) {
+        $('.carousel').carouFredSel({
+            direction: "right",
+            auto: false,
+            width: "600",
+            scroll: {
+                fx: 'fade',
+                easing: "linear"
+            },
+            infinite: false,
+            prev: {
+                button: '#carousel_prev',
+                key: 'left'
+            },
+            next: {
+                button: '#carousel_next',
+                key: 'right'
+            },
+            pagination: '#carousel_pagination'
+        });
+    }
 });
 
 function fbs_click(width, height) {
